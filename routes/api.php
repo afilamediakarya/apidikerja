@@ -39,6 +39,22 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/delete/{params}', [App\Http\Controllers\pegawaiController::class, 'delete']);  
     });
 
+    Route::prefix('jadwal')->group(function () {
+        Route::get('/list', [App\Http\Controllers\jadwalController::class, 'list']);  
+        Route::post('/store', [App\Http\Controllers\jadwalController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\jadwalController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\jadwalController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\jadwalController::class, 'delete']);  
+    });
+
+    Route::prefix('profil_daerah')->group(function () {
+        Route::get('/list', [App\Http\Controllers\profilDaerahController::class, 'list']);  
+        Route::post('/store', [App\Http\Controllers\profilDaerahController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\profilDaerahController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\profilDaerahController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\profilDaerahController::class, 'delete']);  
+    });
+
 });
 
 
