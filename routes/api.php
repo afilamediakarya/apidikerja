@@ -14,6 +14,33 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return  $request->user();
+// });
+Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+// Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/register-user', [App\Http\Controllers\AuthController::class, 'register_user']);  
+    Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
+
+    Route::prefix('satuan_kerja')->group(function () {
+        Route::get('/list', [App\Http\Controllers\satuankerjaController::class, 'list']);  
+        Route::post('/store', [App\Http\Controllers\satuankerjaController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\satuankerjaController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\satuankerjaController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\satuankerjaController::class, 'delete']);  
+    });
+
+    Route::prefix('pegawai')->group(function () {
+        Route::get('/list', [App\Http\Controllers\pegawaiController::class, 'list']);  
+        Route::post('/store', [App\Http\Controllers\pegawaiController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\pegawaiController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\pegawaiController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\pegawaiController::class, 'delete']);  
+    });
+
 });
+
+
+
+
