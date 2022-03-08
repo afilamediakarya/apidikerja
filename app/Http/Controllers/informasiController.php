@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\satuan_kerja;
+use App\Models\informasi;
 use Validator;
-class satuanKerjaController extends Controller
+class informasiController extends Controller
 {
     public function list(){
-        $data = satuan_kerja::latest()->get();
+        $data = informasi::latest()->get();
 
         if ($data) {
             return response()->json([
@@ -25,26 +25,30 @@ class satuanKerjaController extends Controller
     }
 
     public function store(Request $request){
-        // return $request->all();
+       
         $validator = Validator::make($request->all(),[
-            'nama_satuan_kerja' => 'required|string|unique:tb_satuan_kerja',
-            'lat_location' => 'required|string',
-            'long_location' => 'required|string',
-            'status_kepala' => 'required|string',
-            'tahun' => 'required|string',
+            'id_satuan_kerja' => 'required|numeric',
+            'judul' => 'required|string',
+            'deskripsi' => 'required|string',
+            'gambar' => 'required|image',
+            'tahun' => 'required',
         ]);
 
         if($validator->fails()){
             return response()->json($validator->errors());       
         }
 
-        $data = new satuan_kerja();
-        $data->kode_satuan_kerja = '001';
-        $data->nama_satuan_kerja = $request->nama_satuan_kerja;
-        $data->nama_jabatan_satuan_kerja = $request->nama_jabatan_satuan_kerja;
-        $data->lat_location = $request->lat_location;
-        $data->long_location = $request->long_location;
-        $data->status_kepala = $request->status_kepala;
+        if ($request->hasFile('gambar')) {
+            $file = $request->file('gambar');
+            $filename = time().'.'.$file->getClientOriginalExtension();
+            $file->storeAs('public/image',$filename);
+        }
+
+        $data = new informasi();
+        $data->id_satuan_kerja = $request->id_satuan_kerja;
+        $data->judul = $request->judul;
+        $data->deskripsi = $request->deskripsi;
+        $data->gambar = $filename;
         $data->tahun = $request->tahun;
         $data->save();
 
@@ -63,7 +67,7 @@ class satuanKerjaController extends Controller
     }
 
     public function show($params){
-        $data = satuan_kerja::where('id',$params)->first();
+        $data = informasi::where('id',$params)->first();
 
         if ($data) {
             return response()->json([
@@ -81,26 +85,33 @@ class satuanKerjaController extends Controller
 
     public function update($params,Request $request){
         $validator = Validator::make($request->all(),[
-            'nama_satuan_kerja' => 'required|string',
-            'lat_location' => 'required|string',
-            'long_location' => 'required|string',
-            'status_kepala' => 'required|string',
-            'tahun' => 'required|string',
+            'id_satuan_kerja' => 'required|numeric',
+            'judul' => 'required|string',
+            'deskripsi' => 'required|string',
+            'gambar' => 'image',
+            'tahun' => 'required',
         ]);
 
         if($validator->fails()){
             return response()->json($validator->errors());       
         }
 
-        $data = satuan_kerja::where('id',$params)->first();
-        $data->kode_satuan_kerja = '001';
-        $data->nama_satuan_kerja = $request->nama_satuan_kerja;
-        $data->lat_location = $request->lat_location;
-        $data->long_location = $request->long_location;
-        $data->status_kepala = $request->status_kepala;
+        $data = informasi::where('id',$params)->first();
+        $data->id_satuan_kerja = $request->id_satuan_kerja;
+        $data->judul = $request->judul;
+        $data->deskripsi = $request->deskripsi;
+        
+        if (isset($request->gambar)) {
+            if ($request->hasFile('gambar')) {
+                $file = $request->file('gambar');
+                $filename = time().'.'.$file->getClientOriginalExtension();
+                $file->storeAs('public/image',$filename);
+            }
+            $data->gambar = $filename;
+        }
+        
         $data->tahun = $request->tahun;
         $data->save();
-
 
         if ($data) {
             return response()->json([
@@ -117,7 +128,7 @@ class satuanKerjaController extends Controller
     }
 
     public function delete($params){
-        $data = satuan_kerja::where('id',$params)->first();
+        $data = informasi::where('id',$params)->first();
         $data->delete();
 
         if ($data) {
@@ -132,5 +143,4 @@ class satuanKerjaController extends Controller
             ]);
         }
     }
-    
 }

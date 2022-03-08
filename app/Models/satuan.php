@@ -9,8 +9,4 @@ class satuan extends Model
 {
     use HasFactory;
     protected $table = 'tb_satuan';
-
-    public function pegawai(){
-        return $this->belongsTo('App\Models\produk','id_satuan_kerja','id');
-    }
 }

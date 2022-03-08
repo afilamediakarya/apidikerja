@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\satuan_kerja;
+use App\Models\satuan;
 use Validator;
-class satuanKerjaController extends Controller
+class satuanController extends Controller
 {
     public function list(){
-        $data = satuan_kerja::latest()->get();
+        $data = satuan::latest()->get();
 
         if ($data) {
             return response()->json([
@@ -25,28 +25,21 @@ class satuanKerjaController extends Controller
     }
 
     public function store(Request $request){
-        // return $request->all();
         $validator = Validator::make($request->all(),[
-            'nama_satuan_kerja' => 'required|string|unique:tb_satuan_kerja',
-            'lat_location' => 'required|string',
-            'long_location' => 'required|string',
-            'status_kepala' => 'required|string',
-            'tahun' => 'required|string',
+            'nama_satuan' => 'required|string',
+            'status' => 'required',
         ]);
 
         if($validator->fails()){
             return response()->json($validator->errors());       
         }
 
-        $data = new satuan_kerja();
-        $data->kode_satuan_kerja = '001';
-        $data->nama_satuan_kerja = $request->nama_satuan_kerja;
-        $data->nama_jabatan_satuan_kerja = $request->nama_jabatan_satuan_kerja;
-        $data->lat_location = $request->lat_location;
-        $data->long_location = $request->long_location;
-        $data->status_kepala = $request->status_kepala;
-        $data->tahun = $request->tahun;
+        $data = new satuan();
+        $data->kode = '001';
+        $data->nama_satuan = $request->nama_satuan;
+        $data->status = $request->status;
         $data->save();
+
 
         if ($data) {
             return response()->json([
@@ -63,7 +56,7 @@ class satuanKerjaController extends Controller
     }
 
     public function show($params){
-        $data = satuan_kerja::where('id',$params)->first();
+        $data = satuan::where('id',$params)->first();
 
         if ($data) {
             return response()->json([
@@ -81,24 +74,18 @@ class satuanKerjaController extends Controller
 
     public function update($params,Request $request){
         $validator = Validator::make($request->all(),[
-            'nama_satuan_kerja' => 'required|string',
-            'lat_location' => 'required|string',
-            'long_location' => 'required|string',
-            'status_kepala' => 'required|string',
-            'tahun' => 'required|string',
+            'nama_satuan' => 'required|string',
+            'status' => 'required',
         ]);
 
         if($validator->fails()){
             return response()->json($validator->errors());       
         }
 
-        $data = satuan_kerja::where('id',$params)->first();
-        $data->kode_satuan_kerja = '001';
-        $data->nama_satuan_kerja = $request->nama_satuan_kerja;
-        $data->lat_location = $request->lat_location;
-        $data->long_location = $request->long_location;
-        $data->status_kepala = $request->status_kepala;
-        $data->tahun = $request->tahun;
+        $data = satuan::where('id',$params)->first();
+        $data->kode = '001';
+        $data->nama_satuan = $request->nama_satuan;
+        $data->status = $request->status;
         $data->save();
 
 
@@ -117,7 +104,7 @@ class satuanKerjaController extends Controller
     }
 
     public function delete($params){
-        $data = satuan_kerja::where('id',$params)->first();
+        $data = satuan::where('id',$params)->first();
         $data->delete();
 
         if ($data) {
@@ -132,5 +119,4 @@ class satuanKerjaController extends Controller
             ]);
         }
     }
-    
 }
