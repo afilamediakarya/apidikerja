@@ -21,4 +21,10 @@ class satuan_kerja extends Model
      public function kegiatan(){
         return $this->belongsTo('App\Models\kegiatan','id_satuan_kerja','id');
     }
+
+    public function skp(){
+        return $this->belongsTo('App\Models\skp','id_skp','id');
+    }
+
+    
 }

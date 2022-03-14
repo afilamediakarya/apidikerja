@@ -14,9 +14,20 @@ class pegawai extends Model
         return $this->hasMany('App\Models\satuan_kerja','id','id_satuan_kerja');
     }
 
+    public function skp(){
+        return $this->belongsTo('App\Models\skp','id','id_pegawai');
+    }
+
     public function bidang(){
           return $this->belongsTo('App\Models\pegawai','id','id_kepala_bidang');
-        // return $this->hasMany('App\Models\bidang','id','id_kepala_bidang');
+    }
+
+    public function atasan_penilai(){
+        return $this->hasOne('App\Models\atasan','id','id_penilai');
+    }
+
+    public function atasan_pegawai(){
+        return $this->hasOne('App\Models\atasan','id','id_pegawai');
     }
 
 }
