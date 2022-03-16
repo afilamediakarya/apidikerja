@@ -30,4 +30,9 @@ class pegawai extends Model
         return $this->hasOne('App\Models\atasan','id','id_pegawai');
     }
 
+    public function absen(){
+        return $this->hasOne('App\Models\absen','id','id_pegawai');
+    }
+
+
 }

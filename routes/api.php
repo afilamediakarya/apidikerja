@@ -143,6 +143,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/delete/{params}', [App\Http\Controllers\atasanController::class, 'delete']);  
     });
 
+    Route::prefix('absen')->group(function () {
+        Route::get('/list', [App\Http\Controllers\absenController::class, 'list']);  
+        Route::post('/store', [App\Http\Controllers\absenController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\absenController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\absenController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\absenController::class, 'delete']);  
+    });
+
 });
 
 
