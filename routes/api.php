@@ -103,36 +103,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/delete/{params}', [App\Http\Controllers\aktivitasController::class, 'delete']);  
     });
 
-    Route::prefix('aspek_skp')->group(function () {
-        Route::get('/list', [App\Http\Controllers\aspekController::class, 'list']);  
-        Route::post('/store', [App\Http\Controllers\aspekController::class, 'store']);  
-        Route::get('/show/{params}', [App\Http\Controllers\aspekController::class, 'show']);  
-        Route::post('/update/{params}', [App\Http\Controllers\aspekController::class, 'update']);  
-        Route::delete('/delete/{params}', [App\Http\Controllers\aspekController::class, 'delete']);  
-    });
-
-    Route::prefix('target_skp')->group(function () {
-        Route::get('/list', [App\Http\Controllers\targetController::class, 'list']);  
-        Route::post('/store', [App\Http\Controllers\targetController::class, 'store']);  
-        Route::get('/show/{params}', [App\Http\Controllers\targetController::class, 'show']);  
-        Route::post('/update/{params}', [App\Http\Controllers\targetController::class, 'update']);  
-        Route::delete('/delete/{params}', [App\Http\Controllers\targetController::class, 'delete']);  
-    });
-
     Route::prefix('realisasi_skp')->group(function () {
         Route::get('/list', [App\Http\Controllers\realisasiController::class, 'list']);  
         Route::post('/store', [App\Http\Controllers\realisasiController::class, 'store']);  
         Route::get('/show/{params}', [App\Http\Controllers\realisasiController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\realisasiController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\realisasiController::class, 'delete']);  
-    });
-
-    Route::prefix('review')->group(function () {
-        Route::get('/list', [App\Http\Controllers\reviewController::class, 'list']);  
-        Route::post('/store', [App\Http\Controllers\reviewController::class, 'store']);  
-        Route::get('/show/{params}', [App\Http\Controllers\reviewController::class, 'show']);  
-        Route::post('/update/{params}', [App\Http\Controllers\reviewController::class, 'update']);  
-        Route::delete('/delete/{params}', [App\Http\Controllers\reviewController::class, 'delete']);  
     });
 
     Route::prefix('atasan')->group(function () {
@@ -149,6 +125,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/show/{params}', [App\Http\Controllers\absenController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\absenController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\absenController::class, 'delete']);  
+    });
+
+    Route::prefix('review_skp')->group(function () {
+        Route::post('/store', [App\Http\Controllers\reviewController::class, 'store']);    
+    });
+
+    Route::prefix('review_realisasi')->group(function () {
+        Route::post('/store', [App\Http\Controllers\reviewRealisasiSkpController::class, 'store']);    
     });
 
 });

@@ -9,7 +9,6 @@ class skp extends Model
 {
     use HasFactory;
     protected $table = 'tb_skp';
-    protected $with = ['pegawai','satuan_kerja'];
 
     public function pegawai(){
         return $this->hasMany('App\Models\pegawai','id','id_pegawai');
@@ -20,7 +19,7 @@ class skp extends Model
     }
 
     public function aspek_skp(){
-        return $this->hasOne('App\Models\aspek_skp','id','id_skp');
+        return $this->hasMany('App\Models\aspek_skp','id_skp','id');
     }
 
     public function review_skp() {

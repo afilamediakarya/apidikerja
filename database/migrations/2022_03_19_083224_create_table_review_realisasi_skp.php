@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTableAspekSkp extends Migration
+class CreateTableReviewRealisasiSkp extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateTableAspekSkp extends Migration
      */
     public function up()
     {
-        Schema::create('tb_aspek_skp', function (Blueprint $table) {
+        Schema::create('tb_review_realisasi_skp', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_skp');
-            $table->text('iki');
-            $table->enum('aspek_skp', ['kuantitas', 'kualitas','waktu']);
-             $table->string('satuan');
+            $table->text('keterangan')->nullable();
+            $table->enum('kesesuaian', ['ya', 'tidak']);
+            $table->enum('bulan', [0,1,2,3,4,5,6,7,8,9,10,11,12]);
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ class CreateTableAspekSkp extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('table_aspek_skp');
+        Schema::dropIfExists('table_review_realisasi_skp');
     }
 }

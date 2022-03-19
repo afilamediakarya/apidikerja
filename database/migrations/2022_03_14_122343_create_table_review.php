@@ -16,10 +16,8 @@ class CreateTableReview extends Migration
         Schema::create('tb_review', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_skp');
-            $table->text('keterangan');
+            $table->text('keterangan')->nullable();
             $table->enum('kesesuaian', ['ya', 'tidak']);
-            $table->enum('bulan', [1,2,3,4,5,6,7,8,9,10,11,12]);
-            $table->string('tahun');
             $table->timestamps();
         });
     }

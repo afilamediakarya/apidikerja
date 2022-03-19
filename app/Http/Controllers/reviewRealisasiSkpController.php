@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\review_skp;
+use App\Models\review_realisasi_skp;
 use Validator;
-class reviewController extends Controller
+class reviewRealisasiSkpController extends Controller
 {
-
     public function store(Request $request){
         // return $request->all();
         $validator = Validator::make($request->all(),[
             'id_skp' => 'required|array',
             'keterangan' => 'required|array',
             'kesesuaian' => 'required|array',
+            'bulan' => 'required|array',
         ]);
 
         if($validator->fails()){
@@ -21,11 +21,13 @@ class reviewController extends Controller
         }
 
         for ($i=0; $i < count($request->id_skp); $i++) { 
-            $data = review_skp::where('id_skp',$request->id_skp[$i])->first();
-            $data->keterangan = $request['keterangan'][$i];
-            $data->kesesuaian = $request['kesesuaian'][$i];
+            $data = review_realisasi_skp::where('id_skp',$request->id_skp[$i])->where('bulan',$request->bulan[$i])->first();
+            $data->keterangan = $request->keterangan[$i];
+            $data->kesesuaian = $request->kesesuaian[$i];
             $data->save();
         }
+
+        // return $cek;
 
 
         if ($data) {
@@ -41,5 +43,4 @@ class reviewController extends Controller
             ]);
         }
     }
-
 }

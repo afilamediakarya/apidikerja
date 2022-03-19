@@ -16,9 +16,8 @@ class CreateTableRealisasiSkp extends Migration
         Schema::create('tb_realisasi_skp', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_aspek_skp');
-            $table->integer('target_bulanan');
+            $table->integer('realisasi_bulanan');
             $table->enum('bulan', [1,2,3,4,5,6,7,8,9,10,11,12]);
-            // $table->string('tahun');
             $table->timestamps();
         });
     }

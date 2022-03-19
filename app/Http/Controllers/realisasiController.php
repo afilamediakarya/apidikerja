@@ -4,17 +4,32 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\realisasi_skp;
+use App\Models\atasan;
+use App\Models\skp;
+use Auth;
 use Validator;
 class realisasiController extends Controller
 {
     public function list(){
-        $data = realisasi_skp::latest()->get();
+        $result = [];
+        $atasan = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+        $get_skp_atasan = skp::where('id_pegawai',$atasan->id_penilai)->get();
+        foreach($get_skp_atasan as $key => $value){
+            
+            $getsubSKp = skp::with('aspek_skp')->where('id_skp_atasan',$value->id)->get();
+            $result[$key] = [
+                'id_pegawai'=>$value['id_pegawai'],
+                'nama_atasan'=>$value['pegawai'][0]['nama'],
+                'rencana_kerja'=>$value['rencana_kerja'],
+                'sub_skp'=> $getsubSKp
+            ];
+        }
 
-        if ($data) {
+        if ($result) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $data
+                'data' => $result
             ]);
         }else{
             return response()->json([
@@ -25,9 +40,10 @@ class realisasiController extends Controller
     }
 
     public function store(Request $request){
+        // dd($request->all());
         $validator = Validator::make($request->all(),[
-            'id_aspek_skp' => 'required|numeric',
-            'target_bulanan' => 'required|numeric',
+            'id_aspek_skp' => 'required|array',
+            'realisasi_bulanan' => 'required|array',
             'bulan' => 'required'
         ]);
 
@@ -35,12 +51,11 @@ class realisasiController extends Controller
             return response()->json($validator->errors());       
         }
 
-        $data = new realisasi_skp();
-        $data->id_aspek_skp = $request->id_aspek_skp;
-        $data->target_bulanan = $request->target_bulanan;
-        $data->bulan = $request->bulan;
-        $data->save();
-
+        for ($i=0; $i < count($request->id_aspek_skp); $i++) { 
+            $data = realisasi_skp::where('id_aspek_skp',$request->id_aspek_skp[$i])->where('bulan',$request->bulan)->first();
+            $data->realisasi_bulanan = $request->realisasi_bulanan[$i];
+            $data->save();
+        }
 
         if ($data) {
             return response()->json([
@@ -76,7 +91,7 @@ class realisasiController extends Controller
     public function update($params,Request $request){
         $validator = Validator::make($request->all(),[
             'id_aspek_skp' => 'required|numeric',
-            'target_bulanan' => 'required|numeric',
+            'realisasi_bulanan' => 'required|numeric',
             'bulan' => 'required'
         ]);
 
@@ -86,7 +101,7 @@ class realisasiController extends Controller
 
         $data = realisasi_skp::where('id',$params)->first();
         $data->id_aspek_skp = $request->id_aspek_skp;
-        $data->target_bulanan = $request->target_bulanan;
+        $data->realisasi_bulanan = $request->realisasi_bulanan;
         $data->bulan = $request->bulan;
         $data->save();
 
