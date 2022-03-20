@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\atasan;
 use Validator;
+use Auth;
 class atasanController extends Controller
 {
     public function list(){
@@ -27,7 +28,6 @@ class atasanController extends Controller
     public function store(Request $request){
         $validator = Validator::make($request->all(),[
             'id_penilai' => 'required|numeric',
-            'id_pegawai' => 'required|numeric'
         ]);
 
         if($validator->fails()){
@@ -36,7 +36,7 @@ class atasanController extends Controller
 
         $data = new atasan();
         $data->id_penilai = $request->id_penilai;
-        $data->id_pegawai = $request->id_pegawai;
+        $data->id_pegawai = Auth::user()->id_pegawai;
         $data->save();
 
 
@@ -73,8 +73,7 @@ class atasanController extends Controller
 
     public function update($params,Request $request){
         $validator = Validator::make($request->all(),[
-            'id_penilai' => 'required|numeric',
-            'id_pegawai' => 'required|numeric'
+            'id_penilai' => 'required|numeric'
         ]);
 
         if($validator->fails()){
@@ -83,7 +82,7 @@ class atasanController extends Controller
 
         $data = atasan::where('id',$params)->first();
         $data->id_penilai = $request->id_penilai;
-        $data->id_pegawai = $request->id_pegawai;
+        $data->id_pegawai = Auth::user()->id_pegawai;
         $data->save();
 
         if ($data) {

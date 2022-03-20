@@ -4,9 +4,51 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\review_skp;
+use App\Models\atasan;
+use App\Models\pegawai;
+use Auth;
+use DB;
 use Validator;
 class reviewController extends Controller
 {
+
+    public function list(){
+        $getData = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
+        $myArray = [];
+        $status = '';
+        foreach ($getData as $key => $value) {
+            $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$value->id_pegawai)->first();
+            if (isset($res)) {
+                if ($res->kesesuaian == 'ya') {
+                    $status = 'Selesai';
+                }else{
+                    $status = 'Belum Review';
+                }
+                $myArray[$key] = [
+                    'nama'=>$res->nama,
+                    'nip'=>$res->nip,
+                    'jenis_jabatan'=>$res->jenis_jabatan,
+                    'id_skp'=>$res->id_skp,
+                    'id_pegawai'=>$res->id_pegawai,
+                    'status'=>$status
+                ];
+            }
+        }
+
+        if ($myArray) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $myArray
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+      
+    }
 
     public function store(Request $request){
         // return $request->all();

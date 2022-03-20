@@ -128,10 +128,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('review_skp')->group(function () {
+        Route::get('/list', [App\Http\Controllers\reviewController::class, 'list']);    
         Route::post('/store', [App\Http\Controllers\reviewController::class, 'store']);    
     });
 
     Route::prefix('review_realisasi')->group(function () {
+        Route::get('/list', [App\Http\Controllers\reviewRealisasiSkpController::class, 'list']);    
         Route::post('/store', [App\Http\Controllers\reviewRealisasiSkpController::class, 'store']);    
     });
 
