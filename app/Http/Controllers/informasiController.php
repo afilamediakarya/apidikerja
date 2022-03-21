@@ -50,6 +50,7 @@ class informasiController extends Controller
         $data->deskripsi = $request->deskripsi;
         $data->gambar = $filename;
         $data->tahun = $request->tahun;
+        $data->status = $request->status;
         $data->save();
 
         if ($data) {
@@ -111,6 +112,7 @@ class informasiController extends Controller
         }
         
         $data->tahun = $request->tahun;
+        $data->status = $request->status;
         $data->save();
 
         if ($data) {

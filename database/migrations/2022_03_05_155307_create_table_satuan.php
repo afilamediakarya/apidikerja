@@ -17,7 +17,7 @@ class CreateTableSatuan extends Migration
             $table->id();
             $table->string('kode');
             $table->string('nama_satuan');
-            $table->enum('status', ['Aktif', 'Tidak aktif']);
+            $table->enum('status', ['active', 'inactive']);
             $table->timestamps();
         });
     }

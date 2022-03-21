@@ -20,7 +20,7 @@ class CreateTableProfilDaerah extends Migration
             $table->string('alamat');
             $table->string('email');
             $table->string('no_telp');
-            $table->string('tahun');
+            $table->string('logo');
             $table->timestamps();
         });
     }

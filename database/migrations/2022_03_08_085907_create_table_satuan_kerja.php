@@ -16,7 +16,7 @@ class CreateTableSatuanKerja extends Migration
         Schema::create('tb_satuan_kerja', function (Blueprint $table) {
             $table->id();
             $table->string('nama_satuan_kerja');
-            $table->string('nama_jabatan_satuan_kerja');
+            $table->string('inisial_satuan_kerja');
             $table->string('kode_satuan_kerja');
             $table->string('lat_location');
             $table->string('long_location');

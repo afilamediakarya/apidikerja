@@ -145,6 +145,22 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/delete/{params}', [App\Http\Controllers\perilakuController::class, 'delete']);   
     });
 
+    Route::prefix('faq')->group(function () {
+        Route::get('/list', [App\Http\Controllers\faqController::class, 'list']);    
+        Route::post('/store', [App\Http\Controllers\faqController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\faqController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\faqController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\faqController::class, 'delete']);   
+    });
+
+    Route::prefix('kelas_jabatan')->group(function () {
+        Route::get('/list', [App\Http\Controllers\kelasJabatanController::class, 'list']);    
+        Route::post('/store', [App\Http\Controllers\kelasJabatanController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\kelasJabatanController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\kelasJabatanController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\kelasJabatanController::class, 'delete']);   
+    });
+
 });
 
 

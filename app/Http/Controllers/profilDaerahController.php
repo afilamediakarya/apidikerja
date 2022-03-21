@@ -31,10 +31,17 @@ class profilDaerahController extends Controller
             'alamat' => 'required',
             'email' => 'required|unique:tb_profil_daerah',
             'no_telp' => 'required|unique:tb_profil_daerah',
+            'logo' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048'
         ]);
 
         if($validator->fails()){
             return response()->json($validator->errors());       
+        }
+
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $filename = time().'.'.$file->getClientOriginalExtension();
+            $file->storeAs('public/image',$filename);
         }
 
         $data = new profil_daerah();
@@ -43,7 +50,7 @@ class profilDaerahController extends Controller
         $data->alamat = $request->alamat;
         $data->email = $request->email;
         $data->no_telp = $request->no_telp;
-        $data->tahun = date('Y');
+        $data->logo = $filename;
         $data->save();
 
 
@@ -83,13 +90,16 @@ class profilDaerahController extends Controller
             'nama_daerah' => 'required|string',
             'pimpinan_daerah' => 'required|string',
             'alamat' => 'required',
-            'email' => 'required|unique:tb_profil_daerah',
-            'no_telp' => 'required|unique:tb_profil_daerah',
+            'email' => 'required',
+            'no_telp' => 'required',
+            'logo' => 'image|mimes:jpeg,png,jpg,svg|max:2048'
         ]);
 
         if($validator->fails()){
             return response()->json($validator->errors());       
         }
+
+ 
 
         $data =  profil_daerah::where('id',$params)->first();
         $data->nama_daerah = $request->nama_daerah;
@@ -97,7 +107,15 @@ class profilDaerahController extends Controller
         $data->alamat = $request->alamat;
         $data->email = $request->email;
         $data->no_telp = $request->no_telp;
-        $data->tahun = date('Y');
+        if (isset($request->logo)) {
+            if ($request->hasFile('logo')) {
+                $file = $request->file('logo');
+                $filename = time().'.'.$file->getClientOriginalExtension();
+                $file->storeAs('public/image',$filename);
+            }
+            $data->logo = $filename;
+        }
+        
         $data->save();
 
 

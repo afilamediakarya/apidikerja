@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\satuan_kerja;
 use Validator;
-class satuanKerjaController extends Controller
+use App\Models\kelas_jabatan;
+
+class kelasJabatanController extends Controller
 {
     public function list(){
-        $data = satuan_kerja::latest()->get();
+        $data = kelas_jabatan::latest()->get();
 
         if ($data) {
             return response()->json([
@@ -25,29 +26,20 @@ class satuanKerjaController extends Controller
     }
 
     public function store(Request $request){
-        // return $request->all();
         $validator = Validator::make($request->all(),[
-            'nama_satuan_kerja' => 'required|string|unique:tb_satuan_kerja',
-            'lat_location' => 'required|string',
-            'inisial_satuan_kerja' => 'required|string',
-            'long_location' => 'required|string',
-            'status_kepala' => 'required|string',
-            'tahun' => 'required|string',
+            'kelas_jabatan' => 'required|numeric',
+            'besaran_tpp' => 'required|numeric'
         ]);
 
         if($validator->fails()){
             return response()->json($validator->errors());       
         }
 
-        $data = new satuan_kerja();
-        $data->kode_satuan_kerja = '001';
-        $data->nama_satuan_kerja = $request->nama_satuan_kerja;
-        $data->inisial_satuan_kerja = $request->inisial_satuan_kerja;
-        $data->lat_location = $request->lat_location;
-        $data->long_location = $request->long_location;
-        $data->status_kepala = $request->status_kepala;
-        $data->tahun = $request->tahun;
+        $data = new kelas_jabatan();
+        $data->kelas_jabatan = $request->kelas_jabatan;
+        $data->besaran_tpp = $request->besaran_tpp;
         $data->save();
+
 
         if ($data) {
             return response()->json([
@@ -64,7 +56,7 @@ class satuanKerjaController extends Controller
     }
 
     public function show($params){
-        $data = satuan_kerja::where('id',$params)->first();
+        $data = kelas_jabatan::where('id',$params)->first();
 
         if ($data) {
             return response()->json([
@@ -82,28 +74,18 @@ class satuanKerjaController extends Controller
 
     public function update($params,Request $request){
         $validator = Validator::make($request->all(),[
-            'nama_satuan_kerja' => 'required|string',
-            'lat_location' => 'required|string',
-            'long_location' => 'required|string',
-            'status_kepala' => 'required|string',
-            'inisial_satuan_kerja' => 'required|string',
-            'tahun' => 'required|string',
+            'kelas_jabatan' => 'required|numeric',
+            'besaran_tpp' => 'required|numeric'
         ]);
 
         if($validator->fails()){
             return response()->json($validator->errors());       
         }
 
-        $data = satuan_kerja::where('id',$params)->first();
-        $data->kode_satuan_kerja = '001';
-        $data->nama_satuan_kerja = $request->nama_satuan_kerja;
-        $data->inisial_satuan_kerja = $request->inisial_satuan_kerja;
-        $data->lat_location = $request->lat_location;
-        $data->long_location = $request->long_location;
-        $data->status_kepala = $request->status_kepala;
-        $data->tahun = $request->tahun;
+        $data = kelas_jabatan::where('id',$params)->first();
+        $data->kelas_jabatan = $request->kelas_jabatan;
+        $data->besaran_tpp = $request->besaran_tpp;
         $data->save();
-
 
         if ($data) {
             return response()->json([
@@ -120,7 +102,7 @@ class satuanKerjaController extends Controller
     }
 
     public function delete($params){
-        $data = satuan_kerja::where('id',$params)->first();
+        $data = kelas_jabatan::where('id',$params)->first();
         $data->delete();
 
         if ($data) {
@@ -134,6 +116,5 @@ class satuanKerjaController extends Controller
                 'status' => false
             ]);
         }
-    }
-    
+    }    
 }
