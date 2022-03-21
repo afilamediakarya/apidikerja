@@ -137,6 +137,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/store', [App\Http\Controllers\reviewRealisasiSkpController::class, 'store']);    
     });
 
+    Route::prefix('perilaku')->group(function () {
+        Route::get('/list', [App\Http\Controllers\perilakuController::class, 'list']);    
+        Route::post('/store', [App\Http\Controllers\perilakuController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\perilakuController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\perilakuController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\perilakuController::class, 'delete']);   
+    });
+
 });
 
 
