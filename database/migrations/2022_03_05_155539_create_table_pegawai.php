@@ -33,6 +33,7 @@ class CreateTablePegawai extends Migration
             $table->string('alamat_rumah');
             $table->string('email');
             $table->string('jenis_jabatan');
+            $table->string('face_character')->nullable();
             $table->timestamps();
         });
     }
@@ -44,6 +45,6 @@ class CreateTablePegawai extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('table_pegawai');
+        Schema::dropIfExists('tb_pegawai');
     }
 }

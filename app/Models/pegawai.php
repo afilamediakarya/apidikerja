@@ -22,6 +22,10 @@ class pegawai extends Model
           return $this->belongsTo('App\Models\pegawai','id','id_kepala_bidang');
     }
 
+    public function jabatan(){
+        return $this->belongsTo('App\Models\jabatan','id','id_pegawai');
+  }
+
     public function atasan_penilai(){
         return $this->hasOne('App\Models\atasan','id','id_penilai');
     }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTableKegiatan extends Migration
+class CreateTableStatusPendidikan extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateTableKegiatan extends Migration
      */
     public function up()
     {
-        Schema::create('tb_kegiatan', function (Blueprint $table) {
+        Schema::create('tb_pendidikan', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_satuan_kerja');
-            $table->string('nama_kegiatan');
-            $table->string('tahun');
+            $table->string('nama_pendidikan');
+            $table->enum('status',['active','inactive']);
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateTableKegiatan extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('table_kegiatan');
+        Schema::dropIfExists('table_status_pendidikan');
     }
 }

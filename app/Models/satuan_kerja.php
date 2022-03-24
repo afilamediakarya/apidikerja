@@ -18,6 +18,10 @@ class satuan_kerja extends Model
         return $this->belongsTo('App\Models\informasi','id_satuan_kerja','id');
     }
 
+    public function jabatan(){
+        return $this->belongsTo('App\Models\jabatan','id_satuan_kerja','id');
+    }
+
      public function kegiatan(){
         return $this->belongsTo('App\Models\kegiatan','id_satuan_kerja','id');
     }

@@ -20,8 +20,11 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 // Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/register-user', [App\Http\Controllers\AuthController::class, 'register_user']);  
+    Route::post('/register-user', [App\Http\Controllers\AuthController::class, 'register_user']); 
+    Route::post('/change-password', [App\Http\Controllers\AuthController::class, 'change_password']);  
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
+    Route::post('/face_id', [App\Http\Controllers\AuthController::class, 'face_id']);
+    Route::get('/dashboard', [App\Http\Controllers\dashboardController::class, 'get_data']);
 
     Route::prefix('satuan')->group(function () {
         Route::get('/list', [App\Http\Controllers\satuanController::class, 'list']);  
@@ -159,6 +162,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/show/{params}', [App\Http\Controllers\kelasJabatanController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\kelasJabatanController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\kelasJabatanController::class, 'delete']);   
+    });
+
+    Route::prefix('jabatan')->group(function () {
+        Route::get('/list', [App\Http\Controllers\jabatanController::class, 'list']);    
+        Route::post('/store', [App\Http\Controllers\jabatanController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\jabatanController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\jabatanController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\jabatanController::class, 'delete']);   
     });
 
 });

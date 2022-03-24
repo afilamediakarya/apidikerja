@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\informasi;
 use Validator;
-class informasiController extends Controller
+use App\Models\jabatan;
+class jabatanController extends Controller
 {
     public function list(){
-        $data = informasi::latest()->get();
+        $data = jabatan::latest()->get();
 
         if ($data) {
             return response()->json([
@@ -27,11 +27,14 @@ class informasiController extends Controller
     public function store(Request $request){
        
         $validator = Validator::make($request->all(),[
+            'id_pegawai' => 'required|numeric',
             'id_satuan_kerja' => 'required|numeric',
-            'judul' => 'required|string',
-            'deskripsi' => 'required|string',
-            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'tahun' => 'required',
+            'id_kelas_jabatan' => 'required|numeric',
+            'parent_id' => 'required|numeric',
+            'nama_struktur' => 'required',
+            'nama_jabatan' => 'required',
+            'level' => 'required|numeric',
+            'status_jabatan' => 'required'
         ]);
 
         if($validator->fails()){
@@ -44,13 +47,15 @@ class informasiController extends Controller
             $file->storeAs('public/image',$filename);
         }
 
-        $data = new informasi();
+        $data = new jabatan();
+        $data->id_pegawai = $request->id_pegawai;
         $data->id_satuan_kerja = $request->id_satuan_kerja;
-        $data->judul = $request->judul;
-        $data->deskripsi = $request->deskripsi;
-        $data->gambar = $filename;
-        $data->tahun = $request->tahun;
-        $data->status = $request->status;
+        $data->id_kelas_jabatan = $request->id_kelas_jabatan;
+        $data->parent_id = $request->parent_id;
+        $data->nama_struktur = $request->nama_struktur;
+        $data->nama_jabatan = $request->nama_jabatan;
+        $data->level = $request->level;
+        $data->status_jabatan = $request->status_jabatan;
         $data->save();
 
         if ($data) {
@@ -68,7 +73,7 @@ class informasiController extends Controller
     }
 
     public function show($params){
-        $data = informasi::where('id',$params)->first();
+        $data = jabatan::where('id',$params)->first();
 
         if ($data) {
             return response()->json([
@@ -86,33 +91,29 @@ class informasiController extends Controller
 
     public function update($params,Request $request){
         $validator = Validator::make($request->all(),[
+            'id_pegawai' => 'required|numeric',
             'id_satuan_kerja' => 'required|numeric',
-            'judul' => 'required|string',
-            'deskripsi' => 'required|string',
-            'gambar' => 'image|mimes:jpeg,png,jpg|max:2048',
-            'tahun' => 'required',
+            'id_kelas_jabatan' => 'required|numeric',
+            'parent_id' => 'required|numeric',
+            'nama_struktur' => 'required',
+            'nama_jabatan' => 'required',
+            'level' => 'required|numeric',
+            'status_jabatan' => 'required'
         ]);
 
         if($validator->fails()){
             return response()->json($validator->errors());       
         }
 
-        $data = informasi::where('id',$params)->first();
+        $data = jabatan::where('id',$params)->first();
+        $data->id_pegawai = $request->id_pegawai;
         $data->id_satuan_kerja = $request->id_satuan_kerja;
-        $data->judul = $request->judul;
-        $data->deskripsi = $request->deskripsi;
-        
-        if (isset($request->gambar)) {
-            if ($request->hasFile('gambar')) {
-                $file = $request->file('gambar');
-                $filename = time().'.'.$file->getClientOriginalExtension();
-                $file->storeAs('public/image',$filename);
-            }
-            $data->gambar = $filename;
-        }
-        
-        $data->tahun = $request->tahun;
-        $data->status = $request->status;
+        $data->id_kelas_jabatan = $request->id_kelas_jabatan;
+        $data->parent_id = $request->parent_id;
+        $data->nama_struktur = $request->nama_struktur;
+        $data->nama_jabatan = $request->nama_jabatan;
+        $data->level = $request->level;
+        $data->status_jabatan = $request->status_jabatan;
         $data->save();
 
         if ($data) {
@@ -130,7 +131,7 @@ class informasiController extends Controller
     }
 
     public function delete($params){
-        $data = informasi::where('id',$params)->first();
+        $data = jabatan::where('id',$params)->first();
         $data->delete();
 
         if ($data) {

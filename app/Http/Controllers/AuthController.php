@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Hash;
 use Auth;
 use Validator;
 use App\Models\User;
+use App\Models\pegawai;
+use Illuminate\Validation\ValidationException;
+
 class AuthController extends Controller
 {
     public function login(Request $request){
@@ -62,6 +65,66 @@ class AuthController extends Controller
             ]);
         }
 
+    }
+
+    public function change_password(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'password_baru' => 'required|string|min:8',
+            'password_lama' => 'required'
+        ]);
+    
+        if($validator->fails()){
+            return response()->json($validator->errors());       
+        }
+
+        $user = User::where('id',Auth::user()->id)->first();
+        // return $user;
+        if (isset($user)) {    
+            $password = Hash::check($request->password_lama, $user->password);
+            
+            if ($password == true) {
+                    $user->password = Hash::make($request->password_baru);
+                    $user->save();
+            }else{
+                throw ValidationException::withMessages([
+                    'message' => ['Password lama salah.'],
+                ]);
+            }
+        }
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        }else{
+            throw ValidationException::withMessages([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+
+    }
+
+    public function face_id(Request $request){
+        $data = pegawai::where('id',Auth::user()->id_pegawai)->first();
+        $data->face_character = $request->id_face;
+        $data->save();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        }else{
+            throw ValidationException::withMessages([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
     }
 
     public function logout(Request $request)

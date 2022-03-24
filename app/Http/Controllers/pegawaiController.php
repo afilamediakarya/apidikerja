@@ -53,6 +53,8 @@ class pegawaiController extends Controller
             return response()->json($validator->errors());       
         }
 
+
+
         $data = new pegawai();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->nama = $request->nama;
@@ -72,6 +74,7 @@ class pegawaiController extends Controller
         $data->alamat_rumah = $request->alamat_rumah;
         $data->email = $request->email;
         $data->jenis_jabatan = $request->jenis_jabatan;
+        $data->face_character = $request->face_character;
         $data->save();
 
 
@@ -153,6 +156,9 @@ class pegawaiController extends Controller
         $data->no_ktp = $request->no_ktp;
         $data->alamat_rumah = $request->alamat_rumah;
         $data->jenis_jabatan = $request->jenis_jabatan;
+        if (isset($request->face_character)) {
+            $data->face_character = $request->face_character;
+        }
         $data->save();
 
         if ($data) {
