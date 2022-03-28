@@ -128,6 +128,23 @@ class AuthController extends Controller
         }
     }
 
+    public function current_user(){
+          $user = User::findOrFail(Auth::user()->id);
+
+        if ($user) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $user
+            ]);
+        }else{
+            throw ValidationException::withMessages([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
     public function logout(Request $request)
     {
         auth()->user()->tokens()->delete();
