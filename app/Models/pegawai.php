@@ -18,6 +18,10 @@ class pegawai extends Model
         return $this->belongsTo('App\Models\skp','id','id_pegawai');
     }
 
+    public function user(){
+        return $this->belongsTo('App\Models\User','id','id_pegawai');
+    }
+
     public function bidang(){
           return $this->belongsTo('App\Models\pegawai','id','id_kepala_bidang');
     }

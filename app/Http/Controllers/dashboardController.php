@@ -10,6 +10,8 @@ use App\Models\pegawai;
 use App\Models\review_realisasi_skp;
 use App\Models\atasan;
 use App\Models\kelas_jabatan;
+use App\Models\jabatan;
+use App\Models\aspek_skp;
 use DB;
 use Auth;
 class dashboardController extends Controller
@@ -63,6 +65,7 @@ class dashboardController extends Controller
 			];
 		}
 
+
     	$result = [
     		'jumlah_skp' => $skp,
     		'jumlah_realisasi' => $realisasi,
@@ -78,14 +81,14 @@ class dashboardController extends Controller
 		$getSkp = [];
 		$list_pegawai = [];
 		$result = [];
+		$temporary = [];
+		$total_realisasi = 0;
 		$getPegawai = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
 		$getAtasan = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
 		$countAktivitas = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->count();
-		// $kelasJabatan = kelas_jabatan::where()
-		foreach ($getPegawai as $key => $value) {
-			// $value->id_pegawai;
-			// $skp = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->where('tb_pegawai.id',$value->id_pegawai)->get();
 
+		foreach ($getPegawai as $key => $value) {
+		
 			$res = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_pegawai.id',$value->id_pegawai)->get();
 
 			foreach ($res as $x => $y) {
@@ -114,13 +117,37 @@ class dashboardController extends Controller
 			}
 
 			$getSkp[$key] = $res;
-
-
 		}
+	
 
-		$info_pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
+		// INFO PEGAWAI
+		$info_pegawai = pegawai::with('skp')->where('id',Auth::user()->id_pegawai)->first();
 		$info_penilai = pegawai::where('id',$getAtasan->id_penilai)->first();
-		// return $info_pegawai;
+		// 
+
+		$cek = [];
+
+		// INFO TPP
+			$besaran_tpp = jabatan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+
+			return $info_pegawai->skp['id'];
+			// Tunjangan Prestasi Kerja
+				$aspek = aspek_skp::where('id_skp',$info_pegawai->skp['id'])->get();
+				$total_realisasi = 0;
+				$total_target = 0;
+				$persentase_awal_kinerja = 0;
+				foreach($aspek as $index => $val){
+					for ($in=0; $in < count($val['realisasi_skp']); $in++) { 
+						$total_realisasi += $val['realisasi_skp'][$in]['realisasi_bulanan'];
+						$total_target += $val['target_skp'][$in]['target'];
+						$cek[$in] = $val['realisasi_skp'][$in]['realisasi_bulanan'];
+					}					
+					$persentase_awal_kinerja = ($total_realisasi / $total_target) * 100;
+				}
+
+				return $cek;
+			// 
+		// 
 
 		$result = [
     		'jumlah_skp' => count($getSkp),
@@ -140,7 +167,10 @@ class dashboardController extends Controller
 				'jabatan' => $info_penilai['jenis_jabatan'],
 				'Instansi' => $info_penilai['satuan_kerja']['nama_satuan_kerja']
 			],
-			'list_rekap_nilai' => $list_pegawai
+			'list_rekap_nilai' => $list_pegawai,
+			'informasi_tpp' => [
+				'besaran_tpp' => $besaran_tpp['kelas_jabatan']['besaran_tpp']
+			]
     	];
 
     	return $result;
