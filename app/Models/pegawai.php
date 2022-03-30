@@ -11,7 +11,7 @@ class pegawai extends Model
     protected $table = 'tb_pegawai';
     protected $with = ['satuan_kerja'];
     public function satuan_kerja(){
-        return $this->hasMany('App\Models\satuan_kerja','id','id_satuan_kerja');
+        return $this->hasOne('App\Models\satuan_kerja','id','id_satuan_kerja');
     }
 
     public function skp(){

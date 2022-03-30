@@ -38,17 +38,22 @@ class informasiController extends Controller
             return response()->json($validator->errors());       
         }
 
-        if ($request->hasFile('gambar')) {
-            $file = $request->file('gambar');
-            $filename = time().'.'.$file->getClientOriginalExtension();
-            $file->storeAs('public/image',$filename);
-        }
+       
 
         $data = new informasi();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->judul = $request->judul;
         $data->deskripsi = $request->deskripsi;
-        $data->gambar = $filename;
+      
+        if (isset($request->gambar)) {
+            if ($request->hasFile('gambar')) {
+                $file = $request->file('gambar');
+                $filename = time().'.'.$file->getClientOriginalExtension();
+                $file->storeAs('public/image',$filename);
+                $data->gambar = $filename;
+            }
+        }
+        
         $data->tahun = $request->tahun;
         $data->status = $request->status;
         $data->save();
