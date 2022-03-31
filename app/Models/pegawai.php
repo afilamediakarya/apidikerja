@@ -15,7 +15,7 @@ class pegawai extends Model
     }
 
     public function skp(){
-        return $this->belongsTo('App\Models\skp','id','id_pegawai');
+        return $this->hasMany('App\Models\skp','id_pegawai','id');
     }
 
     public function user(){

@@ -44,10 +44,15 @@ class AuthController extends Controller
         }
 
         $data = New User();
-        if ($request->role == 'pegawai') {
+        if ($request->role == 'pegawai' || $request->role == 'admin_opd') {
+            $pegawai = pegawai::where('id',$request->id_pegawai)->first();
             $data->id_pegawai = $request->id_pegawai;
+            $data->username = $pegawai['nip'];
+
+        }else{
+            $data->username = $request->username;
         }
-        $data->username = $request->username;
+        
         $data->email  = $request->email ;
         $data->password = Hash::make($request->password);
         $data->role = $request->role;

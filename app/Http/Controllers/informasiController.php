@@ -30,7 +30,7 @@ class informasiController extends Controller
             'id_satuan_kerja' => 'required|numeric',
             'judul' => 'required|string',
             'deskripsi' => 'required|string',
-            'gambar' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'tahun' => 'required',
         ]);
 

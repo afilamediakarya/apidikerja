@@ -11,7 +11,7 @@ class skp extends Model
     protected $table = 'tb_skp';
 
     public function pegawai(){
-        return $this->hasMany('App\Models\pegawai','id','id_pegawai');
+        return $this->belongsTo('App\Models\pegawai','id_pegawai','id');
     }
 
     public function satuan_kerja(){

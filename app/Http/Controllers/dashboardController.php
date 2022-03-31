@@ -23,7 +23,7 @@ class dashboardController extends Controller
 		} elseif(Auth::user()->role == 'pegawai') {
 			return $this->pegawai_dashboard();
 		}else{
-
+			return $this->opd_dashboard();
 		}
     }
 
@@ -78,11 +78,10 @@ class dashboardController extends Controller
 	}
 
 	public function pegawai_dashboard(){
-		$getSkp = [];
+		$getSkp = skp::where('id_pegawai',Auth::user()->id_pegawai)->get()->count();
 		$list_pegawai = [];
 		$result = [];
 		$temporary = [];
-		$total_realisasi = 0;
 		$getPegawai = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
 		$getAtasan = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
 		$countAktivitas = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->count();
@@ -115,8 +114,6 @@ class dashboardController extends Controller
 					'review_realisasi' => $label_review_skp
 				];
 			}
-
-			$getSkp[$key] = $res;
 		}
 	
 
@@ -125,32 +122,41 @@ class dashboardController extends Controller
 		$info_penilai = pegawai::where('id',$getAtasan->id_penilai)->first();
 		// 
 
+		// return $info_pegawai;
+
 		$cek = [];
+		$total_realisasi = 0;
+		$total_target = 0;
+		$total_kinerja = 0;
+		$hasil_total_kinerja = 0;
 
 		// INFO TPP
 			$besaran_tpp = jabatan::where('id_pegawai',Auth::user()->id_pegawai)->first();
-
-			return $info_pegawai->skp['id'];
 			// Tunjangan Prestasi Kerja
-				$aspek = aspek_skp::where('id_skp',$info_pegawai->skp['id'])->get();
-				$total_realisasi = 0;
-				$total_target = 0;
-				$persentase_awal_kinerja = 0;
+				
+			foreach ($info_pegawai['skp'] as $kk => $vv) {
+				$aspek = aspek_skp::where('id_skp',$vv['id'])->get();
+				$cek[$kk] = $aspek;
+				// $total_realisasi = 0;
+				// $total_target = 0;
+				// $persentase_awal_kinerja = 0;
 				foreach($aspek as $index => $val){
-					for ($in=0; $in < count($val['realisasi_skp']); $in++) { 
-						$total_realisasi += $val['realisasi_skp'][$in]['realisasi_bulanan'];
-						$total_target += $val['target_skp'][$in]['target'];
-						$cek[$in] = $val['realisasi_skp'][$in]['realisasi_bulanan'];
-					}					
-					$persentase_awal_kinerja = ($total_realisasi / $total_target) * 100;
+					foreach($val['realisasi_skp'] as $k => $kl){ 
+						$total_realisasi += $kl['realisasi_bulanan'];
+						$total_target += $val['target_skp'][$k]['target'];
+					}
 				}
+			}
 
-				return $cek;
+			$total_kinerja = (($total_realisasi / $total_target) * 100) / $getSkp;
+			$hasil_total_kinerja = ($total_kinerja / 60) * 100;
+
+				// return $total_realisasi;
 			// 
 		// 
 
 		$result = [
-    		'jumlah_skp' => count($getSkp),
+    		'jumlah_skp' => $getSkp,
     		'pegawai_diniai' => count($getPegawai),
 			'aktivitas' => $countAktivitas,
 			'informasi_pegawai' => [
@@ -169,11 +175,43 @@ class dashboardController extends Controller
 			],
 			'list_rekap_nilai' => $list_pegawai,
 			'informasi_tpp' => [
-				'besaran_tpp' => $besaran_tpp['kelas_jabatan']['besaran_tpp']
+				'besaran_tpp' => number_format($besaran_tpp['kelas_jabatan']['besaran_tpp'],2),
+				'tunjangan_prestasi_kerja' => number_format($hasil_total_kinerja,2)
 			]
     	];
 
     	return $result;
+
+	}
+
+	public function opd_dashboard(){
+		$result = [];
+		$current = pegawai::where('id',Auth::user()->id_pegawai)->first();
+		$pegawaiBySatuankerja = pegawai::where('id_satuan_kerja',$current['id_satuan_kerja'])->get();
+		$count_aktifitas = 0;
+		$count_skp = 0;
+		// return $pegawaiBySatuankerja;
+		foreach($pegawaiBySatuankerja as $k => $vv){
+			// Aktifitias
+			$aktivitas = aktivitas::where('id_pegawai',$vv['id'])->get()->count();
+			$skp = skp::where('id_pegawai',$vv['id'])->get()->count();
+			// return $aktivitas;
+			if ($aktivitas != []) {
+				$count_aktifitas += $aktivitas;
+			}
+
+			if ($skp != []) {
+				$count_skp += $skp;
+			}
+				// 
+		}
+
+		return $result = [
+			'jumlah_pegawai' => count($pegawaiBySatuankerja),
+			'jumlah_aktifitas' => $count_aktifitas,
+			'jumlah_skp' => $count_skp
+		];	
+		
 
 	}
 
