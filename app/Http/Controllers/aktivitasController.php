@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\aktivitas;
+use App\Models\skp;
 use Validator;
+use Auth;
 class aktivitasController extends Controller
 {
     public function list(){
@@ -147,5 +149,10 @@ class aktivitasController extends Controller
                 'status' => false
             ]);
         }
+    }
+
+    public function optionSkp(){
+        $data = skp::where('id_pegawai',Auth::user()->id_pegawai)->latest()->get();
+        return collect($data)->pluck('rencana_kerja','id')->toArray();
     }
 }

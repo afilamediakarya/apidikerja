@@ -73,7 +73,6 @@ class pegawaiController extends Controller
         $data->no_ktp = $request->no_ktp;
         $data->alamat_rumah = $request->alamat_rumah;
         $data->email = $request->email;
-        $data->jenis_jabatan = $request->jenis_jabatan;
         $data->face_character = $request->face_character;
         $data->save();
 
@@ -155,7 +154,6 @@ class pegawaiController extends Controller
         $data->no_npwp = $request->no_npwp;
         $data->no_ktp = $request->no_ktp;
         $data->alamat_rumah = $request->alamat_rumah;
-        $data->jenis_jabatan = $request->jenis_jabatan;
         if (isset($request->face_character)) {
             $data->face_character = $request->face_character;
         }

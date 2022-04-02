@@ -10,6 +10,9 @@ use App\Models\atasan;
 use App\Models\review_realisasi_skp;
 use App\Models\review_skp;
 use App\Models\realisasi_skp;
+use App\Models\satuan;
+use App\Models\jabatan;
+use App\Models\kegiatan;
 use Validator;
 use Auth;
 class skpController extends Controller
@@ -209,4 +212,25 @@ class skpController extends Controller
             ]);
         }
     }
+
+    public function satuan(){
+        $data = satuan::where('status','active')->latest()->get();
+        return collect($data)->pluck('nama_satuan')->toArray();
+    }
+
+    public function optionSkp(){
+        $atasan  = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+        $getJabatan = jabatan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+
+        if ($getJabatan['level'] != "1") {
+            $getSkp = skp::where('id_pegawai',$atasan['id_penilai'])->get();
+            return collect($getSkp)->pluck('rencana_kerja','id')->toArray();
+        }else{
+            $kegiatan = kegiatan::latest()->get();
+            return collect($kegiatan)->pluck('nama_kegiatan','id')->toArray();
+        }
+
+        
+    }
+
 }

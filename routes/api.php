@@ -97,6 +97,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/show/{params}', [App\Http\Controllers\skpController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\skpController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\skpController::class, 'delete']);  
+        Route::get('/get-option-satuan', [App\Http\Controllers\skpController::class, 'satuan']);  
+        Route::get('/get-option-sasaran-kinerja', [App\Http\Controllers\skpController::class, 'optionSkp']);  
     });
 
     Route::prefix('aktivitas')->group(function () {
@@ -104,7 +106,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/store', [App\Http\Controllers\aktivitasController::class, 'store']);  
         Route::get('/show/{params}', [App\Http\Controllers\aktivitasController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\aktivitasController::class, 'update']);  
-        Route::delete('/delete/{params}', [App\Http\Controllers\aktivitasController::class, 'delete']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\aktivitasController::class, 'delete']);
+        Route::get('/get-option-sasaran-kinerja', [App\Http\Controllers\aktivitasController::class, 'optionSkp']);
     });
 
     Route::prefix('realisasi_skp')->group(function () {
@@ -170,7 +173,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/store', [App\Http\Controllers\jabatanController::class, 'store']);  
         Route::get('/show/{params}', [App\Http\Controllers\jabatanController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\jabatanController::class, 'update']);  
-        Route::delete('/delete/{params}', [App\Http\Controllers\jabatanController::class, 'delete']);   
+        Route::delete('/delete/{params}', [App\Http\Controllers\jabatanController::class, 'delete']);
+        Route::get('/get-option-jabatan-atasan/{params}', [App\Http\Controllers\jabatanController::class, 'jabatanAtasan']);     
     });
 
 });

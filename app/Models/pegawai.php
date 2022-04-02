@@ -27,7 +27,7 @@ class pegawai extends Model
     }
 
     public function jabatan(){
-        return $this->belongsTo('App\Models\jabatan','id','id_pegawai');
+        return $this->hasOne('App\Models\jabatan','id','id_jabatan');
   }
 
     public function atasan_penilai(){

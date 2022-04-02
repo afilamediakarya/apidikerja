@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\jabatan;
+use App\Models\pegawai;
+use Auth;
+use DB;
 class jabatanController extends Controller
 {
     public function list(){
@@ -145,5 +148,13 @@ class jabatanController extends Controller
                 'status' => false
             ]);
         }
+    }
+
+    public function jabatanAtasan($level){
+        $current_user = pegawai::where('id',Auth::user()->id_pegawai)->first();
+        // return $current_user['id_satuan_kerja'];
+        $data = jabatan::where('id_satuan_kerja',$current_user['id_satuan_kerja'])->where('level',$level-1)->get();
+
+        return collect($data)->pluck('nama_jabatan','id')->toArray();
     }
 }
