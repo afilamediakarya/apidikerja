@@ -152,9 +152,17 @@ class jabatanController extends Controller
 
     public function jabatanAtasan($level){
         $current_user = pegawai::where('id',Auth::user()->id_pegawai)->first();
+        $result = [];
         // return $current_user['id_satuan_kerja'];
         $data = jabatan::where('id_satuan_kerja',$current_user['id_satuan_kerja'])->where('level',$level-1)->get();
 
-        return collect($data)->pluck('nama_jabatan','id')->toArray();
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'id' => $value->id,
+                'value'=> $value->nama_jabatan
+            ];
+        }
+
+        return response()->json($result);
     }
 }

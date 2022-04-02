@@ -207,28 +207,58 @@ class pegawaiController extends Controller
     }
 
     public function optionAgama(){
+        $result = [];
         $data = DB::table('tb_agama')->latest()->get();
-        return collect($data)->pluck('nama_agama')->toArray();
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'value'=> $value->nama_agama
+            ];
+        }
+        return response()->json($result);
     }
 
     public function optionStatusKawin(){
+        $result = [];
         $data = DB::table('tb_status_kawin')->latest()->get();
-        return collect($data)->pluck('nama_status_kawin')->toArray();
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'value'=> $value->nama_status_kawin
+            ];
+        }
+        return response()->json($result);
     }
 
     public function optionGolongan(){
+        $result = [];
         $data = DB::table('tb_golongan')->latest()->get();
-        return collect($data)->pluck('nama_golongan')->toArray();
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'value'=> $value->nama_golongan
+            ];
+        }
+        return response()->json($result);
     }
 
     public function optionStatusPegawai(){
+        $result = [];
         $data = DB::table('tb_status_pegawai')->latest()->get();
-        return collect($data)->pluck('nama_status_pegawai')->toArray();
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'value'=> $value->nama_status_pegawai
+            ];
+        }
+        return response()->json($result);
     }
 
     public function pendidikanTerakhir(){
+        $result = [];
         $data = DB::table('tb_pendidikan')->latest()->get();
-        return collect($data)->pluck('nama_pendidikan')->toArray();
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'value'=> $value->nama_pendidikan
+            ];
+        }
+        return response()->json($result);
     }
 
 

@@ -144,7 +144,7 @@ class absenController extends Controller
     public function getTime(){
         // $dt = Carbon::now()->format('h:i:sa');
         ini_set('date.timezone', 'Asia/Jakarta');
-        $dt = date('H:i:s');
+        $dt = date('Y-m-d H:i:s');
         // date_default_timezone_set('Asia/Jakarta');
        return response()->json(['time' => $dt]);
     }

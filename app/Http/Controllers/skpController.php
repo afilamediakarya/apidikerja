@@ -20,6 +20,7 @@ class skpController extends Controller
     public function list(){
         $result = [];
         $atasan = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+        return $atasan;
         $get_skp_atasan = skp::where('id_pegawai',$atasan->id_penilai)->get();
         foreach($get_skp_atasan as $key => $value){
             
@@ -214,8 +215,16 @@ class skpController extends Controller
     }
 
     public function satuan(){
+        $result = [];
         $data = satuan::where('status','active')->latest()->get();
-        return collect($data)->pluck('nama_satuan')->toArray();
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'value'=> $value->nama_satuan
+            ];
+        }
+
+        return response()->json($result);
+        // return collect($data)->pluck('nama_satuan')->toArray();
     }
 
     public function optionSkp(){
