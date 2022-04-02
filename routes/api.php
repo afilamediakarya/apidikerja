@@ -49,6 +49,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/show/{params}', [App\Http\Controllers\pegawaiController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\pegawaiController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\pegawaiController::class, 'delete']);  
+        Route::get('/get-option-agama', [App\Http\Controllers\pegawaiController::class, 'optionAgama']); 
+        Route::get('/get-option-status-kawin', [App\Http\Controllers\pegawaiController::class, 'optionStatusKawin']);
+        Route::get('/get-option-pendidikan-terakhir', [App\Http\Controllers\pegawaiController::class, 'pendidikanTerakhir']);  
+        Route::get('/get-option-pangkat-golongan', [App\Http\Controllers\pegawaiController::class, 'optionGolongan']);  
+        Route::get('/get-option-status-pegawai', [App\Http\Controllers\pegawaiController::class, 'optionStatusPegawai']);  
     });
 
     Route::prefix('jadwal')->group(function () {

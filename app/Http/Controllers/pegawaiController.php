@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\pegawai;
 use App\Models\User;
 use Validator;
+use DB;
 class pegawaiController extends Controller
 {
     
@@ -189,5 +190,31 @@ class pegawaiController extends Controller
             ]);
         }
     }
+
+    public function optionAgama(){
+        $data = DB::table('tb_agama')->latest()->get();
+        return collect($data)->pluck('nama_agama','id')->toArray();
+    }
+
+    public function optionStatusKawin(){
+        $data = DB::table('tb_status_kawin')->latest()->get();
+        return collect($data)->pluck('nama_status_kawin','id')->toArray();
+    }
+
+    public function optionGolongan(){
+        $data = DB::table('tb_golongan')->latest()->get();
+        return collect($data)->pluck('nama_golongan','id')->toArray();
+    }
+
+    public function optionStatusPegawai(){
+        $data = DB::table('tb_status_pegawai')->latest()->get();
+        return collect($data)->pluck('nama_status_pegawai','id')->toArray();
+    }
+
+    public function pendidikanTerakhir(){
+        $data = DB::table('tb_pendidikan')->latest()->get();
+        return collect($data)->pluck('nama_pendidikan','id')->toArray();
+    }
+
 
 }
