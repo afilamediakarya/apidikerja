@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\pegawai;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Validator;
 use DB;
 class pegawaiController extends Controller
@@ -32,22 +33,22 @@ class pegawaiController extends Controller
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required',
             'nama' => 'required|string',
-            'tempat_tanggal_lahir' => 'required',
+            'tempat_lahir' => 'required',
+            'tanggal_lahir' => 'required|date',
             'nip' => 'required|numeric|unique:tb_pegawai',
-            'golongan_pangkat' => 'required',
-            'tmt_golongan' => 'required',
+            'golongan' => 'required',
+            'tmt_golongan' => 'required|date',
             'eselon' => 'required',
-            'status_pegawai' => 'required',
-            'tmt_pegawai' => 'required',
+            'tmt_jabatan' => 'required|date',
+            'tmt_pegawai' => 'required|date',
             'jenis_kelamin' => 'required',
             'agama' => 'required',
             'status_perkawinan' => 'required',
-            'pendidikan_akhir' => 'required',
-            'no_npwp' => 'required|unique:tb_pegawai',
-            'no_ktp' => 'required|unique:tb_pegawai',
-            'alamat_rumah' => 'required',
-            'jenis_jabatan' => 'required',
-            'email' => 'required|string|email|max:255|unique:tb_pegawai'
+            'pendidikan' => 'required',
+            'lulus_pendidikan' => 'required',
+            'pendidikan_struktural' => 'required',
+            'lulus_pendidikan_struktural' => 'required',
+            'jurusan' => 'required',
         ]);
 
         if($validator->fails()){
@@ -59,23 +60,33 @@ class pegawaiController extends Controller
         $data = new pegawai();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->nama = $request->nama;
-        $data->tempat_tanggal_lahir = $request->tempat_tanggal_lahir;
+        $data->tempat_lahir = $request->tempat_lahir;
+        $data->tanggal_lahir = $request->tanggal_lahir;
         $data->nip = $request->nip;
-        $data->golongan_pangkat = $request->golongan_pangkat;
+        $data->golongan = $request->golongan;
         $data->tmt_golongan = $request->tmt_golongan;
         $data->eselon = $request->eselon;
-        $data->status_pegawai = $request->status_pegawai;
+        $data->jenis_jabatan = $request->jenis_jabatan;
+        $data->jabatan = $request->jabatan;
+        $data->tmt_jabatan = $request->tmt_jabatan;
         $data->tmt_pegawai = $request->tmt_pegawai;
         $data->jenis_kelamin = $request->jenis_kelamin;
         $data->agama = $request->agama;
         $data->status_perkawinan = $request->status_perkawinan;
-        $data->pendidikan_akhir = $request->pendidikan_akhir;
-        $data->no_npwp = $request->no_npwp;
-        $data->no_ktp = $request->no_ktp;
-        $data->alamat_rumah = $request->alamat_rumah;
-        $data->email = $request->email;
+        $data->pendidikan = $request->pendidikan;
+        $data->lulus_pendidikan = $request->lulus_pendidikan;
+        $data->pendidikan_struktural = $request->pendidikan_struktural;
+        $data->lulus_pendidikan_struktural = $request->lulus_pendidikan_struktural;
+        $data->jurusan = $request->jurusan;
         $data->face_character = $request->face_character;
         $data->save();
+
+        $user = new User();
+        $user->username = $data->nip;
+        $user->password = Hash::make('dikerja');
+        $user->id_pegawai = $data->id;
+        $user->role = 'pegawai';
+        $user->save();
 
 
         if ($data) {
@@ -115,23 +126,22 @@ class pegawaiController extends Controller
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required',
             'nama' => 'required|string',
-            'tempat_tanggal_lahir' => 'required',
+            'tempat_lahir' => 'required',
+            'tanggal_lahir' => 'required|date',
             'nip' => 'required|numeric',
-            'golongan_pangkat' => 'required',
+            'golongan' => 'required',
             'tmt_golongan' => 'required',
             'eselon' => 'required',
-            'status_pegawai' => 'required',
-            'tmt_pegawai' => 'required',
+            'tmt_jabatan' => 'required|date',
+            'tmt_pegawai' => 'required|date',
             'jenis_kelamin' => 'required',
-            'status_pegawai' => 'required',
             'agama' => 'required',
             'status_perkawinan' => 'required',
-            'pendidikan_akhir' => 'required',
-            'no_npwp' => 'required',
-            'no_ktp' => 'required',
-            'alamat_rumah' => 'required',
-            'jenis_jabatan' => 'required',
-            'email' => 'required|string|email|max:255'
+            'pendidikan' => 'required',
+            'lulus_pendidikan' => 'required',
+            'pendidikan_struktural' => 'required',
+            'lulus_pendidikan_struktural' => 'required',
+            'jurusan' => 'required',
         ]);
 
         if($validator->fails()){
@@ -141,24 +151,29 @@ class pegawaiController extends Controller
         $data =  pegawai::where('id',$params)->first();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->nama = $request->nama;
-        $data->tempat_tanggal_lahir = $request->tempat_tanggal_lahir;
+        $data->tempat_lahir = $request->tempat_lahir;
+        $data->tanggal_lahir = $request->tanggal_lahir;
         $data->nip = $request->nip;
-        $data->golongan_pangkat = $request->tempat_tanggal_lahir;
+        $data->golongan = $request->golongan;
         $data->tmt_golongan = $request->tmt_golongan;
         $data->eselon = $request->eselon;
-        $data->status_pegawai = $request->status_pegawai;
+        $data->jenis_jabatan = $request->jenis_jabatan;
+        $data->jabatan = $request->jabatan;
+        $data->tmt_jabatan = $request->tmt_jabatan;
         $data->tmt_pegawai = $request->tmt_pegawai;
         $data->jenis_kelamin = $request->jenis_kelamin;
         $data->agama = $request->agama;
         $data->status_perkawinan = $request->status_perkawinan;
-        $data->pendidikan_akhir = $request->pendidikan_akhir;
-        $data->no_npwp = $request->no_npwp;
-        $data->no_ktp = $request->no_ktp;
-        $data->alamat_rumah = $request->alamat_rumah;
+        $data->pendidikan = $request->pendidikan;
+        $data->lulus_pendidikan = $request->lulus_pendidikan;
+        $data->pendidikan_struktural = $request->pendidikan_struktural;
+        $data->lulus_pendidikan_struktural = $request->lulus_pendidikan_struktural;
+        $data->jurusan = $request->jurusan;
         if (isset($request->face_character)) {
             $data->face_character = $request->face_character;
         }
         $data->save();
+
 
         if ($data) {
             return response()->json([
@@ -193,27 +208,27 @@ class pegawaiController extends Controller
 
     public function optionAgama(){
         $data = DB::table('tb_agama')->latest()->get();
-        return collect($data)->pluck('nama_agama','id')->toArray();
+        return collect($data)->pluck('nama_agama')->toArray();
     }
 
     public function optionStatusKawin(){
         $data = DB::table('tb_status_kawin')->latest()->get();
-        return collect($data)->pluck('nama_status_kawin','id')->toArray();
+        return collect($data)->pluck('nama_status_kawin')->toArray();
     }
 
     public function optionGolongan(){
         $data = DB::table('tb_golongan')->latest()->get();
-        return collect($data)->pluck('nama_golongan','id')->toArray();
+        return collect($data)->pluck('nama_golongan')->toArray();
     }
 
     public function optionStatusPegawai(){
         $data = DB::table('tb_status_pegawai')->latest()->get();
-        return collect($data)->pluck('nama_status_pegawai','id')->toArray();
+        return collect($data)->pluck('nama_status_pegawai')->toArray();
     }
 
     public function pendidikanTerakhir(){
         $data = DB::table('tb_pendidikan')->latest()->get();
-        return collect($data)->pluck('nama_pendidikan','id')->toArray();
+        return collect($data)->pluck('nama_pendidikan')->toArray();
     }
 
 
