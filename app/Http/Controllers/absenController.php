@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\absen;
 use Validator;
+use Carbon\Carbon;
 class absenController extends Controller
 {
     public function list(){
@@ -138,5 +139,13 @@ class absenController extends Controller
                 'status' => false
             ]);
         }
+    }
+
+    public function getTime(){
+        // $dt = Carbon::now()->format('h:i:sa');
+        ini_set('date.timezone', 'Asia/Jakarta');
+        $dt = date('H:i:s');
+        // date_default_timezone_set('Asia/Jakarta');
+       return $dt;
     }
 }
