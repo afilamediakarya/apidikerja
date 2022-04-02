@@ -146,6 +146,6 @@ class absenController extends Controller
         ini_set('date.timezone', 'Asia/Jakarta');
         $dt = date('H:i:s');
         // date_default_timezone_set('Asia/Jakarta');
-       return $dt;
+       return response()->json(['time' => $dt]);
     }
 }
