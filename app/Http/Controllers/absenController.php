@@ -7,6 +7,7 @@ use App\Models\absen;
 use Validator;
 use Carbon\Carbon;
 use Auth;
+use Illuminate\Validation\ValidationException;
 class absenController extends Controller
 {
     public function list(){
@@ -56,15 +57,18 @@ class absenController extends Controller
 
         if ($data) {
             return response()->json([
-                'message' => 'Success',
+                'message'     => 'Success',
                 'status' => true,
                 'data' => $data
             ]);
         }else{
-            return response()->json([
-                'message' => 'Failed',
-                'status' => false
-            ]);
+            // return response()->json([
+            //     'message' => 'Failed',
+            //     'status' => false
+            // ],422);
+              throw ValidationException::withMessages([
+                    'message' => ['Gagal.'],
+             ]);
         }
     }
 
