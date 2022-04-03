@@ -156,16 +156,19 @@ class absenController extends Controller
         $time_now = date('H:i:s');
         $status_checkin = false;
         $status_checkout = false;
-        $data = absen::where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->first();
+        $data = absen::where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->get();
         // return $data;
         if (isset($data)) {
           
-            if ($data['jenis'] == 'checkin') {
-                $status_checkin = true;
-            }else{
-                $status_checkout = true;
+            foreach ($data as $key => $value) {
+                if ($value['jenis'] == 'checkin') {
+                    $status_checkin = true;
+                }else{
+                    $status_checkout = true;
+                }
+
             }
-            
+                        
             return response()->json([
                 'checkin' => $status_checkin,
                 'checkout' => $status_checkout,
