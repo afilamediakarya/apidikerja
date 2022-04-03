@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\kelas_jabatan;
-
+use DB;
 class kelasJabatanController extends Controller
 {
     public function list(){
@@ -116,5 +116,17 @@ class kelasJabatanController extends Controller
                 'status' => false
             ]);
         }
-    }    
+    }  
+    
+    public function optionKelasJabatan(){
+        $result = [];
+        $data = DB::table('tb_kelas_jabatan')->latest()->get();
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'id' => $value->id,
+                'value'=> $value->kelas_jabatan
+            ];
+        }
+        return response()->json($result);
+    }
 }

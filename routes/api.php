@@ -138,6 +138,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/show/{params}', [App\Http\Controllers\absenController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\absenController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\absenController::class, 'delete']);  
+        Route::get('/check-absen', [App\Http\Controllers\absenController::class, 'checkAbsen']);  
     });
 
     Route::prefix('review_skp')->group(function () {
@@ -172,6 +173,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/show/{params}', [App\Http\Controllers\kelasJabatanController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\kelasJabatanController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\kelasJabatanController::class, 'delete']);   
+        Route::get('/get-option-kelas-jabatan', [App\Http\Controllers\kelasJabatanController::class, 'optionKelasJabatan']);
     });
 
     Route::prefix('jabatan')->group(function () {

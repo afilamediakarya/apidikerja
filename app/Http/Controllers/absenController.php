@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\absen;
 use Validator;
 use Carbon\Carbon;
+use Auth;
 class absenController extends Controller
 {
     public function list(){
@@ -142,10 +143,69 @@ class absenController extends Controller
     }
 
     public function getTime(){
-        // $dt = Carbon::now()->format('h:i:sa');
-        ini_set('date.timezone', 'Asia/Jakarta');
         $dt = date('Y-m-d H:i:s');
-        // date_default_timezone_set('Asia/Jakarta');
        return response()->json(['time' => $dt]);
+    }
+
+    public function checkAbsen(){
+        $dt = date('Y-m-d');
+        $time_now = date('H:i:s');
+        $status_checkin = false;
+        $status_checkout = false;
+        $data = absen::where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->first();
+        // return $data;
+        if (isset($data)) {
+          
+            if ($data['jenis'] == 'checkin') {
+                $status_checkin = true;
+            }else{
+                $status_checkout = true;
+            }
+            
+            return response()->json([
+                'checkin' => $status_checkin,
+                'checkout' => $status_checkout,
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Anda belum absen'
+            ]);
+        }
+        
+
+        // if ($time_now > '12:00:01') {
+        //     $data = absen::where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->where('jenis','checkout')->first();
+            
+        //     if (isset($data)) {
+        //         return response()->json([
+        //             'message' => 'Anda sudah absen checkout',
+        //             'status' => false,
+        //         ]);
+        //     }else{
+        //         return response()->json([
+        //             'message' => 'Anda belum absen checkout',
+        //             'status' => true,
+        //         ]);
+        //     }
+
+        // }else{
+        //     $data = absen::where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->where('jenis','checkin')->first();
+            
+        //     if (isset($data)) {
+        //         return response()->json([
+        //             'message' => 'Anda sudah absen checkin',
+        //             'status' => false,
+        //         ]);
+        //     }else{
+        //         return response()->json([
+        //             'message' => 'Anda belum absen checkin',
+        //             'status' => true,
+        //         ]);
+        //     }
+
+        // }
+
+       
+        return $time_now;
     }
 }
