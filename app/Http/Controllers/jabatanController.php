@@ -30,7 +30,6 @@ class jabatanController extends Controller
     public function store(Request $request){
        
         $validator = Validator::make($request->all(),[
-            'id_pegawai' => 'required|numeric',
             'id_satuan_kerja' => 'required|numeric',
             'id_kelas_jabatan' => 'required|numeric',
             'parent_id' => 'required|numeric',
@@ -51,7 +50,6 @@ class jabatanController extends Controller
         }
 
         $data = new jabatan();
-        $data->id_pegawai = $request->id_pegawai;
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->id_kelas_jabatan = $request->id_kelas_jabatan;
         $data->parent_id = $request->parent_id;
@@ -94,7 +92,6 @@ class jabatanController extends Controller
 
     public function update($params,Request $request){
         $validator = Validator::make($request->all(),[
-            'id_pegawai' => 'required|numeric',
             'id_satuan_kerja' => 'required|numeric',
             'id_kelas_jabatan' => 'required|numeric',
             'parent_id' => 'required|numeric',
@@ -109,7 +106,6 @@ class jabatanController extends Controller
         }
 
         $data = jabatan::where('id',$params)->first();
-        $data->id_pegawai = $request->id_pegawai;
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->id_kelas_jabatan = $request->id_kelas_jabatan;
         $data->parent_id = $request->parent_id;
