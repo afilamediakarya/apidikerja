@@ -168,7 +168,8 @@ class absenController extends Controller
             ]);
         }else{
             return response()->json([
-                'message' => 'Anda belum absen'
+                  'checkin' => $status_checkin,
+                  'checkout' => $status_checkout,
             ]);
         }
         
