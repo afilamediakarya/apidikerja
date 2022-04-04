@@ -22,6 +22,11 @@ class skp extends Model
         return $this->hasMany('App\Models\aspek_skp','id_skp','id');
     }
 
+    public function aktivitas(){
+        return $this->belongsTo('App\Models\aktivitas','id_skp','id');
+    }
+
+
     public function review_skp() {
         return $this->hasOne('App\Models\review_skp', 'id', 'id_skp');
     }

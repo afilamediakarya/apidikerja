@@ -107,7 +107,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('aktivitas')->group(function () {
-        Route::get('/list', [App\Http\Controllers\aktivitasController::class, 'list']);  
+        Route::get('/list', [App\Http\Controllers\aktivitasController::class, 'list']); 
+        Route::get('/list-by-user', [App\Http\Controllers\aktivitasController::class, 'listByUser']);  
         Route::post('/store', [App\Http\Controllers\aktivitasController::class, 'store']);  
         Route::get('/show/{params}', [App\Http\Controllers\aktivitasController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\aktivitasController::class, 'update']);  

@@ -20,17 +20,19 @@ class skpController extends Controller
     public function list(){
         $result = [];
         $atasan = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
-        return $atasan;
-        $get_skp_atasan = skp::where('id_pegawai',$atasan->id_penilai)->get();
-        foreach($get_skp_atasan as $key => $value){
-            
-            $getsubSKp = skp::with('aspek_skp')->where('id_skp_atasan',$value->id)->get();
-            $result[$key] = [
-                'id_pegawai'=>$value['id_pegawai'],
-                'nama_atasan'=>$value['pegawai'][0]['nama'],
-                'rencana_kerja'=>$value['rencana_kerja'],
-                'sub_skp'=> $getsubSKp
-            ];
+        
+        if (isset($atasan)) {
+            $get_skp_atasan = skp::where('id_pegawai',$atasan->id_penilai)->get();
+            foreach($get_skp_atasan as $key => $value){
+                
+                $getsubSKp = skp::with('aspek_skp')->where('id_skp_atasan',$value->id)->get();
+                $result[$key] = [
+                    'id_pegawai'=>$value['id_pegawai'],
+                    'nama_atasan'=>$value['pegawai'][0]['nama'],
+                    'rencana_kerja'=>$value['rencana_kerja'],
+                    'sub_skp'=> $getsubSKp
+                ];
+            }
         }
 
         if ($result) {
@@ -41,8 +43,9 @@ class skpController extends Controller
             ]);
         }else{
             return response()->json([
-                'message' => 'Failed',
-                'status' => false
+                'message' => 'empty data',
+                'status' => false,
+                 'data' => $result
             ]);
         }
     }
