@@ -12,7 +12,7 @@ class aktivitas extends Model
     protected $with = ['skp'];
 
     public function skp() {
-        return $this->hasMany('App\Models\skp', 'id', 'id_skp');
+        return $this->hasOne('App\Models\skp', 'id', 'id_skp');
     }
 
 
