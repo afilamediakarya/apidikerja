@@ -10,7 +10,7 @@ use Validator;
 use App\Models\User;
 use App\Models\pegawai;
 use Illuminate\Validation\ValidationException;
-
+use DB;
 class AuthController extends Controller
 {
     public function login(Request $request){
@@ -152,8 +152,8 @@ class AuthController extends Controller
     }
 
     public function listUsersByOpd(){
-        $data = pegawai::where('role','admin_opd')->get();
-        
+        // $data = User::where('role','admin_opd')->get();
+        $data = pegawai::join('users','tb_pegawai.id', '=', 'users.id_pegawai')->where('users.role','admin_opd')->get();
         if ($data) {
             return response()->json([
                 'message' => 'Success',
@@ -183,7 +183,7 @@ class AuthController extends Controller
     }
 
     public function changeRoleAdmin($params){
-        $data = users::where('id_pegawai',$params)->first();
+        $data = User::where('id_pegawai',$params)->first();
         $data->role = 'admin_opd';
         $data->save();
 
@@ -203,7 +203,7 @@ class AuthController extends Controller
     }
 
     public function changeRolePegawai($params){
-        $data = users::where('id_pegawai',$params)->first();
+        $data = User::where('id_pegawai',$params)->first();
         $data->role = 'pegawai';
         $data->save();
 
