@@ -147,11 +147,11 @@ class jabatanController extends Controller
         }
     }
 
-    public function jabatanAtasan($level){
+    public function jabatanAtasan($level,$id_satuan_kerja){
         $current_user = pegawai::where('id',Auth::user()->id_pegawai)->first();
         $result = [];
         // return $current_user['id_satuan_kerja'];
-        $data = jabatan::where('id_satuan_kerja',$current_user['id_satuan_kerja'])->where('level',$level-1)->get();
+        $data = jabatan::where('id_satuan_kerja',$id_satuan_kerja)->where('level',$level-1)->get();
 
         foreach ($data as $key => $value) {
             $result[$key] = [
