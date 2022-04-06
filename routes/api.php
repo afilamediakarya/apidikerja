@@ -27,6 +27,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/dashboard', [App\Http\Controllers\dashboardController::class, 'get_data']);
     Route::get('/current_user', [App\Http\Controllers\AuthController::class, 'current_user']);
 
+    Route::prefix('admin')->group(function () {
+        Route::get('/list', [App\Http\Controllers\AuthController::class, 'listUsersByOpd']);  
+        Route::get('/option-pegawai-satuankerja/{params}', [App\Http\Controllers\AuthController::class, 'pegawailistBySatuanKerja']);  
+        Route::get('/change-role/{params}', [App\Http\Controllers\AuthController::class, 'changeRoleAdmin']);  
+        Route::delete('/change-role/{params}', [App\Http\Controllers\AuthController::class, 'changeRolePegawai']);    
+    });
+
     Route::prefix('satuan')->group(function () {
         Route::get('/list', [App\Http\Controllers\satuanController::class, 'list']);  
         Route::post('/store', [App\Http\Controllers\satuanController::class, 'store']);  

@@ -151,6 +151,76 @@ class AuthController extends Controller
         }
     }
 
+    public function listUsersByOpd(){
+        $data = pegawai::where('role','admin_opd')->get();
+        
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ],422);
+        }
+    }
+
+    public function pegawailistBySatuanKerja($params){
+        $result = [];
+        $data = pegawai::where('id_satuan_kerja',$params)->get();
+      
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'id' => $value->id,
+                'value'=> $value->nama
+            ];
+        }
+
+        return response()->json($result);
+    }
+
+    public function changeRoleAdmin($params){
+        $data = users::where('id_pegawai',$params)->first();
+        $data->role = 'admin_opd';
+        $data->save();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ],422);
+        }
+
+    }
+
+    public function changeRolePegawai($params){
+        $data = users::where('id_pegawai',$params)->first();
+        $data->role = 'pegawai';
+        $data->save();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ],422);
+        }
+    }
+
     public function logout(Request $request)
     {
         auth()->user()->tokens()->delete();
