@@ -32,7 +32,7 @@ class jabatanController extends Controller
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
             'id_kelas_jabatan' => 'required|numeric',
-            'parent_id' => 'required|numeric',
+            'parent_id' => Rule::requiredIf($request->level > 1),
             'nama_struktur' => 'required',
             'nama_jabatan' => 'required',
             'level' => 'required|numeric',
@@ -94,7 +94,7 @@ class jabatanController extends Controller
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
             'id_kelas_jabatan' => 'required|numeric',
-            'parent_id' => 'required|numeric',
+            'parent_id' => Rule::requiredIf($request->level > 1),
             'nama_struktur' => 'required',
             'nama_jabatan' => 'required',
             'level' => 'required|numeric',
