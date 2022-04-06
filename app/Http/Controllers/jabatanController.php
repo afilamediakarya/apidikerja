@@ -8,6 +8,7 @@ use App\Models\jabatan;
 use App\Models\pegawai;
 use Auth;
 use DB;
+use Illuminate\Validation\Rule;
 class jabatanController extends Controller
 {
     public function list(){
