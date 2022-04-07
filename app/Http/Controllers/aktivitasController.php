@@ -7,6 +7,8 @@ use App\Models\aktivitas;
 use App\Models\skp;
 use Validator;
 use Auth;
+use DB;
+
 class aktivitasController extends Controller
 {
     public function list(){
@@ -26,9 +28,88 @@ class aktivitasController extends Controller
         }
     }
 
+    public function convertNamaBulan($params){
+        switch ($params) {
+            case '1':
+              return 'Januari';
+            case '2':
+              return 'Februari';
+            case '3':
+              return 'Maret';
+            case '4':
+              return 'April';
+            case '5':
+              return 'Mei';
+            case '6':
+              return 'Juni';
+            case '7':
+              return 'Juli';
+            case '8':
+                return 'Juli';
+            case '9':
+                return 'Agustus';
+            case '10':
+                return 'September';
+            case '11':
+                return 'November';
+            default:
+              return 'Desember';
+          }
+    }
+
     public function listByUser(){
  
-        $data = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->latest()->get();
+        $result = [];
+        // $data = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->latest()->get();
+       $getbulan = DB::table("tb_aktivitas")
+        ->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))
+        ->where('id_pegawai',Auth::user()->id_pegawai)
+        ->groupBy('bulan')
+        ->get();
+
+        $bulan = '';
+
+        foreach ($getbulan as $key => $value) {
+            $aktivitas = [];
+            // return $value;
+            $bulan = $this->convertNamaBulan($value->bulan);
+
+            $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'))->whereMonth('tanggal',$value->bulan)->groupBy('date')->orderBy('date')->get();
+            // foreach ($aktivitasgetDate as $x => $y) {
+            //     $getAktivitas = aktivitas::where('tanggal',$y->date)->get();
+            //     $aktivitas[$x] = $getAktivitas;
+            // }
+
+            // $result[$key] = [
+            //     'tanggal' => $y->date,
+            //     'aktivitas' => $aktivitas
+            // ];
+
+            // TESTING
+            foreach ($aktivitasgetDate as $x => $y) {
+                $getAktivitas = aktivitas::where('tanggal',$y->date)->get();
+                $aktivitas[$y->date][$x] = $getAktivitas;
+            }
+            $result[$bulan][] = $aktivitas;
+
+            if ($result) {
+                return response()->json([
+                    'message' => 'Success',
+                    'status' => true,
+                    'data' => $result
+                ]);
+            }else{
+                return response()->json([
+                    'message' => 'Failed',
+                    'status' => false
+                ],422);
+            }
+            
+        }
+
+
+
+        return $result;
 
         if ($data) {
             return response()->json([
