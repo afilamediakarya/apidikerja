@@ -87,7 +87,7 @@ class aktivitasController extends Controller
                 $aktivitas[$y->date][$x] = $getAktivitas;
             }
 
-            $result[$bulan][] = $aktivitas;
+            $result[$key][$bulan][] = $aktivitas;
 
           
         }
