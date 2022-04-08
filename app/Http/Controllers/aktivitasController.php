@@ -67,6 +67,7 @@ class aktivitasController extends Controller
 
         foreach ($getbulan as $key => $value) {
             $aktivitas = [];
+            $aktivitas_data_date = [];
             // return $value;
             $bulan = $this->convertNamaBulan($value->bulan);
 
@@ -84,10 +85,20 @@ class aktivitasController extends Controller
             // TESTING
             foreach ($aktivitasgetDate as $x => $y) {
                 $getAktivitas = aktivitas::where('tanggal',$y->date)->get();
-                $aktivitas[$y->date][$x] = $getAktivitas;
+                // $aktivitas[$y->date][$x] = $getAktivitas;
+            
+                // array_push($aktivitas_data_date,$getAktivitas);
+                $aktivitas[$x] = [
+                    'tanggal' =>$y->date,
+                    'data_tanggal'=>$getAktivitas 
+                ];
             }
 
-            $result[$key][$bulan][] = $aktivitas;
+            // $result[$key][$bulan][] = $aktivitas;
+            $result[$key] = [
+                'bulan'=>$bulan,
+                'data_bulan'=>$aktivitas
+            ];
 
           
         }
