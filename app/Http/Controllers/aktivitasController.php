@@ -96,7 +96,7 @@ class aktivitasController extends Controller
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $result
+                'data' => 'gfdgdfgfd'
             ],200);
         }else{
             return response()->json([
