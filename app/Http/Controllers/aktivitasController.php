@@ -97,12 +97,12 @@ class aktivitasController extends Controller
                 'message' => 'Success',
                 'status' => true,
                 'data' => $result
-            ],200);
+            ]);
         }else{
             return response()->json([
-                'message' => 'Failed',
+                'message' => 'Aktivitas belum ada',
                 'status' => false
-            ],422);
+            ]);
         }   
 
     }
