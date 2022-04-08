@@ -60,12 +60,8 @@ class aktivitasController extends Controller
     public function listByUser(){
  
         $result = [];
-        // $data = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->latest()->get();
-       $getbulan = DB::table("tb_aktivitas")
-        ->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))
-        ->where('id_pegawai',Auth::user()->id_pegawai)
-        ->groupBy('bulan')
-        ->get();
+      
+       $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('bulan')->get();
 
         $bulan = '';
 
@@ -90,39 +86,25 @@ class aktivitasController extends Controller
                 $getAktivitas = aktivitas::where('tanggal',$y->date)->get();
                 $aktivitas[$y->date][$x] = $getAktivitas;
             }
+
             $result[$bulan][] = $aktivitas;
 
-            if ($result) {
-                return response()->json([
-                    'message' => 'Success',
-                    'status' => true,
-                    'data' => $result
-                ]);
-            }else{
-                return response()->json([
-                    'message' => 'Failed',
-                    'status' => false
-                ],422);
-            }
-            
+          
         }
 
-
-
-        return $result;
-
-        if ($data) {
+        if ($result) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $data
+                'data' => $result
             ]);
         }else{
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
-            ]);
-        }
+            ],422);
+        }   
+
     }
 
     public function store(Request $request){
