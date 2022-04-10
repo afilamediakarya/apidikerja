@@ -137,21 +137,15 @@ class atasanController extends Controller
        
         if ($pegawai) {
             $getOption = jabatan::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->get();
-            return $getOption;
             if (isset($getOption)) {
                 foreach ($getOption as $key => $value) {
-                    $result[$key] = [
-                        'id' => $value->id,
-                        'value'=> $value->nama_jabatan.'-'.$value['pegawai']['nama']
-                    ];
-                    // if ($value['pegawai'] != null) {
-                        
-                    // }else{
-                    //     return response()->json([
-                    //         'message' => 'Maaf, Pegawai belum mempunyai jabatan',
-                    //         'status' => false
-                    //     ],422);
-                    // }
+                   
+                    if ($value['pegawai'] != null) {
+                        $result[$key] = [
+                            'id' => $value->id,
+                            'value'=> $value->nama_jabatan.'-'.$value['pegawai']['nama']
+                        ];
+                    }
                 }
             }else{
                 return response()->json([
