@@ -143,7 +143,7 @@ class atasanController extends Controller
                     if ($value['pegawai'] != null) {
                         $result[$key] = [
                             'id' => $value->id,
-                            'value'=> $value->nama_jabatan.'-'.$value['pegawai']['nama']
+                            'value'=> $value->nama_jabatan.' - '.$value['pegawai']['nama']
                         ];
                     }
                 }
