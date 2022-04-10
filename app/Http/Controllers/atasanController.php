@@ -136,7 +136,6 @@ class atasanController extends Controller
         
         if ($pegawai) {
             $getOption = jabatan::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->get();
-            return $getOption;
             $result = [];
 
             if (isset($getOption)) {
