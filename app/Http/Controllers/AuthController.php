@@ -22,12 +22,13 @@ class AuthController extends Controller
 
         $user = User::where('username', $request['username'])->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
+        $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
 
         return response()->json([
             'message' => 'Hi '.$user->username.', Berhasil Login',
             'access_token' => $token, 
             'role' => $user->role,
-            'current' => $user,
+            'current' => $data,
             'token_type' => 'Bearer', 
         ]);
     }
@@ -135,13 +136,14 @@ class AuthController extends Controller
     }
 
     public function current_user(){
-          $user = User::findOrFail(Auth::user()->id);
+        //   $user = User::findOrFail(Auth::user()->id);
+        $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
 
-        if ($user) {
+        if ($data) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $user
+                'data' => $data
             ]);
         }else{
             throw ValidationException::withMessages([

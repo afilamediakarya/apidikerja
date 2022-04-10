@@ -38,32 +38,33 @@ class atasanController extends Controller
         }
 
         $checkData = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+        $data = '';
 
-        if (isset($checkData)) {
+        if (!isset($checkData)) {
             $data = new atasan();
             $data->id_penilai = $request->id_penilai;
             $data->id_pegawai = Auth::user()->id_pegawai;
             $data->save();
+        }else{
+            $data = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+            $data->id_penilai = $request->id_penilai;
+            $data->id_pegawai = Auth::user()->id_pegawai;
+            $data->save();
+        }
 
-            if ($data) {
-                return response()->json([
-                    'message' => 'Success',
-                    'status' => true,
-                    'data' => $data
-                ]);
-            }else{
-                return response()->json([
-                    'message' => 'Failed',
-                    'status' => false
-                ]);
-            }
+        
 
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
         }else{
             return response()->json([
-                'message' => 'Maaf, anda sudah mempunyai atasan',
+                'message' => 'Failed',
                 'status' => false
-            ],422);
-         
+            ]);
         }
        
     }
