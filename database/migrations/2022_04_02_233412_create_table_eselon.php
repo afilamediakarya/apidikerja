@@ -15,6 +15,8 @@ class CreateTableEselon extends Migration
     {
         Schema::create('tb_eselon', function (Blueprint $table) {
             $table->id();
+            $table->string('nama_eselon');
+            $table->enum('status',['active','inactive']);  
             $table->timestamps();
         });
     }

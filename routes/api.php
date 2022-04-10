@@ -61,6 +61,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/get-option-pendidikan-terakhir', [App\Http\Controllers\pegawaiController::class, 'pendidikanTerakhir']);  
         Route::get('/get-option-pangkat-golongan', [App\Http\Controllers\pegawaiController::class, 'optionGolongan']);  
         Route::get('/get-option-status-pegawai', [App\Http\Controllers\pegawaiController::class, 'optionStatusPegawai']);  
+        Route::get('/get-option-status-eselon', [App\Http\Controllers\pegawaiController::class, 'optionEselon']);  
     });
 
     Route::prefix('jadwal')->group(function () {

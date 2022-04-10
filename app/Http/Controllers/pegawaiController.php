@@ -39,7 +39,6 @@ class pegawaiController extends Controller
             'golongan' => 'required',
             'tmt_golongan' => 'required|date',
             'eselon' => 'required',
-            'tmt_jabatan' => 'required|date',
             'tmt_pegawai' => 'required|date',
             'jenis_kelamin' => 'required',
             'agama' => 'required',
@@ -67,8 +66,6 @@ class pegawaiController extends Controller
         $data->tmt_golongan = $request->tmt_golongan;
         $data->eselon = $request->eselon;
         $data->jenis_jabatan = $request->jenis_jabatan;
-        $data->jabatan = $request->jabatan;
-        $data->tmt_jabatan = $request->tmt_jabatan;
         $data->tmt_pegawai = $request->tmt_pegawai;
         $data->jenis_kelamin = $request->jenis_kelamin;
         $data->agama = $request->agama;
@@ -132,7 +129,6 @@ class pegawaiController extends Controller
             'golongan' => 'required',
             'tmt_golongan' => 'required',
             'eselon' => 'required',
-            'tmt_jabatan' => 'required|date',
             'tmt_pegawai' => 'required|date',
             'jenis_kelamin' => 'required',
             'agama' => 'required',
@@ -158,8 +154,6 @@ class pegawaiController extends Controller
         $data->tmt_golongan = $request->tmt_golongan;
         $data->eselon = $request->eselon;
         $data->jenis_jabatan = $request->jenis_jabatan;
-        $data->jabatan = $request->jabatan;
-        $data->tmt_jabatan = $request->tmt_jabatan;
         $data->tmt_pegawai = $request->tmt_pegawai;
         $data->jenis_kelamin = $request->jenis_kelamin;
         $data->agama = $request->agama;
@@ -256,6 +250,17 @@ class pegawaiController extends Controller
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'value'=> $value->nama_pendidikan
+            ];
+        }
+        return response()->json($result);
+    }
+
+    public function optionEselon(){
+        $result = [];
+        $data = DB::table('tb_eselon')->latest()->get();
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'value'=> $value->nama_eselon
             ];
         }
         return response()->json($result);
