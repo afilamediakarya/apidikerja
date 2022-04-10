@@ -138,6 +138,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/show/{params}', [App\Http\Controllers\atasanController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\atasanController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\atasanController::class, 'delete']);  
+        Route::get('/option-atasan', [App\Http\Controllers\atasanController::class, 'option_atasan']);  
     });
 
     Route::prefix('absen')->group(function () {

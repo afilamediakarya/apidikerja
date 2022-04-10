@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\atasan;
+use App\Models\pegawai;
+use App\Models\jabatan;
 use Validator;
 use Auth;
+
 class atasanController extends Controller
 {
     public function list(){
@@ -34,24 +37,35 @@ class atasanController extends Controller
             return response()->json($validator->errors());       
         }
 
-        $data = new atasan();
-        $data->id_penilai = $request->id_penilai;
-        $data->id_pegawai = Auth::user()->id_pegawai;
-        $data->save();
+        $checkData = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
 
+        if (isset($checkData)) {
+            $data = new atasan();
+            $data->id_penilai = $request->id_penilai;
+            $data->id_pegawai = Auth::user()->id_pegawai;
+            $data->save();
 
-        if ($data) {
-            return response()->json([
-                'message' => 'Success',
-                'status' => true,
-                'data' => $data
-            ]);
+            if ($data) {
+                return response()->json([
+                    'message' => 'Success',
+                    'status' => true,
+                    'data' => $data
+                ]);
+            }else{
+                return response()->json([
+                    'message' => 'Failed',
+                    'status' => false
+                ]);
+            }
+
         }else{
             return response()->json([
-                'message' => 'Failed',
+                'message' => 'Maaf, anda sudah mempunyai atasan',
                 'status' => false
-            ]);
+            ],422);
+         
         }
+       
     }
 
     public function show($params){
@@ -115,4 +129,21 @@ class atasanController extends Controller
             ]);
         }
     }
+
+    public function option_atasan(){
+        $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
+        $getOption = jabatan::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->get();
+        $result = [];
+
+        foreach ($getOption as $key => $value) {
+            $result[$key] = [
+                'id' => $value->id,
+                'value'=> $value->nama_jabatan.'-'.$value['pegawai']['nama']
+            ];
+        }
+
+        return response()->json($result);
+
+    }
+
 }

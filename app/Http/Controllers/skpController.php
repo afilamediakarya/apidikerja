@@ -232,16 +232,31 @@ class skpController extends Controller
 
     public function optionSkp(){
         $atasan  = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
-        $getJabatan = jabatan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+        $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
+    
+        if (isset($atasan)) {
+            $getJabatan = jabatan::where('id',$atasan['id_penilai'])->first();
 
-        if ($getJabatan['level'] != "1") {
-            $getSkp = skp::where('id_pegawai',$atasan['id_penilai'])->get();
-            return collect($getSkp)->pluck('rencana_kerja','id')->toArray();
+            if (isset($getJabatan)) {
+                if ($getJabatan['level'] != "1") {
+                    $getSkp = skp::where('id_pegawai',$getJabatan['id_pegawai'])->get();
+                    return collect($getSkp)->pluck('rencana_kerja','id')->toArray();
+                }else{
+                    $kegiatan = kegiatan::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->latest()->get();
+                    return collect($kegiatan)->pluck('nama_kegiatan','id')->toArray();
+                }
+            }else{
+                return response()->json([
+                    'message' => 'Data tidak ada',
+                    'status' => false
+                ],422);
+            }
         }else{
-            $kegiatan = kegiatan::latest()->get();
-            return collect($kegiatan)->pluck('nama_kegiatan','id')->toArray();
+            return response()->json([
+                'message' => 'Data tidak ada',
+                'status' => false
+            ],422); 
         }
-
         
     }
 
