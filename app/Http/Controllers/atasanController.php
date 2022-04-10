@@ -133,15 +133,32 @@ class atasanController extends Controller
 
     public function option_atasan(){
         $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
-        $getOption = jabatan::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->get();
-        $result = [];
+        
+        if ($pegawai) {
+            $getOption = jabatan::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->get();
+            $result = [];
 
-        foreach ($getOption as $key => $value) {
-            $result[$key] = [
-                'id' => $value->id,
-                'value'=> $value->nama_jabatan.'-'.$value['pegawai']['nama']
-            ];
+            if (isset($getOption)) {
+                foreach ($getOption as $key => $value) {
+                    $result[$key] = [
+                        'id' => $value->id,
+                        'value'=> $value->nama_jabatan.'-'.$value['pegawai']['nama']
+                    ];
+                }
+            }else{
+                return response()->json([
+                    'message' => 'Data tidak ada',
+                    'status' => false
+                ],422);
+            }
+
+        }else{
+            return response()->json([
+                'message' => 'Data tidak ada',
+                'status' => false
+            ],422);
         }
+       
 
         return response()->json($result);
 
