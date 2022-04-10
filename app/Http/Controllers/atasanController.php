@@ -137,8 +137,7 @@ class atasanController extends Controller
        
         if ($pegawai) {
             $getOption = jabatan::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->get();
-         
-            return $getOption;
+     
             if (isset($getOption)) {
                 foreach ($getOption as $key => $value) {
                     if ($value['pegawai'] != null) {
@@ -167,8 +166,8 @@ class atasanController extends Controller
             ],422);
         }
        
-
         return response()->json($result);
+       
 
     }
 
