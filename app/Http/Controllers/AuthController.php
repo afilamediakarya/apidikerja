@@ -137,8 +137,8 @@ class AuthController extends Controller
     }
 
     public function current_user(){
-        //   $user = User::findOrFail(Auth::user()->id);
-        $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
+          $data = User::findOrFail(Auth::user()->id);
+        // $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
 
         if ($data) {
             return response()->json([
