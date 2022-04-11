@@ -28,7 +28,8 @@ class AuthController extends Controller
             'message' => 'Hi '.$user->username.', Berhasil Login',
             'access_token' => $token, 
             'role' => $user->role,
-            'current' => $data,
+            'current' => $user,
+            'check_atasan'=> $data,
             'token_type' => 'Bearer', 
         ]);
     }
