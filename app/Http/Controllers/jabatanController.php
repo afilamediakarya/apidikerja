@@ -162,4 +162,20 @@ class jabatanController extends Controller
 
         return response()->json($result);
     }
+
+    public function getPegawaiBySatuanKerja(){
+        $current_user = pegawai::where('id',Auth::user()->id_pegawai)->first();
+
+        $data = pegawai::where('id_satuan_kerja',$current_user['id_satuan_kerja'])->get();
+
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'id' => $value->id,
+                'value'=> $value->nama
+            ];
+        }
+
+        return response()->json($result);
+
+    }
 }

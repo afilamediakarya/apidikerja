@@ -194,6 +194,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/update/{params}', [App\Http\Controllers\jabatanController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\jabatanController::class, 'delete']);
         Route::get('/get-option-jabatan-atasan/{params}/{id_satuan_kerja}', [App\Http\Controllers\jabatanController::class, 'jabatanAtasan']);     
+        Route::post('/pegawaiBySatuanKerja', [App\Http\Controllers\jabatanController::class, 'getPegawaiBySatuanKerja']);  
     });
 
 });
