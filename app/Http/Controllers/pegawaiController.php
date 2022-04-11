@@ -14,25 +14,18 @@ class pegawaiController extends Controller
 {
     
     public function list(){
-        $data = pegawai::latest()->get();
-
-        if ($data) {
-            return response()->json([
-                'message' => 'Success',
-                'status' => true,
-                'data' => $data
-            ]);
+        $data = '';
+        if (Auth::user()->role == 'admin') {
+            $data = pegawai::latest()->get();
         }else{
-            return response()->json([
-                'message' => 'Failed',
-                'status' => false
-            ]);
+            $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
+            if (isset($pegawai)) {
+                $data = pegawai::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->latest()->get();
+            }else{
+                $data = [];
+            }
+           
         }
-    }
-
-    public function listOpd(){
-        $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
-        $data = pegawai::where('id_pegawai',$pegawai['id_satuan_kerja'])->latest()->get();
 
         if ($data) {
             return response()->json([
