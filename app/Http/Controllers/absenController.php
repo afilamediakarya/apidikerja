@@ -212,8 +212,5 @@ class absenController extends Controller
         //     }
 
         // }
-
-       
-        return $time_now;
     }
 }

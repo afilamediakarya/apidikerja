@@ -4,15 +4,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\pegawai;
+use App\Models\absen;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Validator;
 use DB;
+use Auth;
 class pegawaiController extends Controller
 {
     
     public function list(){
         $data = pegawai::latest()->get();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
+    public function listOpd(){
+        $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
+        $data = pegawai::where('id_pegawai',$pegawai['id_satuan_kerja'])->latest()->get();
 
         if ($data) {
             return response()->json([
@@ -264,6 +284,91 @@ class pegawaiController extends Controller
             ];
         }
         return response()->json($result);
+    }
+
+    public function tesScheduling(){
+        $ada = [];
+        $tidak = [];
+        $result = [];
+        $dt = date('Y-m-d');
+        $status_checkin = false;
+        $status_checkout = false;
+        // return $dt;
+        $data = pegawai::all();
+        // return  absen::where('id_pegawai',2951)->where('tanggal_absen',$dt)->get();
+        foreach ($data as $key => $value) {
+            $absenCheck = absen::where('id_pegawai',$value->id)->where('tanggal_absen',$dt)->get();
+
+            if ($absenCheck == []) {
+                $result[] = $value->id;
+            }
+
+            // if (isset($absenCheck)) {
+            //     // if (count($v) > 1) {
+
+            //     // }
+            //     $result[$key]['ada'] = $value->id;
+            // }else{
+            //     $result[$key]['tidak ada'] = $value->id;
+            //     // for ($i=0; $i < 2; $i++) { 
+            //     //         $absen = new absen();
+            //     //         $absen->id_pegawai = $value->id;
+            //     //         $absen->tanggal_absen = $dt;
+            //     //         $absen->status = 'alpa';
+            //     //         if ($i == 0) {
+            //     //             $absen->jenis = 'checkin';
+            //     //             $absen->waktu_absen = '08:00:00';
+            //     //         }else{
+            //     //             $absen->jenis = 'checkout';
+            //     //             $absen->waktu_absen = '17:00:00';
+            //     //         }
+            //     //         $absen->location_auth = 'valid';
+            //     //         $absen->face_auth = 'valid';
+            //     //         $absen->tahun = '2022';
+            //     //         $absen->save();
+            //     // }  
+            // }
+
+            // foreach ($absenCheck as $i => $v) {
+            //     return $v;
+            //    if (isset($v)) {
+            //        return count($v);
+            //     //    if (count($v) > 1) {
+            //     //     $absen = new absen();
+            //     //     $absen->id_pegawai = $value->id;
+            //     //     $absen->tanggal_absen = $dt;
+            //     //     $absen->status = 'hadir';
+            //     //     $absen->jenis = 'checkout';
+            //     //     $absen->waktu_absen = '17:00:00';
+            //     //     $absen->location_auth = 'valid';
+            //     //     $absen->face_auth = 'valid';
+            //     //     $absen->tahun = '2022';
+            //     //     $absen->save();
+            //     //    }
+            //    }else{
+            //        for ($i=0; $i < 2; $i++) { 
+            //             $absen = new absen();
+            //             $absen->id_pegawai = $value->id;
+            //             $absen->tanggal_absen = $dt;
+            //             $absen->status = 'alpa';
+            //             if ($i == 0) {
+            //                 $absen->jenis = 'checkin';
+            //                 $absen->waktu_absen = '08:00:00';
+            //             }else{
+            //                 $absen->jenis = 'checkout';
+            //                 $absen->waktu_absen = '17:00:00';
+            //             }
+            //             $absen->location_auth = 'valid';
+            //             $absen->face_auth = 'valid';
+            //             $absen->tahun = '2022';
+            //             $absen->save();
+            //        } 
+            //    }
+            // }
+        }
+
+        return $result;
+      
     }
 
 

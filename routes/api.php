@@ -52,6 +52,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('pegawai')->group(function () {
         Route::get('/list', [App\Http\Controllers\pegawaiController::class, 'list']);  
+        Route::get('/list-by-opd', [App\Http\Controllers\pegawaiController::class, 'listOpd']);  
         Route::post('/store', [App\Http\Controllers\pegawaiController::class, 'store']);  
         Route::get('/show/{params}', [App\Http\Controllers\pegawaiController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\pegawaiController::class, 'update']);  
@@ -62,6 +63,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/get-option-pangkat-golongan', [App\Http\Controllers\pegawaiController::class, 'optionGolongan']);  
         Route::get('/get-option-status-pegawai', [App\Http\Controllers\pegawaiController::class, 'optionStatusPegawai']);  
         Route::get('/get-option-status-eselon', [App\Http\Controllers\pegawaiController::class, 'optionEselon']);  
+        Route::get('/tesScheduling', [App\Http\Controllers\pegawaiController::class, 'tesScheduling']);  
     });
 
     Route::prefix('jadwal')->group(function () {
