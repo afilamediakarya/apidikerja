@@ -71,6 +71,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/show/{params}', [App\Http\Controllers\jadwalController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\jadwalController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\jadwalController::class, 'delete']);  
+        Route::get('/option-tahapan', [App\Http\Controllers\jadwalController::class, 'optionTahapan']);
+        Route::get('/option-sub-tahapan/{params}', [App\Http\Controllers\jadwalController::class, 'optionSubTahapan']);  
     });
 
     Route::prefix('profil_daerah')->group(function () {
