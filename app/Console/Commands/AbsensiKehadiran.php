@@ -39,17 +39,16 @@ class AbsensiKehadiran extends Command
     public function handle()
     {
        
-        $dt = date('Y-m-d');
         $absen = '';
         $data = DB::table('tb_pegawai')->whereNotExists(function($query){
-            $query->select(DB::raw(1))->from('tb_absen')->whereColumn('tb_absen.id_pegawai','tb_pegawai.id');
+            $query->select(DB::raw(1))->from('tb_absen')->where('tanggal_absen',date('Y-m-d'))->whereColumn('tb_absen.id_pegawai','tb_pegawai.id');
         })->get();
 
         foreach ($data as $key => $value) {
             for ($i=0; $i < 2; $i++) { 
                 $absen = new absen();
                 $absen->id_pegawai = $value->id;
-                $absen->tanggal_absen = $dt;
+                $absen->tanggal_absen = date('Y-m-d');
                 $absen->status = 'alpa';
                 if ($i == 0) {
                     $absen->jenis = 'checkin';

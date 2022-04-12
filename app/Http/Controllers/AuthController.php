@@ -77,7 +77,7 @@ class AuthController extends Controller
     }
 
     public function change_password(Request $request){
-
+        // return $request->all();
         $validator = Validator::make($request->all(), [
             'password_baru' => 'required|string|min:8',
             'password_lama' => 'required'
@@ -88,31 +88,32 @@ class AuthController extends Controller
         }
 
         $user = User::where('id',Auth::user()->id)->first();
-        // return $user;
+        // return $user->password;
         if (isset($user)) {    
             $password = Hash::check($request->password_lama, $user->password);
-            
+            // dd($password);    
             if ($password == true) {
                     $user->password = Hash::make($request->password_baru);
                     $user->save();
             }else{
-                throw ValidationException::withMessages([
-                    'message' => ['Password lama salah.'],
-                ]);
+                return response()->json([
+                    'message' => 'Password lama salah',
+                    'status' => false,
+                ],422);
             }
         }
 
-        if ($data) {
+        if ($user) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $data
+                'data' => $user
             ]);
         }else{
-            throw ValidationException::withMessages([
+            return response()->json([
                 'message' => 'Failed',
-                'status' => false
-            ]);
+                'status' => false,
+            ],422);
         }
 
     }
