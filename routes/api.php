@@ -200,7 +200,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('laporan-rekapitulasi-absen')->group(function () {
-        Route::get('/rekapByUser', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'rekapByUser']);      
+        Route::get('/rekapByUser/{start_date}/{end_date}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'rekapByUser']);      
     });
 
 });

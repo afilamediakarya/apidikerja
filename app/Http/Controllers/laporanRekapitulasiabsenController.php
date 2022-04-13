@@ -9,14 +9,15 @@ use DB;
 use Auth;
 class laporanRekapitulasiabsenController extends Controller
 {
-    public function rekapByUser(){
+    public function rekapByUser($startDate, $endDate){
+        // return $startDate. ' - '.$endDate;
         $result = [];
     //    return Auth::user()->id_pegawai;
         $rekapAbsen = [];
         $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
         // $getAbsen = DB::table('tb_absen')->where('id_pegawai',Auth::user()->id_pegawai)->get();
-        $getDatatanggal = DB::table('tb_absen')->select(DB::raw('tanggal_absen as date'))->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
-        // return $getDatatanggal;
+        $getDatatanggal = DB::table('tb_absen')->select(DB::raw('tanggal_absen as date'))->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
+        return $getDatatanggal;
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
             $getAbsen = DB::table('tb_absen')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$value->date)->get();
