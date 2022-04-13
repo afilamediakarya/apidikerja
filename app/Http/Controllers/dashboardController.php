@@ -17,7 +17,6 @@ use Auth;
 class dashboardController extends Controller
 {
     public function get_data(){
-
 		if (Auth::user()->role == 'super_admin') {
 			return $this->admin_dashboard();
 		} elseif(Auth::user()->role == 'pegawai') {
@@ -78,12 +77,14 @@ class dashboardController extends Controller
 	}
 
 	public function pegawai_dashboard(){
+		// return Auth::user()->id_pegawai;
 		$getSkp = skp::where('id_pegawai',Auth::user()->id_pegawai)->get()->count();
 		$list_pegawai = [];
 		$result = [];
 		$temporary = [];
 		$getPegawai = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
-		$getAtasan = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+		$getAtasan = jabatan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+	
 		$countAktivitas = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->count();
 
 		foreach ($getPegawai as $key => $value) {
@@ -118,8 +119,31 @@ class dashboardController extends Controller
 	
 
 		// INFO PEGAWAI
-		$info_pegawai = pegawai::with('skp')->where('id',Auth::user()->id_pegawai)->first();
-		$info_penilai = pegawai::where('id',$getAtasan->id_penilai)->first();
+		$info_pegawai = [];
+		$get_pegawai = pegawai::with('skp')->where('id',Auth::user()->id_pegawai)->first();
+		if (isset($info_pegawai)) {
+			$info_pegawai = [
+				'nama' => $get_pegawai['nama'],
+				'nip' => $get_pegawai['nip'],
+				'pangkat' => $get_pegawai['golongan_pangkat'],
+				'jabatan' => $get_pegawai['jenis_jabatan'],
+				'Instansi' => $get_pegawai['satuan_kerja']['nama_satuan_kerja']
+			];
+		}
+		$info_penilai = [];
+		if (isset($getAtasan)) {
+			// return $getAtasan;
+			$get_penilai = pegawai::where('id',$getAtasan->id_pegawai)->first();
+			// return $get_penilai;
+			$info_penilai = [
+				'nama' => $get_penilai['nama'],
+				'nip' => $get_penilai['nip'],
+				'pangkat' => $get_penilai['golongan_pangkat'],
+				'jabatan' => $get_penilai['jenis_jabatan'],
+				'Instansi' => $get_penilai['satuan_kerja']['nama_satuan_kerja']
+			];	
+		}
+		
 		// 
 
 		// return $info_pegawai;
@@ -131,25 +155,33 @@ class dashboardController extends Controller
 		$hasil_total_kinerja = 0;
 
 		// INFO TPP
+			$nilai_besaran_tpp = 0;
 			$besaran_tpp = jabatan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+			if ($besaran_tpp) {
+				$nilai_besaran_tpp = $besaran_tpp['kelas_jabatan']['besaran_tpp'];
+			}
 			// Tunjangan Prestasi Kerja
-				
-			foreach ($info_pegawai['skp'] as $kk => $vv) {
-				$aspek = aspek_skp::where('id_skp',$vv['id'])->get();
-				$cek[$kk] = $aspek;
-				// $total_realisasi = 0;
-				// $total_target = 0;
-				// $persentase_awal_kinerja = 0;
-				foreach($aspek as $index => $val){
-					foreach($val['realisasi_skp'] as $k => $kl){ 
-						$total_realisasi += $kl['realisasi_bulanan'];
-						$total_target += $val['target_skp'][$k]['target'];
+			// return $get_pegawai;
+			if (isset($get_pegawai)) {
+				if (!empty($get_pegawai['skp'])) {
+					// return $get_pegawai['skp'];
+					foreach ($get_pegawai['skp'] as $kk => $vv) {
+						$aspek = aspek_skp::where('id_skp',$vv['id'])->get();
+						$cek[$kk] = $aspek;
+						foreach($aspek as $index => $val){
+							foreach($val['realisasi_skp'] as $k => $kl){ 
+								$total_realisasi += $kl['realisasi_bulanan'];
+								$total_target += $val['target_skp'][$k]['target'];
+							}
+						}
+					}
+		
+					if ($total_realisasi > 0 && $total_target > 0) {
+						$total_kinerja = (($total_realisasi / $total_target) * 100) / $getSkp;
+						$hasil_total_kinerja = ($total_kinerja / 60) * 100;
 					}
 				}
 			}
-
-			$total_kinerja = (($total_realisasi / $total_target) * 100) / $getSkp;
-			$hasil_total_kinerja = ($total_kinerja / 60) * 100;
 
 				// return $total_realisasi;
 			// 
@@ -159,23 +191,11 @@ class dashboardController extends Controller
     		'jumlah_skp' => $getSkp,
     		'pegawai_diniai' => count($getPegawai),
 			'aktivitas' => $countAktivitas,
-			'informasi_pegawai' => [
-				'nama' => $info_pegawai['nama'],
-				'nip' => $info_pegawai['nip'],
-				'pangkat' => $info_pegawai['golongan_pangkat'],
-				'jabatan' => $info_pegawai['jenis_jabatan'],
-				'Instansi' => $info_pegawai['satuan_kerja']['nama_satuan_kerja']
-			],
-			'informasi_penilai' => [
-				'nama' => $info_penilai['nama'],
-				'nip' => $info_penilai['nip'],
-				'pangkat' => $info_penilai['golongan_pangkat'],
-				'jabatan' => $info_penilai['jenis_jabatan'],
-				'Instansi' => $info_penilai['satuan_kerja']['nama_satuan_kerja']
-			],
+			'informasi_pegawai' => $info_pegawai,
+			'informasi_penilai' => $info_penilai,
 			'list_rekap_nilai' => $list_pegawai,
 			'informasi_tpp' => [
-				'besaran_tpp' => number_format($besaran_tpp['kelas_jabatan']['besaran_tpp'],2),
+				'besaran_tpp' => number_format($nilai_besaran_tpp,2),
 				'tunjangan_prestasi_kerja' => number_format($hasil_total_kinerja,2)
 			]
     	];

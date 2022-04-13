@@ -199,6 +199,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/pegawaiBySatuanKerja', [App\Http\Controllers\jabatanController::class, 'getPegawaiBySatuanKerja']);  
     });
 
+    Route::prefix('laporan-rekapitulasi-absen')->group(function () {
+        Route::get('/rekapByUser', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'rekapByUser']);      
+    });
+
 });
 
 
