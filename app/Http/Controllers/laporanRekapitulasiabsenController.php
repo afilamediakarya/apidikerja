@@ -53,7 +53,7 @@ class laporanRekapitulasiabsenController extends Controller
                 'data_tanggal'=>$dataAbsen 
             ];
         }
-        $result['pegawai'] = $pegawai['nama'];
+        $result['pegawai'] = $pegawai;
         $result['data_absen'] = $rekapAbsen;
 
         if ($result) {
