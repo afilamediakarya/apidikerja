@@ -88,10 +88,51 @@ class laporanRekapitulasiabsenController extends Controller
         return $selisih_waktu;
     }
 
-    public function rekapByAdminOpd(){
+    public function jmlHariKerja($startDate, $endDate){
+        $tanggal_awal = strtotime($startDate);
+        $tanggal_akhir = strtotime($endDate);
+
+        $harikerja = array();
+        for ($i=$tanggal_awal; $i <= $tanggal_akhir; $i += (60 * 60 * 24)) {
+            if (date('w', $i) !== '0' && date('w', $i) !== '6') {
+                $harikerja[] = $i;
+            }
+        }
+
+        $jumlah_hari = count($harikerja);
+
+        return $jumlah_hari;
+
+    }
+
+    public function rekapByAdminOpd($startDate, $endDate){
+        $result = [];
+        $pegawai_data = [];
         $pegawai = DB::table('tb_pegawai')->select('id_satuan_kerja')->where('id',Auth::user()->id_pegawai)->first();
         $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->get();
-        return $pegawaiBySatuanKerja;
+
+        foreach ($pegawaiBySatuanKerja as $key => $value) {
+            // $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id_pegawai',DB::raw("SUM(tb_absen.status = 'alpa') as tanpa_keterangan"), DB::raw("SUM(tb_absen.status = 'hadir') as hadir"),DB::raw("SUM(tb_absen.status = 'alpa') as potongan"))->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->groupBy('tb_absen.id_pegawai')->get();
+            $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id','id_pegawai','waktu_absen','status','jenis',DB::raw("SUM(tb_absen.status = 'alpa') as tanpa_keterangan"), DB::raw("SUM(tb_absen.status = 'hadir') as hadir"))->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->groupBy('tb_absen.id')->get();
+            // return $getAbsenPegawai;
+            // foreach ($getAbsenPegawai as $key => $value) {
+                
+            // }
+           $pegawai_data[$key] = $getAbsenPegawai;
+        }
+
+        // return $pegawai_data;
+
+        $jml_hari = $this->jmlHariKerja($startDate, $endDate);
+        
+
+        return $result = [
+            'hari_kerja' => $jml_hari,
+            'pegawai' => $pegawai_data
+        ];
+
+        // return $pegawaiBySatuanKerja;
+
         
     }
 }
