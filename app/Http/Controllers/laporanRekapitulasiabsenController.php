@@ -12,7 +12,6 @@ class laporanRekapitulasiabsenController extends Controller
     public function rekapByUser($startDate, $endDate){
         // return $startDate. ' - '.$endDate;
         $result = [];
-    //    return Auth::user()->id_pegawai;
         $rekapAbsen = [];
         $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
         // $getAbsen = DB::table('tb_absen')->where('id_pegawai',Auth::user()->id_pegawai)->get();
@@ -87,5 +86,12 @@ class laporanRekapitulasiabsenController extends Controller
         $selisih_waktu = floor($menit/60);
 
         return $selisih_waktu;
+    }
+
+    public function rekapByAdminOpd(){
+        $pegawai = DB::table('tb_pegawai')->select('id_satuan_kerja')->where('id',Auth::user()->id_pegawai)->first();
+        $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->get();
+        return $pegawaiBySatuanKerja;
+        
     }
 }

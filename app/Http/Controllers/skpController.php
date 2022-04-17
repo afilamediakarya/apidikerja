@@ -13,6 +13,7 @@ use App\Models\realisasi_skp;
 use App\Models\satuan;
 use App\Models\jabatan;
 use App\Models\kegiatan;
+use App\Models\pegawai;
 use Validator;
 use Auth;
 class skpController extends Controller
