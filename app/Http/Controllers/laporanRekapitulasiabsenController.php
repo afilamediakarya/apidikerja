@@ -118,7 +118,7 @@ class laporanRekapitulasiabsenController extends Controller
             // foreach ($getAbsenPegawai as $key => $value) {
                 
             // }
-           if ($getAbsenPegawai != []) {
+           if (!empty($getAbsenPegawai)) {
                $pegawai_data[$key] = $getAbsenPegawai;
            }
         }
