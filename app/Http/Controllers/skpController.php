@@ -234,16 +234,17 @@ class skpController extends Controller
 
     public function optionSkp(){
         $atasan = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        $checkDataAtasan;
-        return $atasan;
-        $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
-    
-        if (isset($atasan)) {
-            $getJabatan = jabatan::where('id',$atasan['id_penilai'])->first();
+        // $checkDataAtasan = DB::table('tb_jabatan')->where('id',$atasan->parent_id)->first();
+        // $pegawai = pegawai::where('id',$checkDataAtasan->id_pegawai)->first();
+        // return $checkDataAtasan;
 
+        if (isset($atasan)) {
+            // $getJabatan = jabatan::where('id',$atasan['id_penilai'])->first();
+            $getJabatan = DB::table('tb_jabatan')->where('id',$atasan->parent_id)->first();
+            // return $getJabatan;
             if (isset($getJabatan)) {
-                if ($getJabatan['level'] != "1") {
-                    $getSkp = skp::where('id_pegawai',$getJabatan['id_pegawai'])->get();
+                if ($getJabatan->level != "1") {
+                    $getSkp = skp::where('id_pegawai',$getJabatan->id_pegawai)->get();
                     return collect($getSkp)->pluck('rencana_kerja','id')->toArray();
                 }else{
                     $kegiatan = kegiatan::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->latest()->get();
@@ -253,7 +254,7 @@ class skpController extends Controller
                 return response()->json([
                     'message' => 'Data tidak ada',
                     'status' => false
-                ],422);
+                ]);
             }
         }else{
             return response()->json([
