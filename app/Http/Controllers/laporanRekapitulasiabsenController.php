@@ -115,15 +115,10 @@ class laporanRekapitulasiabsenController extends Controller
             // $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id_pegawai',DB::raw("SUM(tb_absen.status = 'alpa') as tanpa_keterangan"), DB::raw("SUM(tb_absen.status = 'hadir') as hadir"),DB::raw("SUM(tb_absen.status = 'alpa') as potongan"))->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->groupBy('tb_absen.id_pegawai')->get();
             $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id','id_pegawai','waktu_absen','status','jenis',DB::raw("SUM(tb_absen.status = 'alpa') as tanpa_keterangan"), DB::raw("SUM(tb_absen.status = 'hadir') as hadir"))->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->groupBy('tb_absen.id')->get();
 
-            // foreach ($getAbsenPegawai as $key => $value) {
-                
-            // }
-           if (!empty($getAbsenPegawai)) {
-               $pegawai_data[$key] = $getAbsenPegawai;
+           if (count($getAbsenPegawai) > 0) {
+               $pegawai_data[] = $getAbsenPegawai;
            }
         }
-
-        // return $pegawai_data;
 
         $jml_hari = $this->jmlHariKerja($startDate, $endDate);
         
