@@ -14,6 +14,7 @@ use App\Models\satuan;
 use App\Models\jabatan;
 use App\Models\kegiatan;
 use App\Models\pegawai;
+use DB;
 use Validator;
 use Auth;
 class skpController extends Controller
@@ -232,7 +233,9 @@ class skpController extends Controller
     }
 
     public function optionSkp(){
-        $atasan  = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+        $atasan = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        $checkDataAtasan;
+        return $atasan;
         $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
     
         if (isset($atasan)) {
@@ -256,7 +259,7 @@ class skpController extends Controller
             return response()->json([
                 'message' => 'Data tidak ada',
                 'status' => false
-            ],422); 
+            ]); 
         }
         
     }
