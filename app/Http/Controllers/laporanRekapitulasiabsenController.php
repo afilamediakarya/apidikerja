@@ -108,7 +108,7 @@ class laporanRekapitulasiabsenController extends Controller
     public function rekapByAdminOpd($startDate, $endDate){
         $result = [];
         $pegawai_data = [];
-        $pegawai = DB::table('tb_pegawai')->select('id_satuan_kerja')->where('id',Auth::user()->id_pegawai)->first();
+        $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
         $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->get();
 
         foreach ($pegawaiBySatuanKerja as $key => $value) {
@@ -121,9 +121,9 @@ class laporanRekapitulasiabsenController extends Controller
         }
 
         $jml_hari = $this->jmlHariKerja($startDate, $endDate);
-        
 
         return $result = [
+            'satuan_kerja' => $pegawai['satuan_kerja']['nama_satuan_kerja'],
             'hari_kerja' => $jml_hari,
             'pegawai' => $pegawai_data
         ];
