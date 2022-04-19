@@ -235,7 +235,7 @@ class skpController extends Controller
     public function optionSkp(){
         $atasan = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         // $checkDataAtasan = DB::table('tb_jabatan')->where('id',$atasan->parent_id)->first();
-        // $pegawai = pegawai::where('id',$checkDataAtasan->id_pegawai)->first();
+        $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
         // return $checkDataAtasan;
 
         if (isset($atasan)) {
