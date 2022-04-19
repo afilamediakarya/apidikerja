@@ -233,6 +233,7 @@ class skpController extends Controller
     }
 
     public function optionSkp(){
+        $result = [];
         $atasan = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         // $checkDataAtasan = DB::table('tb_jabatan')->where('id',$atasan->parent_id)->first();
         $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
@@ -245,10 +246,24 @@ class skpController extends Controller
             if (isset($getJabatan)) {
                 if ($getJabatan->level != "1") {
                     $getSkp = skp::where('id_pegawai',$getJabatan->id_pegawai)->get();
-                    return collect($getSkp)->pluck('rencana_kerja','id')->toArray();
+                    foreach ($getSkp as $key => $value) {
+                        $result[$key] = [
+                            'id' => $value->id,
+                            'value'=> $value->rencana_kerja
+                        ];
+                    }
+                    return $result;
+                    // return collect($getSkp)->pluck('rencana_kerja','id')->toArray();
                 }else{
                     $kegiatan = kegiatan::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->latest()->get();
-                    return collect($kegiatan)->pluck('nama_kegiatan','id')->toArray();
+                    foreach ($kegiatan as $key => $value) {
+                        $result[$key] = [
+                            'id' => $value->id,
+                            'value'=> $value->nama_kegiatan
+                        ];
+                    }
+                    return $result;
+                    // return collect($kegiatan)->pluck('nama_kegiatan','id')->toArray();
                 }
             }else{
                 return response()->json([
