@@ -53,7 +53,7 @@ class skpController extends Controller
     }
 
     public function store(Request $request){
-        // return $request;
+        return $request;
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
             'id_skp_atasan' => 'required|numeric',
@@ -124,7 +124,7 @@ class skpController extends Controller
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
-            ]);
+            ],422);
         }
     }
 
@@ -198,7 +198,7 @@ class skpController extends Controller
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
-            ]);
+            ],422);
         }
     }
 
