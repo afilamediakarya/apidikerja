@@ -53,7 +53,7 @@ class skpController extends Controller
     }
 
     public function store(Request $request){
-        return $request;
+        // return $request;
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
             'id_skp_atasan' => 'required|numeric',
