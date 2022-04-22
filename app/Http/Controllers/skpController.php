@@ -29,7 +29,7 @@ class skpController extends Controller
 
         foreach ($get_skp_atasan as $key => $value) {
             $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
-            $skpChild = skp::where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',Auth::user()->id_pegawai)->get();
+            $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',Auth::user()->id_pegawai)->get();
             $result[$key]['atasan'] = $getSkpByAtasan;
             $result[$key]['skp_child'] = $skpChild;
       
