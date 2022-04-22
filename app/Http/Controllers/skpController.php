@@ -21,27 +21,56 @@ class skpController extends Controller
 {
     public function list(){
         $result = [];
-        // $atasan = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
-        $atasan = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        $getDataAtasan = jabatan::where('id',$atasan->parent_id)->first();
-        // return $atasan;/
+        $groupSkpAtasan = [];
+
+        $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('tb_skp.id_skp_atasan')->get();
+
+        // return $get_skp_atasan;
+
+        foreach ($get_skp_atasan as $key => $value) {
+            $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
+            $skpChild = skp::where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',Auth::user()->id_pegawai)->get();
+            $result[$key]['atasan'] = $getSkpByAtasan;
+            $result[$key]['skp_child'] = $skpChild;
+      
+        }      
+
+        // foreach ($groupSkpAtasan as $k => $v) {
+        //     $skpChild = skp::where('id_skp_atasan',$v->id)->where('id_pegawai',Auth::user()->id_pegawai)->get();
+        //     // $result[$key] = $v;
+        //     $result[$key]['sub_skp'] = $skpChild;
+        // }
+
+        // return $result;
+        // $skp_pegawai = [];
+        // // $atasan = atasan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+        // $atasan = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        // $getDataAtasan = jabatan::where('id',$atasan->parent_id)->first();
+        // // return $atasan;/
         
-        if (isset($atasan)) {
-            // $
-            $get_skp_atasan = skp::with('pegawai')->where('id_pegawai',$getDataAtasan->id_pegawai)->get();
-            // return $get_skp_atasan;
-            // return $atasan->parent_id;
-            foreach($get_skp_atasan as $key => $value){
-                
-                $getsubSKp = skp::with('aspek_skp')->where('id_skp_atasan',$value->id)->get();
-                $result[$key] = [
-                    'id_pegawai'=>$value['id_pegawai'],
-                    'nama_atasan'=>$value['pegawai']['nama'],
-                    'rencana_kerja'=>$value['rencana_kerja'],
-                    'sub_skp'=> $getsubSKp
-                ];
-            }
-        }
+        // if (isset($atasan)) {
+        //     $getSkp = skp::where('id_pegawai',Auth::user()->id_pegawai)->get();
+        //     // foreach ($getSkp as $k => $v) {
+        //     //     if ($v->jenis == 'utama') {
+        //     //         $skp_pegawai['utama'][] = $v;
+        //     //     }else{
+        //     //         $skp_pegawai['tambahan'][] = $v;
+        //     //     }
+        //     // }
+
+        //     // return $getSkp;
+        //     $get_skp_atasan = skp::with('pegawai')->where('id_pegawai',$getDataAtasan->id_pegawai)->get();
+        //     return $skp_pegawai;
+        //     foreach($get_skp_atasan as $key => $value){
+        //         $getsubSKp = skp::with('aspek_skp')->where('id_skp_atasan',$value->id)->get();
+        //         $result[$key] = [
+        //             'id_pegawai'=>$value['id_pegawai'],
+        //             'nama_atasan'=>$value['pegawai']['nama'],
+        //             'rencana_kerja'=>$value['rencana_kerja'],
+        //             'sub_skp'=> $getsubSKp
+        //         ];
+        //     }
+        // }
 
         if ($result) {
             return response()->json([
