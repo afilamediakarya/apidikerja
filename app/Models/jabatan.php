@@ -9,7 +9,7 @@ class jabatan extends Model
 {
     use HasFactory;
     protected $table = 'tb_jabatan';
-    protected $with = ['satuan_kerja','kelas_jabatan'];
+    protected $with = ['pegawai','satuan_kerja','kelas_jabatan'];
 
     public function pegawai() {
         return $this->hasOne('App\Models\pegawai', 'id', 'id_pegawai');
