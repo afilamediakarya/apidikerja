@@ -165,7 +165,6 @@ class skpController extends Controller
 
     public function show($params){
         $data = skp::with('aspek_skp')->where('id',$params)->first();
-
         if ($data) {
             return response()->json([
                 'message' => 'Success',
@@ -180,6 +179,7 @@ class skpController extends Controller
         }
     }
 
+
     public function update($params,Request $request){
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
@@ -193,11 +193,11 @@ class skpController extends Controller
             return response()->json($validator->errors());       
         }
 
-        $delete_skp = aspek_skp::where('id',$params)->first();
-        $delete_skp->delete();
 
-        if ($delete_skp) {
-             $skp = skp::where('id',$params)->first();
+        $clearSkp = $this->delete($params);
+
+        if ($clearSkp) {
+            $skp = new skp();
             $skp->id_pegawai = Auth::user()->id_pegawai;
             $skp->id_satuan_kerja = $request->id_satuan_kerja;
             $skp->id_skp_atasan = $request->id_skp_atasan;
