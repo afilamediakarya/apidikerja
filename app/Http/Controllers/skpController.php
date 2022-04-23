@@ -193,48 +193,49 @@ class skpController extends Controller
             return response()->json($validator->errors());       
         }
 
-        $delete_skp = aspek_skp::where('id',$params)->delete();
-        
+        $delete_skp = aspek_skp::where('id',$params)->first();
+        $delete_skp->delete();
 
-        $skp = skp::where('id',$params)->first();
-        $skp->id_pegawai = Auth::user()->id_pegawai;
-        $skp->id_satuan_kerja = $request->id_satuan_kerja;
-        $skp->id_skp_atasan = $request->id_skp_atasan;
-        $skp->jenis = $request->jenis;
-        $skp->rencana_kerja = $request->rencana_kerja;
-        $skp->tahun = $request->tahun;
-        $skp->save();
+        if ($delete_skp) {
+             $skp = skp::where('id',$params)->first();
+            $skp->id_pegawai = Auth::user()->id_pegawai;
+            $skp->id_satuan_kerja = $request->id_satuan_kerja;
+            $skp->id_skp_atasan = $request->id_skp_atasan;
+            $skp->jenis = $request->jenis;
+            $skp->rencana_kerja = $request->rencana_kerja;
+            $skp->tahun = $request->tahun;
+            $skp->save();
 
-       
+            foreach ($request['aspek'] as $key => $value) {
+                $aspek = new aspek_skp();
+                $aspek->id_skp = $skp->id;
+                $aspek->aspek_skp = $value['type_aspek'];
+                $aspek->iki = $value['iki'];
+                $aspek->satuan = $value['satuan'];
+                $aspek->save();
+                foreach ($value['target'] as $index => $res) {
+                    $target = new target_skp();
+                    $target->id_aspek_skp = $aspek->id;
+                    $target->target = $res;
+                    $target->bulan = $index+1;
+                    $target->save();
+                }
+            }
 
-        foreach ($request['aspek'] as $key => $value) {
-            $aspek = new aspek_skp();
-            $aspek->id_skp = $skp->id;
-            $aspek->aspek_skp = $value['type_aspek'];
-            $aspek->iki = $value['iki'];
-            $aspek->satuan = $value['satuan'];
-            $aspek->save();
-            foreach ($value['target'] as $index => $res) {
-                $target = new target_skp();
-                $target->id_aspek_skp = $aspek->id;
-                $target->target = $res;
-                $target->bulan = $index+1;
-                $target->save();
+            if ($skp) {
+                return response()->json([
+                    'message' => 'Success',
+                    'status' => true,
+                    'data' => $skp
+                ]);
+            }else{
+                return response()->json([
+                    'message' => 'Failed',
+                    'status' => false
+                ],422);
             }
         }
-
-        if ($skp) {
-            return response()->json([
-                'message' => 'Success',
-                'status' => true,
-                'data' => $skp
-            ]);
-        }else{
-            return response()->json([
-                'message' => 'Failed',
-                'status' => false
-            ],422);
-        }
+      
     }
 
     public function delete($params){
