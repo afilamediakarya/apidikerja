@@ -60,6 +60,7 @@ class jabatanController extends Controller
         $data = new jabatan();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->id_kelas_jabatan = $request->id_kelas_jabatan;
+        $data->id_pegawai = $request->id_pegawai;
         $data->parent_id = $request->parent_id;
         $data->nama_struktur = $request->nama_struktur;
         $data->nama_jabatan = $request->nama_jabatan;
@@ -116,6 +117,7 @@ class jabatanController extends Controller
         $data = jabatan::where('id',$params)->first();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->id_kelas_jabatan = $request->id_kelas_jabatan;
+           $data->id_pegawai = $request->id_pegawai;
         $data->parent_id = $request->parent_id;
         $data->nama_struktur = $request->nama_struktur;
         $data->nama_jabatan = $request->nama_jabatan;
