@@ -193,9 +193,8 @@ class skpController extends Controller
             return response()->json($validator->errors());       
         }
 
-        if($skp){
-            $delete_skp = aspek_skp::where('id',$params)->delete();
-        }
+        $delete_skp = aspek_skp::where('id',$params)->delete();
+        
 
         $skp = skp::where('id',$params)->first();
         $skp->id_pegawai = Auth::user()->id_pegawai;
