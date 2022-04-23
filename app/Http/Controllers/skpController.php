@@ -193,6 +193,10 @@ class skpController extends Controller
             return response()->json($validator->errors());       
         }
 
+        if($skp){
+            $delete_skp = aspek_skp::where('id',$params)->delete();
+        }
+
         $skp = skp::where('id',$params)->first();
         $skp->id_pegawai = Auth::user()->id_pegawai;
         $skp->id_satuan_kerja = $request->id_satuan_kerja;
@@ -202,10 +206,7 @@ class skpController extends Controller
         $skp->tahun = $request->tahun;
         $skp->save();
 
-        if($skp){
-            $delete_skp = aspek_skp::where('id',$skp->id)->delete();
-            // $delete_skp->delete
-        }
+       
 
         foreach ($request['aspek'] as $key => $value) {
             $aspek = new aspek_skp();
