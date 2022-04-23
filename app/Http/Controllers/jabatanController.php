@@ -14,10 +14,10 @@ class jabatanController extends Controller
     public function list(){
         $data = '';
         if (Auth::user()->role == 'super_admin') {
-           $data = jabatan::latest()->get();
+           $data = jabatan::with('pegawai')->latest()->get();
         }else{
             $pegawai = pegawai::select('id_satuan_kerja')->where('id',Auth::user()->id_pegawai)->first();
-            $data = jabatan::where('id_satuan_kerja',$pegawai->id_satuan_kerja)->latest()->get();
+            $data = jabatan::with('pegawai')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->latest()->get();
         }
         
 
