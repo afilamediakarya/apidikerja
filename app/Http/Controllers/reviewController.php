@@ -23,7 +23,7 @@ class reviewController extends Controller
         $myArray = [];
         $status = '';
         foreach ($getData as $key => $value) {
-            $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$value->id_pegawai)->first();
+            $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$value->id_pegawai)->first();
             if (isset($res)) {
                 if ($res->kesesuaian == 'ya') {
                     $status = 'Selesai';
@@ -91,6 +91,39 @@ class reviewController extends Controller
                 'status' => false
             ]);
         }
+    }
+
+    public function skpbyId($params){
+          $result = [];
+        $groupSkpAtasan = [];
+
+        $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',$params)->groupBy('tb_skp.id_skp_atasan')->get();
+
+        // return $get_skp_atasan;
+
+        foreach ($get_skp_atasan as $key => $value) {
+            $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
+            $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',$params)->get();
+            $result[$key]['atasan'] = $getSkpByAtasan;
+            $result[$key]['skp_child'] = $skpChild;
+      
+        }      
+
+
+        if ($result) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $result
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'empty data',
+                'status' => false,
+                 'data' => $result
+            ]);
+        }
+
     }
 
 }
