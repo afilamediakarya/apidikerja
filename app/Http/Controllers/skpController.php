@@ -288,7 +288,13 @@ class skpController extends Controller
                             'value'=> $value->rencana_kerja
                         ];
                     }
-                    return $result;
+                
+                     return response()->json([
+                        'message' => 'Success',
+                        'status' => true,
+                        'data' => $result
+                    ]);
+
                     // return collect($getSkp)->pluck('rencana_kerja','id')->toArray();
                 }else{
                     $kegiatan = kegiatan::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->latest()->get();
@@ -299,18 +305,26 @@ class skpController extends Controller
                         ];
                     }
                     return $result;
+                return response()->json([
+                 'message' => 'Success',
+                       'status' => true,
+                        'data' => $result
+                ]);
+
                     // return collect($kegiatan)->pluck('nama_kegiatan','id')->toArray();
                 }
             }else{
                 return response()->json([
                     'message' => 'Data tidak ada',
-                    'status' => false
+                    'status' => false,
+                    'data' => $result
                 ]);
             }
         }else{
             return response()->json([
                 'message' => 'Data tidak ada',
-                'status' => false
+                'status' => false,
+                'data' => $result
             ]); 
         }
         
