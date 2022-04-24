@@ -34,6 +34,7 @@ class kegiatanController extends Controller
     }
 
     public function store(Request $request){
+        // return $request->all();
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
             'nama_kegiatan' => 'required|string',
