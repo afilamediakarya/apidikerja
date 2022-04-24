@@ -27,6 +27,8 @@ class skpController extends Controller
         // return $jabatanByPegawai;
         $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('tb_skp.id_skp_atasan')->get();
 
+        // return $jabatanByPegawai;
+
         // if (!is_null($jabatanByPegawai->parent_id)) {
            
         // }else{
@@ -45,26 +47,25 @@ class skpController extends Controller
         // return $get_skp_atasan;
 
         foreach ($get_skp_atasan as $key => $value) {
-            $getSkpByAtasan = '';
+            $getRencanaKerjaAtasan = '';
            if (!is_null($jabatanByPegawai->parent_id)) {
-               $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
+               $getSkpAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
+               // return $getSkpAtasan;
+                $getRencanaKerjaAtasan = [
+                'id' => $getSkpAtasan->id,
+                'rencana_kerja' =>$getSkpAtasan->rencana_kerja
+             ];
            }else{
              $getKegiatan= DB::table('tb_kegiatan')->select('id','nama_kegiatan','kode_kegiatan')->where('id',$value->id_skp_atasan)->first();
-             // return $getKegiatan;
 
-             $getSkpByAtasan = [
+             $getRencanaKerjaAtasan = [
                 'id' => $getKegiatan->id,
                 'rencana_kerja' =>$getKegiatan->nama_kegiatan
              ];
-
-             // return $getSkpByAtasan;
-                // $getSkpByAtasan['rencana_kerja'] = $getSkpByAtasan['nama_kegiatan'];
            }
-
-           // return $getSkpByAtasan['id'];
            
-            $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getSkpByAtasan['id'])->where('id_pegawai',Auth::user()->id_pegawai)->get();
-            $result[$key]['atasan'] = $getSkpByAtasan;
+            $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('id_pegawai',Auth::user()->id_pegawai)->get();
+            $result[$key]['atasan'] = $getRencanaKerjaAtasan;
             $result[$key]['skp_child'] = $skpChild;
       
         }      
