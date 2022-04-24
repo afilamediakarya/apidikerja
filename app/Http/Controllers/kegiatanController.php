@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\kegiatan;
+use App\Models\pegawai;
 use Validator;
 use Auth;
 class kegiatanController extends Controller
