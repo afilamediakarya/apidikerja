@@ -47,6 +47,7 @@ class kegiatanController extends Controller
         $data = new kegiatan();
         $data->id_satuan_kerja	 = $request->id_satuan_kerja;
         $data->nama_kegiatan = $request->nama_kegiatan;
+        $data->kode_kegiatan = $request->kode_kegiatan;
         $data->tahun = $request->tahun;
         $data->save();
 
@@ -97,6 +98,7 @@ class kegiatanController extends Controller
         $data = kegiatan::where('id',$params)->first();
         $data->id_satuan_kerja	 = $request->id_satuan_kerja;
         $data->nama_kegiatan = $request->nama_kegiatan;
+        $data->kode_kegiatan = $request->kode_kegiatan;
         $data->tahun = $request->tahun;
         $data->save();
 
