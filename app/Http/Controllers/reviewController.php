@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\review_skp;
+use App\Models\skp;
 use App\Models\atasan;
 use App\Models\pegawai;
 use App\Models\jabatan;
