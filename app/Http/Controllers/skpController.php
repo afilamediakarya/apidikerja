@@ -304,7 +304,7 @@ class skpController extends Controller
                             'value'=> $value->nama_kegiatan
                         ];
                     }
-                    return $result;
+                    // return $result;
                 return response()->json([
                  'message' => 'Success',
                        'status' => true,
