@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\review_skp;
 use App\Models\atasan;
 use App\Models\pegawai;
+use App\Models\jabatan;
 use Auth;
 use DB;
 use Validator;
@@ -13,7 +14,12 @@ class reviewController extends Controller
 {
 
     public function list(){
-        $getData = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
+        // $getData = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
+       // return Auth::user()->id_pegawai;
+        $jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get();
+        // return $getData;
+
         $myArray = [];
         $status = '';
         foreach ($getData as $key => $value) {
@@ -27,13 +33,15 @@ class reviewController extends Controller
                 $myArray[$key] = [
                     'nama'=>$res->nama,
                     'nip'=>$res->nip,
-                    'jenis_jabatan'=>$res->jenis_jabatan,
+                    'jabatan'=>$value->nama_jabatan,
                     'id_skp'=>$res->id_skp,
                     'id_pegawai'=>$res->id_pegawai,
                     'status'=>$status
                 ];
             }
         }
+
+        // return $myArray;
 
         if ($myArray) {
             return response()->json([
@@ -43,8 +51,9 @@ class reviewController extends Controller
             ]);
         }else{
             return response()->json([
-                'message' => 'Failed',
-                'status' => false
+                'message' => 'Data belum ada',
+                'status' => false,
+                'data' => $myArray
             ]);
         }
       
