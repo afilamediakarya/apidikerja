@@ -35,7 +35,6 @@ class reviewController extends Controller
                     'nama'=>$res->nama,
                     'nip'=>$res->nip,
                     'jabatan'=>$value->nama_jabatan,
-                    'id_skp'=>$res->id_skp,
                     'id_pegawai'=>$res->id_pegawai,
                     'status'=>$status
                 ];
