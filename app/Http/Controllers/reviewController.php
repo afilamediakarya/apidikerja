@@ -19,6 +19,7 @@ class reviewController extends Controller
        // return Auth::user()->id_pegawai;
         $myArray = [];
         $groupId = [];
+        $groupSkpPegawai = [];
         $jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         // return $jabatanPegawai;
 
@@ -39,27 +40,27 @@ class reviewController extends Controller
 
                         if (count($res) > 0) {
                                 
-                                  // $myArray[$key] = $res;
-                                 foreach ($res as $vv => $bb) {
-                                     $getDataStatus[] = $bb->kesesuaian;
-                                 }
+                                  $groupSkpPegawai[$x] = $res;
+                                //  foreach ($res as $vv => $bb) {
+                                //      $getDataStatus[] = $bb->kesesuaian;
+                                //  }
 
-                                if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
-                                    $status = 'Belum Sesuai';
-                                }
-                                else if(in_array("ya", $getDataStatus) == true && in_array("tidak", $getDataStatus) == false){
-                                    $status = 'Selesai';
-                                }else{
-                                    $status = 'Belum Review';
-                                }
+                                // if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
+                                //     $status = 'Belum Sesuai';
+                                // }
+                                // else if(in_array("ya", $getDataStatus) == true && in_array("tidak", $getDataStatus) == false){
+                                //     $status = 'Selesai';
+                                // }else{
+                                //     $status = 'Belum Review';
+                                // }
 
-                                $myArray[$key] = [
-                                    'nama'=>$res[0]->nama,
-                                    'nip'=>$res[0]->nip,
-                                    'jabatan'=>$value->nama_jabatan,
-                                    'id_pegawai'=>$res[0]->id_pegawai,
-                                    'status' => $status
-                                ];
+                                // $myArray[$key] = [
+                                //     'nama'=>$res[0]->nama,
+                                //     'nip'=>$res[0]->nip,
+                                //     'jabatan'=>$value->nama_jabatan,
+                                //     'id_pegawai'=>$res[0]->id_pegawai,
+                                //     'status' => $status
+                                // ];
                               
                         }       
                    }          
@@ -75,17 +76,17 @@ class reviewController extends Controller
 
         }
 
-         if ($myArray) {
+         if ($groupSkpPegawai) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $myArray
+                'data' => $groupSkpPegawai
             ]);
         }else{
             return response()->json([
                 'message' => 'Data belum ada',
                 'status' => false,
-                'data' => $myArray
+                'data' => $groupSkpPegawai
             ]);
         }
 
