@@ -41,54 +41,60 @@ class reviewController extends Controller
                         if (count($res) > 0) {
 
                             array_push($groupSkpPegawai,$res);
-                                
-                                  // $groupSkpPegawai[$x] = $res;
-                                //  foreach ($res as $vv => $bb) {
-                                //      $getDataStatus[] = $bb->kesesuaian;
-                                //  }
-
-                                // if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
-                                //     $status = 'Belum Sesuai';
-                                // }
-                                // else if(in_array("ya", $getDataStatus) == true && in_array("tidak", $getDataStatus) == false){
-                                //     $status = 'Selesai';
-                                // }else{
-                                //     $status = 'Belum Review';
-                                // }
-
-                                // $myArray[$key] = [
-                                //     'nama'=>$res[0]->nama,
-                                //     'nip'=>$res[0]->nip,
-                                //     'jabatan'=>$value->nama_jabatan,
-                                //     'id_pegawai'=>$res[0]->id_pegawai,
-                                //     'status' => $status
-                                // ];
                               
                         }       
                    }          
-
-
-
-                  
                     
                 }
 
               
             }
 
+
+            foreach ($groupSkpPegawai as $bnb => $llo) {
+                foreach ($llo as $vv => $bb) {
+                     $getDataStatus[] = $bb->kesesuaian;
+                }
+
+                if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
+                    $status = 'Belum Sesuai';
+                }
+                else if(in_array("ya", $getDataStatus) == true && in_array("tidak", $getDataStatus) == false){
+                    $status = 'Selesai';
+                }else{
+                    $status = 'Belum Review';
+                }
+
+                 $myArray[$bnb] = [
+                    'nama'=>$llo[0]->nama,
+                    'nip'=>$llo[0]->nip,
+                    // 'jabatan'=>$value->nama_jabatan,
+                    'id_pegawai'=>$llo[0]->id_pegawai,
+                    'status' => $status
+                ];
+
+            }
+
+
+               
+
+              
+
+               
+
         }
 
-         if ($groupSkpPegawai) {
+         if ($myArray) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $groupSkpPegawai
+                'data' => $myArray
             ]);
         }else{
             return response()->json([
                 'message' => 'Data belum ada',
                 'status' => false,
-                'data' => $groupSkpPegawai
+                'data' => $myArray
             ]);
         }
 
