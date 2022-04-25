@@ -29,14 +29,14 @@ class reviewController extends Controller
 
             $status = '';
             foreach ($getData as $key => $value) {
-                 return  $myArray[$key] = $value->id_pegawai;
-                if (!is_null($value->id_pegawai)) {
+                 $myArray[$key] = $value->id_pegawai;
+                // if (!is_null($value->id_pegawai)) {
 
-                      $getDataStatus = [];
-                $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian','tb_skp.id AS id_skp')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$value->id_pegawai)->get();
+                //       $getDataStatus = [];
+                // $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian','tb_skp.id AS id_skp')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$value->id_pegawai)->get();
                 
 
-                    $myArray[$key] = $res;
+                //     $myArray[$key] = $res;
 
                     // if (isset($res)) {
                          // foreach ($res as $vv => $bb) {
@@ -61,7 +61,7 @@ class reviewController extends Controller
                          //    ];
                     // }
                     
-                }
+                // }
 
               
             }
