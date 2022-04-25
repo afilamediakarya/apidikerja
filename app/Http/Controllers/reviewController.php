@@ -18,6 +18,7 @@ class reviewController extends Controller
         // $getData = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
        // return Auth::user()->id_pegawai;
         $myArray = [];
+        $groupId = [];
         $jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         // return $jabatanPegawai;
 
@@ -31,7 +32,8 @@ class reviewController extends Controller
             foreach ($getData as $key => $value) {
 
                 if (!is_null($value->id_pegawai)) {
-                    $myArray[$key] = $value->id_pegawai;
+                   array_push($groupId,$value->id_pegawai);
+                   
                 
 
                 //       $getDataStatus = [];
@@ -71,17 +73,17 @@ class reviewController extends Controller
 
         }
 
-         if ($myArray) {
+         if ($groupId) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $myArray
+                'data' => $groupId
             ]);
         }else{
             return response()->json([
                 'message' => 'Data belum ada',
                 'status' => false,
-                'data' => $myArray
+                'data' => $groupId
             ]);
         }
 
