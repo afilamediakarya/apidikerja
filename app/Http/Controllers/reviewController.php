@@ -17,11 +17,14 @@ class reviewController extends Controller
     public function list(){
         // $getData = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
        // return Auth::user()->id_pegawai;
-        $jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get();
-        // return $getData;
-
         $myArray = [];
+        $jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        // return $jabatanPegawai;
+
+        if (isset($jabatanPegawai)) {
+            $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get();    
+
+
         $status = '';
         foreach ($getData as $key => $value) {
             $getDataStatus = [];
@@ -31,8 +34,6 @@ class reviewController extends Controller
              foreach ($res as $vv => $bb) {
                  $getDataStatus[] = $bb->kesesuaian;
              }
-
-             // return $getDataStatus;
 
                 if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
                     $status = 'Belum Sesuai';
@@ -53,7 +54,9 @@ class reviewController extends Controller
             }
         }
 
-        if ($myArray) {
+        }
+
+         if ($myArray) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
@@ -66,6 +69,9 @@ class reviewController extends Controller
                 'data' => $myArray
             ]);
         }
+
+
+       
       
     }
 
