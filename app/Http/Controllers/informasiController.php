@@ -4,11 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\informasi;
+use App\Models\pegawai;
 use Validator;
 class informasiController extends Controller
 {
     public function list(){
-        $data = informasi::latest()->get();
+        $data = '';
+        if (Auth::user()->role == 'super_admin') {
+           $data = informasi::latest()->get();
+        }else{
+            $pegawai = pegawai::select('id_satuan_kerja')->where('id',Auth::user()->id_pegawai)->first();
+            $data = informasi::where('id_satuan_kerja',$pegawai->id_satuan_kerja)->latest()->get();
+        }
 
         if ($data) {
             return response()->json([
