@@ -50,7 +50,7 @@ class reviewController extends Controller
               
             }
 
-            return count($groupSkpPegawai);
+            return $groupSkpPegawai;
 
 
             // foreach ($groupSkpPegawai as $bnb => $llo) {
