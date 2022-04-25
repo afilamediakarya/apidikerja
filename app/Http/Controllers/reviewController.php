@@ -53,10 +53,10 @@ class reviewController extends Controller
                             }
 
                             $myArray[$key] = [
-                                'nama'=>$res[0]->nama,
-                                'nip'=>$res[0]->nip,
-                                'jabatan'=>$value->nama_jabatan,
-                                'id_pegawai'=>$res[0]->id_pegawai,
+                                // 'nama'=>$res[0]->nama,
+                                // 'nip'=>$res[0]->nip,
+                                // 'jabatan'=>$value->nama_jabatan,
+                                // 'id_pegawai'=>$res[0]->id_pegawai,
                                 'status' => $status
                             ];
                     }
