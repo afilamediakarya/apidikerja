@@ -39,8 +39,10 @@ class reviewController extends Controller
                          // return count($res);
 
                         if (count($res) > 0) {
+
+                            array_push($groupSkpPegawai,$res);
                                 
-                                  $groupSkpPegawai[$x] = $res;
+                                  // $groupSkpPegawai[$x] = $res;
                                 //  foreach ($res as $vv => $bb) {
                                 //      $getDataStatus[] = $bb->kesesuaian;
                                 //  }
