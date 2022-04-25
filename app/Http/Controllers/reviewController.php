@@ -24,23 +24,18 @@ class reviewController extends Controller
 
         if (isset($jabatanPegawai)) {
             $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get(); 
-
-            // return $getData;   
-
-
             $status = '';
             foreach ($getData as $key => $value) {
 
                 if (!is_null($value->id_pegawai)) {
                    array_push($groupId,$value->id_pegawai);
-                   
-                
 
-                //       $getDataStatus = [];
-                // $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian','tb_skp.id AS id_skp')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$value->id_pegawai)->get();
-                
+                $getDataStatus = [];
+                   foreach ($groupId as $x) {
+                         $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian','tb_skp.id AS id_skp')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$x)->get();       
+                   }          
 
-                  
+                    $myArray[$key] = $res;        
 
                     // if (!empty($res[$key])) {
                     //       // $myArray[$key] = $res;
@@ -73,17 +68,17 @@ class reviewController extends Controller
 
         }
 
-         if ($groupId) {
+         if ($myArray) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $groupId
+                'data' => $myArray
             ]);
         }else{
             return response()->json([
                 'message' => 'Data belum ada',
                 'status' => false,
-                'data' => $groupId
+                'data' => $myArray
             ]);
         }
 
