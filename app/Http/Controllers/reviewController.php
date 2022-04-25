@@ -32,11 +32,11 @@ class reviewController extends Controller
                    array_push($groupId,$value->id_pegawai);
 
                 // $getDataStatus = [];
-                   foreach ($groupId as $x) {
-                         $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian','tb_skp.id AS id_skp')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$x)->get(); 
+                   foreach ($groupId as $x => $vv) {
+                         $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian','tb_skp.id AS id_skp')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$vv)->get(); 
 
                         if (!empty($res)) {
-                            $myArray[] = $res;          
+                            $myArray[$x] = $res;          
                         }       
                    }          
 
