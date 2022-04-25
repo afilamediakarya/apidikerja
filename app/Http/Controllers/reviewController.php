@@ -50,30 +50,32 @@ class reviewController extends Controller
               
             }
 
+            return count($groupSkpPegawai);
 
-            foreach ($groupSkpPegawai as $bnb => $llo) {
-                foreach ($llo as $vv => $bb) {
-                     $getDataStatus[] = $bb->kesesuaian;
-                }
 
-                if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
-                    $status = 'Belum Sesuai';
-                }
-                else if(in_array("ya", $getDataStatus) == true && in_array("tidak", $getDataStatus) == false){
-                    $status = 'Selesai';
-                }else{
-                    $status = 'Belum Review';
-                }
+            // foreach ($groupSkpPegawai as $bnb => $llo) {
+            //     foreach ($llo as $vv => $bb) {
+            //          $getDataStatus[] = $bb->kesesuaian;
+            //     }
 
-                 $myArray[$bnb] = [
-                    'nama'=>$llo[0]->nama,
-                    'nip'=>$llo[0]->nip,
-                    // 'jabatan'=>$value->nama_jabatan,
-                    'id_pegawai'=>$llo[0]->id_pegawai,
-                    'status' => $status
-                ];
+            //     if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
+            //         $status = 'Belum Sesuai';
+            //     }
+            //     else if(in_array("ya", $getDataStatus) == true && in_array("tidak", $getDataStatus) == false){
+            //         $status = 'Selesai';
+            //     }else{
+            //         $status = 'Belum Review';
+            //     }
 
-            }
+            //      $myArray[$bnb] = [
+            //         'nama'=>$llo[0]->nama,
+            //         'nip'=>$llo[0]->nip,
+            //         // 'jabatan'=>$value->nama_jabatan,
+            //         'id_pegawai'=>$llo[0]->id_pegawai,
+            //         'status' => $status
+            //     ];
+
+            // }
 
 
                
