@@ -24,6 +24,7 @@ class reviewController extends Controller
 
         if (isset($jabatanPegawai)) {
             $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get(); 
+            return $getData;
             $status = '';
             foreach ($getData as $key => $value) {
 
