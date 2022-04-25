@@ -22,26 +22,36 @@ class reviewController extends Controller
         // return $getData;
 
         $myArray = [];
+        $getDataStatus = [];
         $status = '';
         foreach ($getData as $key => $value) {
-            $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$value->id_pegawai)->first();
+            $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian','tb_skp.id AS id_skp')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('id_pegawai',$value->id_pegawai)->get();
+            
             if (isset($res)) {
-                if ($res->kesesuaian == 'ya') {
+             foreach ($res as $vv => $bb) {
+                 $getDataStatus[] = $bb->kesesuaian;
+             }
+
+             // return $getDataStatus;
+
+                if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
+                    $status = 'Belum Sesuai';
+                }
+                else if(in_array("ya", $getDataStatus) == true && in_array("tidak", $getDataStatus) == false){
                     $status = 'Selesai';
                 }else{
                     $status = 'Belum Review';
                 }
+
                 $myArray[$key] = [
-                    'nama'=>$res->nama,
-                    'nip'=>$res->nip,
+                    'nama'=>$res[0]->nama,
+                    'nip'=>$res[0]->nip,
                     'jabatan'=>$value->nama_jabatan,
-                    'id_pegawai'=>$res->id_pegawai,
-                    'status'=>$status
+                    'id_pegawai'=>$res[0]->id_pegawai,
+                    'status' => $status
                 ];
             }
         }
-
-        // return $myArray;
 
         if ($myArray) {
             return response()->json([
