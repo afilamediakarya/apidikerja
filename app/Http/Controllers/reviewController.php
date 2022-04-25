@@ -103,7 +103,7 @@ class reviewController extends Controller
 
         foreach ($get_skp_atasan as $key => $value) {
             $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
-            $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',$params)->get();
+            $skpChild = skp::with('aspek_skp','review_skp')->where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',$params)->get();
             $result[$key]['atasan'] = $getSkpByAtasan;
             $result[$key]['skp_child'] = $skpChild;
       

@@ -28,7 +28,7 @@ class skp extends Model
 
 
     public function review_skp() {
-        return $this->hasOne('App\Models\review_skp', 'id', 'id_skp');
+        return $this->hasOne('App\Models\review_skp','id_skp' ,'id');
     }
 
 }
