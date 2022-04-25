@@ -48,7 +48,7 @@ class reviewController extends Controller
                         }       
             }  
 
-            return $groupSkpPegawai;
+            // return $groupSkpPegawai;
 
 
             foreach ($groupSkpPegawai as $bnb => $llo) {
@@ -68,7 +68,7 @@ class reviewController extends Controller
                  $myArray[$bnb] = [
                     'nama'=>$llo[0]->nama,
                     'nip'=>$llo[0]->nip,
-                    // 'jabatan'=>$value->nama_jabatan,
+                    'jabatan'=>$llo[0]->nama_jabatan,
                     'id_pegawai'=>$llo[0]->id_pegawai,
                     'status' => $status
                 ];
