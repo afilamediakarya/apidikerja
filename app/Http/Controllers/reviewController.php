@@ -69,7 +69,7 @@ class reviewController extends Controller
                     'nama'=>$llo[0]->nama,
                     'nip'=>$llo[0]->nip,
                     'jabatan'=>$llo[0]->nama_jabatan,
-                    'id_pegawai'=>$llo[0]->id_pegawai,
+                    'id_pegawai'=>$llo[0]->id_pegawai_,
                     'status' => $status
                 ];
 
