@@ -48,8 +48,12 @@ class reviewController extends Controller
 
 
             foreach ($groupSkpPegawai as $bnb => $llo) {
+                $getDataStatus = [];
                 foreach ($llo as $vv => $bb) {
-                     $getDataStatus[] = $bb->kesesuaian;
+                    foreach ($llo as $cc => $klp) {
+                        $getDataStatus[] = $klp->kesesuaian;  
+                    }
+                     
                 }
 
                 if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
