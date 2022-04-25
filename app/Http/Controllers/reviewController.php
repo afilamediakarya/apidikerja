@@ -38,7 +38,7 @@ class reviewController extends Controller
 
                   
 
-                    if (count(get_object_vars($res)) > 0) {
+                    if (!empty($res[$key])) {
                           // $myArray[$key] = $res;
                          foreach ($res as $vv => $bb) {
                              $getDataStatus[] = $bb->kesesuaian;
