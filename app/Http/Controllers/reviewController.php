@@ -22,7 +22,9 @@ class reviewController extends Controller
         // return $jabatanPegawai;
 
         if (isset($jabatanPegawai)) {
-            $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get();    
+            $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get(); 
+
+            return $getData;   
 
 
             $status = '';
