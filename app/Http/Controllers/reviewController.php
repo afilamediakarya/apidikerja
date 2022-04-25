@@ -29,7 +29,7 @@ class reviewController extends Controller
 
             $status = '';
             foreach ($getData as $key => $value) {
-
+                 return  $myArray[$key] = $value->id_pegawai;
                 if (!is_null($value->id_pegawai)) {
 
                       $getDataStatus = [];
