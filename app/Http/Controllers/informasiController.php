@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\informasi;
 use App\Models\pegawai;
 use Validator;
+use Auth;
 class informasiController extends Controller
 {
     public function list(){
