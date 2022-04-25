@@ -30,11 +30,7 @@ class reviewController extends Controller
             foreach ($getData as $key => $value) {
 
                 if (!is_null($value->id_pegawai)) {
-                   array_push($groupId,$value->id_pegawai);
-
-                // $getDataStatus = [];
-                           
-                    
+                   array_push($groupId,$value->id_pegawai);       
                 }
 
               
@@ -48,7 +44,7 @@ class reviewController extends Controller
                         }       
             }  
 
-            // return $groupSkpPegawai;
+            return $groupSkpPegawai;
 
 
             foreach ($groupSkpPegawai as $bnb => $llo) {
@@ -73,14 +69,7 @@ class reviewController extends Controller
                     'status' => $status
                 ];
 
-            }
-
-
-               
-
-              
-
-               
+            }  
 
         }
 
