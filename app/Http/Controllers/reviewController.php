@@ -41,7 +41,7 @@ class reviewController extends Controller
             }
 
             foreach ($groupId as $x => $vv) {
-                         $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai_','tb_review.kesesuaian AS kesesuaian','tb_skp.id AS id_skp','tb_jabatan.nama_jabatan')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->where('tb_pegawai.id_pegawai',$vv)->get(); 
+                         $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.id AS id_pegawai_','tb_review.kesesuaian AS kesesuaian','tb_skp.id AS id_skp','tb_jabatan.nama_jabatan')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->where('tb_pegawai.id',$vv)->get(); 
 
                         if (count($res) > 0) {
                             array_push($groupSkpPegawai,$res);
