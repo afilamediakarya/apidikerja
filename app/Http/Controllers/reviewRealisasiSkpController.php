@@ -12,15 +12,43 @@ class reviewRealisasiSkpController extends Controller
 {
 
     public function list(){
-        $getData = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
+        // $getData = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
+        $jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         $myArray = [];
-        $status = '';
-        foreach ($getData as $key => $value) {
-            $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->where('id_pegawai',$value->id_pegawai)->first();
-            if (isset($res)) {
-                
-                $getReview = review_realisasi_skp::where('id_skp',$res->id_skp)->get()->pluck('kesesuaian')->toArray();
-                if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
+        $groupId = [];
+         $groupSkpPegawai = [];
+        if (isset($jabatanPegawai)) {
+            $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get(); 
+            $status = '';
+            foreach ($getData as $key => $value) {
+
+                if (!is_null($value->id_pegawai)) {
+                   array_push($groupId,$value->id_pegawai);       
+                }  
+             }
+
+             foreach ($groupId as $x => $vv) {
+
+                $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->where('id_pegawai',$vv)->get();
+
+                if (count($res) > 0) {
+                    array_push($groupSkpPegawai,$res);
+                } 
+
+              }      
+        }
+
+         // return $groupSkpPegawai;
+
+          foreach ($groupSkpPegawai as $bnb => $llo) {
+            $getDataStatus = [];
+              foreach ($llo as $vv => $bb) {
+                 $getReview = review_realisasi_skp::where('id_skp',$bb->id_skp)->get()->pluck('kesesuaian')->toArray();
+                 // $getDataStatus[] = $getReview; 
+                }
+
+                // return $getDataStatus;
+                  if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
                     $status = 'Belum Sesuai';
                 }
                 else if(in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false){
@@ -29,17 +57,42 @@ class reviewRealisasiSkpController extends Controller
                     $status = 'Belum Review';
                 }
 
-                $myArray[$key] = [
-                    'nama'=>$res->nama,
-                    'nip'=>$res->nip,
-                    'jenis_jabatan'=>$res->jenis_jabatan,
-                    'id_skp'=>$res->id_skp,
-                    'id_pegawai'=>$res->id_pegawai,
+                $myArray[$bnb] = [
+                    'nama'=>$llo[0]->nama,
+                    'nip'=>$llo[0]->nip,
+                    'jenis_jabatan'=>$llo[0]->jenis_jabatan,
+                    'id_skp'=>$llo[0]->id_skp,
+                    'id_pegawai'=>$llo[0]->id_pegawai,
                     'status'=>$status,
                 ];
+
+          }
+
+        // foreach ($getData as $key => $value) {
+        //     $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->where('id_pegawai',$value->id_pegawai)->first();
+        //     if (isset($res)) {
                 
-            }
-        }
+        //         $getReview = review_realisasi_skp::where('id_skp',$res->id_skp)->get()->pluck('kesesuaian')->toArray();
+        //         if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
+        //             $status = 'Belum Sesuai';
+        //         }
+        //         else if(in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false){
+        //             $status = 'Selesai';
+        //         }else{
+        //             $status = 'Belum Review';
+        //         }
+
+        //         $myArray[$key] = [
+        //             'nama'=>$res->nama,
+        //             'nip'=>$res->nip,
+        //             'jenis_jabatan'=>$res->jenis_jabatan,
+        //             'id_skp'=>$res->id_skp,
+        //             'id_pegawai'=>$res->id_pegawai,
+        //             'status'=>$status,
+        //         ];
+                
+        //     }
+        // }
 
         if ($myArray) {
             return response()->json([
