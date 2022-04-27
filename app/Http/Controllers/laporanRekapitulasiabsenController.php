@@ -105,14 +105,23 @@ class laporanRekapitulasiabsenController extends Controller
 
     }
 
-    public function rekapByAdminOpd($startDate, $endDate){
+    public function rekapByAdminOpd($startDate, $endDate,$satuan_kerja){
+        $satker = intval($satuan_kerja);
         $result = [];
         $pegawai_data = [];
-        $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
-        $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->get();
+        $satuan_kerja_ = '';
+        $pegawaiBySatuanKerja = '';
+        if ($satker > 0) {
+            $getSatuankerjaById = DB::table('tb_satuan_kerja')->where('id',$satker)->first();
+            $satuan_kerja_ = $getSatuankerjaById->nama_satuan_kerja;
+            $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$satuan_kerja)->get();
+        }else{   
+            $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
+            $satuan_kerja_ = $pegawai['satuan_kerja']['nama_satuan_kerja'];
+            $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->get();
+        }
 
         foreach ($pegawaiBySatuanKerja as $key => $value) {
-            // $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id_pegawai',DB::raw("SUM(tb_absen.status = 'alpa') as tanpa_keterangan"), DB::raw("SUM(tb_absen.status = 'hadir') as hadir"),DB::raw("SUM(tb_absen.status = 'alpa') as potongan"))->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->groupBy('tb_absen.id_pegawai')->get();
             $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id','id_pegawai','waktu_absen','status','jenis',DB::raw("SUM(tb_absen.status = 'alpa') as tanpa_keterangan"), DB::raw("SUM(tb_absen.status = 'hadir') as hadir"))->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->groupBy('tb_absen.id')->get();
 
            if (count($getAbsenPegawai) > 0) {
@@ -123,13 +132,10 @@ class laporanRekapitulasiabsenController extends Controller
         $jml_hari = $this->jmlHariKerja($startDate, $endDate);
 
         return $result = [
-            'satuan_kerja' => $pegawai['satuan_kerja']['nama_satuan_kerja'],
+            'satuan_kerja' => $satuan_kerja_,
             'hari_kerja' => $jml_hari,
             'pegawai' => $pegawai_data
         ];
-
-        // return $pegawaiBySatuanKerja;
-
         
     }
 }
