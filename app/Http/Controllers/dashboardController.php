@@ -16,10 +16,10 @@ use DB;
 use Auth;
 class dashboardController extends Controller
 {
-    public function get_data(){
-		if (Auth::user()->role == 'super_admin') {
+    public function get_data($type){
+		if ($type == 'super_admin') {
 			return $this->admin_dashboard();
-		} elseif(Auth::user()->role == 'pegawai') {
+		} elseif($type == 'pegawai') {
 			return $this->pegawai_dashboard();
 		}else{
 			return $this->opd_dashboard();
