@@ -187,6 +187,17 @@ class dashboardController extends Controller
 			// 
 		// 
 
+
+
+		if (count($list_pegawai) == 0) {
+			$list_pegawai = null;
+		}
+
+		if (count($info_penilai) == 0) {
+			$info_penilai = null;
+		}
+
+
 		$result = [
     		'jumlah_skp' => $getSkp,
     		'pegawai_diniai' => count($getPegawai),
