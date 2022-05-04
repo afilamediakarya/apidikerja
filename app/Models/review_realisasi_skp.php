@@ -11,4 +11,5 @@ class review_realisasi_skp extends Model
     protected $table = 'tb_review_realisasi_skp';
 
     
+    
 }

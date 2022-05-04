@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\review_realisasi_skp;
+use App\Models\skp;
 use App\Models\atasan;
 use Auth;
 use DB;
@@ -38,8 +39,6 @@ class reviewRealisasiSkpController extends Controller
               }      
         }
 
-         // return $groupSkpPegawai;
-
           foreach ($groupSkpPegawai as $bnb => $llo) {
             $getDataStatus = [];
               foreach ($llo as $vv => $bb) {
@@ -61,7 +60,6 @@ class reviewRealisasiSkpController extends Controller
                     'nama'=>$llo[0]->nama,
                     'nip'=>$llo[0]->nip,
                     'jenis_jabatan'=>$llo[0]->jenis_jabatan,
-                    'id_skp'=>$llo[0]->id_skp,
                     'id_pegawai'=>$llo[0]->id_pegawai,
                     'status'=>$status,
                 ];
@@ -108,6 +106,46 @@ class reviewRealisasiSkpController extends Controller
         }
     }
 
+    public function skpbyId($params,$bulan){
+        
+              $result = [];
+             $groupSkpAtasan = [];
+
+            $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',$params)->groupBy('tb_skp.id_skp_atasan')->get();
+
+        // return $get_skp_atasan;
+
+        foreach ($get_skp_atasan as $key => $value) {
+            $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
+            $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',$params)->get();
+            foreach ($skpChild as $xx => $vv) {
+                $realisasi_bulan = DB::table('tb_review_realisasi_skp')->where('id_skp',$vv->id)->where('bulan',$bulan)->first();   
+                $result[$key]['atasan'] = $getSkpByAtasan;
+                $result[$key]['skp_child'] = $skpChild;
+                $result[$key]['skp_child'][$xx]['realisasi_bulan'] = $realisasi_bulan;
+            }
+            
+            // $result[$key]['atasan'] = $getSkpByAtasan;
+            // $result[$key]['skp_child'] = $skpChild;
+      
+        }      
+
+
+        if ($result) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $result
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'empty data',
+                'status' => false,
+                 'data' => $result
+            ]);
+        }
+    }
+
     public function store(Request $request){
         // return $request->all();
         $validator = Validator::make($request->all(),[
@@ -116,6 +154,8 @@ class reviewRealisasiSkpController extends Controller
             'kesesuaian' => 'required|array',
             'bulan' => 'required|array',
         ]);
+
+
 
         if($validator->fails()){
             return response()->json($validator->errors());       

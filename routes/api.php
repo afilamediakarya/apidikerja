@@ -162,7 +162,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('review_realisasi')->group(function () {
         Route::get('/list', [App\Http\Controllers\reviewRealisasiSkpController::class, 'list']);    
-        Route::post('/store', [App\Http\Controllers\reviewRealisasiSkpController::class, 'store']);    
+        Route::post('/store', [App\Http\Controllers\reviewRealisasiSkpController::class, 'store']);
+             Route::get('/skpbyId/{params}/{bulan}', [App\Http\Controllers\reviewRealisasiSkpController::class, 'skpbyId']);      
     });
 
     Route::prefix('perilaku')->group(function () {
