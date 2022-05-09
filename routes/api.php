@@ -42,6 +42,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/delete/{params}', [App\Http\Controllers\satuanController::class, 'delete']);  
     });
 
+    Route::prefix('harilibur')->group(function () {
+        Route::get('/list', [App\Http\Controllers\hariliburController::class, 'list']);  
+        Route::post('/store', [App\Http\Controllers\hariliburController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\hariliburController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\hariliburController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\hariliburController::class, 'delete']);  
+    });
+
+
     Route::prefix('satuan_kerja')->group(function () {
         Route::get('/list', [App\Http\Controllers\satuanKerjaController::class, 'list']);  
         Route::post('/store', [App\Http\Controllers\satuanKerjaController::class, 'store']);  
