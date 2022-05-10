@@ -56,10 +56,8 @@ class hariliburController extends Controller
         }
     }
 
-       public function show($params){
-
+    public function show($params){
         $data = DB::table('tb_libur')->where('id',$params)->first();
-
         if ($data) {
             return response()->json([
                 'message' => 'Success',
