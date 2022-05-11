@@ -164,6 +164,7 @@ class laporanRekapitulasiabsenController extends Controller
         $result['potongan_kehadiran'] = $jml_potongan_kehadiran;
         $result['persentase_pemotongan'] = round($persentase_pemotongan_tunjangan,2);
         $result['pegawai'] = $pegawai;
+        $result['tanpa_keterangan'] = count($temps_absensi['alpa']);
         $result['data_absen'] = $rekapAbsen;
 
         
