@@ -24,33 +24,12 @@ class skpController extends Controller
         $groupSkpAtasan = [];
 
         $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        // return $jabatanByPegawai;
         $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('tb_skp.id_skp_atasan')->get();
-
-        // return $jabatanByPegawai;
-
-        // if (!is_null($jabatanByPegawai->parent_id)) {
-           
-        // }else{
-        //     return $get_skp_atasan;
-        // }
-
-            // if ($jabatanByPegawai->level != "1") {
-            //     $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('tb_skp.id_skp_atasan')->get();    
-            // }else{
-
-            // }
-
-
-        
-
-        // return $get_skp_atasan;
 
         foreach ($get_skp_atasan as $key => $value) {
             $getRencanaKerjaAtasan = '';
            if (!is_null($jabatanByPegawai->parent_id)) {
                $getSkpAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
-               // return $getSkpAtasan;
                 $getRencanaKerjaAtasan = [
                 'id' => $getSkpAtasan->id,
                 'rencana_kerja' =>$getSkpAtasan->rencana_kerja
