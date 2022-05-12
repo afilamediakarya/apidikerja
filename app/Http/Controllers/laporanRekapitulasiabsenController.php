@@ -35,7 +35,6 @@ class laporanRekapitulasiabsenController extends Controller
         
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
         $hariLibur = $this->cekHariLibur($jmlHariKerja['weekend']);
-        // return $hariLibur;
         $jml_kehadiran = [];
         $temps_absensi = [
             'kmk' => [
@@ -157,13 +156,12 @@ class laporanRekapitulasiabsenController extends Controller
 
          
         }
-        // return $testing;
 
         $jml_potongan_kehadiran = (count($temps_absensi['alpa']) * 3) + (count($temps_absensi['kmk']['kmk_30'])) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90'])) + (count($temps_absensi['kmk']['kmk_90_keatas'])) + (count($temps_absensi['cpk']['cpk_30'])) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90'])) + count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5;
 
         $persentase_pemotongan_tunjangan = ($jml_potongan_kehadiran / 100) * 0.4;
 
-        $result['jml_hari_kerja'] = count($jmlHariKerja['hari_kerja']);
+        $result['jml_hari_kerja'] = count($rekapAbsen);
         $result['kehadiran'] = count($jml_kehadiran);
         $result['potongan_kehadiran'] = $jml_potongan_kehadiran;
         $result['persentase_pemotongan'] = round($persentase_pemotongan_tunjangan,2);
