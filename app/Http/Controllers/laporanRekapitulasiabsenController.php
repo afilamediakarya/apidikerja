@@ -63,7 +63,7 @@ class laporanRekapitulasiabsenController extends Controller
             // return in_array(date( 'Y-m-d', $i), $hariLibur); 
 
             if (in_array(date( 'Y-m-d', $i), $hariLibur) != 1) {
-             $getDatatanggal[]['date'] = date( 'Y-m-d', $i);   
+                $getDatatanggal[]['date'] = date( 'Y-m-d', $i);   
             }  
         }
 
@@ -250,11 +250,20 @@ class laporanRekapitulasiabsenController extends Controller
             $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->get();
         }
 
+        // return $pegawaiBySatuanKerja;
+
         foreach ($pegawaiBySatuanKerja as $key => $value) {
             $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id','id_pegawai','waktu_absen','status','jenis',DB::raw("SUM(tb_absen.status = 'alpa') as tanpa_keterangan"), DB::raw("SUM(tb_absen.status = 'hadir') as hadir"))->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->groupBy('tb_absen.id')->get();
 
+            // return $getAbsenPegawai;
+
            if (count($getAbsenPegawai) > 0) {
                $pegawai_data[] = $getAbsenPegawai;
+           }else{
+               $pegawai = pegawai::select('nama')->where('id',$value->id)->first();
+               $pegawai_data[][0] =[
+                    'pegawai' =>$pegawai
+               ];
            }
         }
 
@@ -262,7 +271,7 @@ class laporanRekapitulasiabsenController extends Controller
 
         return $result = [
             'satuan_kerja' => $satuan_kerja_,
-            'hari_kerja' => $jml_hari,
+            'hari_kerja' => count($jml_hari['hari_kerja']),
             'pegawai' => $pegawai_data
         ];
         
