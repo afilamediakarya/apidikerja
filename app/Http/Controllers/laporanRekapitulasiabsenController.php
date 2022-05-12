@@ -258,7 +258,7 @@ class laporanRekapitulasiabsenController extends Controller
            if (count($getAbsenPegawai) > 0) {
                $pegawai_data[] = $getAbsenPegawai;
            }else{
-               $pegawai = pegawai::select('nama')->where('id',$value->id)->first();
+               $pegawai = pegawai::select('nama','nip')->where('id',$value->id)->first();
                $pegawai_data[][0] =[
                     'pegawai' =>$pegawai
                ];
