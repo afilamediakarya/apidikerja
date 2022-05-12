@@ -10,19 +10,21 @@ use Auth;
 class laporanRekapitulasiabsenController extends Controller
 {
 
-    public function cekHariLibur(){
+    public function cekHariLibur($params){
+        // return $params;
         $temps = [];
         $libur = DB::table('tb_libur')->latest()->get();
         foreach ($libur as $key => $value) {
             for ( $i = strtotime($value->start_end); $i <= strtotime($value->end_date); $i += (60 * 60 * 24)) {
-                // return date('w', $i);
-                // if (date('w', $i) !== '0' && date('w', $i) !== '6') {
-                //     $temps[] = date( 'Y-m-d', $i );
-                // }
-                $temps[] = date( 'Y-m-d', $i );
-                 
+                $temps[] = date( 'Y-m-d', $i );  
             }
         }
+
+        for ($i=0; $i < count($params); $i++) { 
+           $temps[] = $params[$i];
+        }
+
+
         return $temps;
     }
 
@@ -30,8 +32,10 @@ class laporanRekapitulasiabsenController extends Controller
         $startTime = strtotime($startDate);
         $endTime = strtotime($endDate);
         $getDatatanggal= [];
-        $hariLibur = $this->cekHariLibur();
+        
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
+        $hariLibur = $this->cekHariLibur($jmlHariKerja['weekend']);
+        // return $hariLibur;
         $jml_kehadiran = [];
         $temps_absensi = [
             'kmk' => [
@@ -159,7 +163,7 @@ class laporanRekapitulasiabsenController extends Controller
 
         $persentase_pemotongan_tunjangan = ($jml_potongan_kehadiran / 100) * 0.4;
 
-        $result['jml_hari_kerja'] = $jmlHariKerja;
+        $result['jml_hari_kerja'] = count($jmlHariKerja['hari_kerja']);
         $result['kehadiran'] = count($jml_kehadiran);
         $result['potongan_kehadiran'] = $jml_potongan_kehadiran;
         $result['persentase_pemotongan'] = round($persentase_pemotongan_tunjangan,2);
@@ -213,17 +217,20 @@ class laporanRekapitulasiabsenController extends Controller
     public function jmlHariKerja($startDate, $endDate){
         $tanggal_awal = strtotime($startDate);
         $tanggal_akhir = strtotime($endDate);
+ 
 
         $harikerja = array();
         for ($i=$tanggal_awal; $i <= $tanggal_akhir; $i += (60 * 60 * 24)) {
             if (date('w', $i) !== '0' && date('w', $i) !== '6') {
-                $harikerja[] = $i;
+                $harikerja['hari_kerja'][] = date('Y-m-d', $i);
+            }else{
+                $harikerja['weekend'][] = date('Y-m-d', $i);
             }
         }
 
-        $jumlah_hari = count($harikerja);
+        // $jumlah_hari = count($harikerja);
 
-        return $jumlah_hari;
+        return $harikerja;
 
     }
 
