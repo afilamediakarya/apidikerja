@@ -169,8 +169,6 @@ class laporanRekapitulasiabsenController extends Controller
         $result['tanpa_keterangan'] = count($temps_absensi['alpa']);
         $result['data_absen'] = $rekapAbsen;
 
-        
-
         if ($result) {
             return response()->json([
                 'message' => 'Success',
@@ -252,7 +250,6 @@ class laporanRekapitulasiabsenController extends Controller
             }  
         }
 
-        // return $jmlHariKerja;
 
         // return count($jmlHariKerja['hari_kerja']) - count($getDatatanggal);
 
@@ -286,7 +283,7 @@ class laporanRekapitulasiabsenController extends Controller
 
         return $result = [
             'satuan_kerja' => $satuan_kerja_,
-            'hari_kerja' => count($jmlHariKerja['hari_kerja']),
+            'hari_kerja' => count($getDatatanggal),
             'pegawai' => $pegawai_data
         ];
         
