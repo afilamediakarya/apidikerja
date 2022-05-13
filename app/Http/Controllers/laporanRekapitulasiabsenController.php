@@ -141,16 +141,16 @@ class laporanRekapitulasiabsenController extends Controller
                             'data_tanggal'=>$dataAbsen 
                         ];
                    }else{
-                    $temps_absensi['alpa'][] = $key;
-                    $rekapAbsen[$key] = [
-                        'tanggal' =>$value['date'],
-                        'data_tanggal'=>[
-                            'jenis' => '',
-                            'status_absen' => 'tanpa keterangan',
-                            'waktu_absen' => '00:00:00',
-                            'keterangan' => 'tanpa keterangan'
-                        ] 
-                    ];
+                        $temps_absensi['alpa'][] = $key;
+                        $rekapAbsen[$key] = [
+                            'tanggal' =>$value['date'],
+                            'data_tanggal'=>[
+                                'jenis' => '',
+                                'status_absen' => 'tanpa keterangan',
+                                'waktu_absen' => '00:00:00',
+                                'keterangan' => 'tanpa keterangan'
+                            ] 
+                        ];
                    }
                 }
 
@@ -233,11 +233,30 @@ class laporanRekapitulasiabsenController extends Controller
     }
 
     public function rekapByAdminOpd($startDate, $endDate,$satuan_kerja){
+        
         $satker = intval($satuan_kerja);
         $result = [];
         $pegawai_data = [];
         $satuan_kerja_ = '';
         $pegawaiBySatuanKerja = '';
+        $getDatatanggal= [];
+        $startTime = strtotime($startDate);
+        $endTime = strtotime($endDate);
+        $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
+        $hariLibur = $this->cekHariLibur($jmlHariKerja['weekend']);
+
+         for ( $i = $startTime; $i <= $endTime; $i = $i + 86400 ) {
+
+            if (in_array(date( 'Y-m-d', $i), $hariLibur) != 1) {
+                $getDatatanggal[]['date'] = date( 'Y-m-d', $i);   
+            }  
+        }
+
+        // return $jmlHariKerja;
+
+        // return count($jmlHariKerja['hari_kerja']) - count($getDatatanggal);
+
+
         if ($satker > 0) {
             $getSatuankerjaById = DB::table('tb_satuan_kerja')->where('id',$satker)->first();
             $satuan_kerja_ = $getSatuankerjaById->nama_satuan_kerja;
@@ -248,28 +267,26 @@ class laporanRekapitulasiabsenController extends Controller
             $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->get();
         }
 
-        // return $pegawaiBySatuanKerja;
-
         foreach ($pegawaiBySatuanKerja as $key => $value) {
-            $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id','id_pegawai','waktu_absen','status','jenis',DB::raw("SUM(tb_absen.status = 'alpa') as tanpa_keterangan"), DB::raw("SUM(tb_absen.status = 'hadir') as hadir"))->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->groupBy('tb_absen.id')->get();
+            $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id','id_pegawai','waktu_absen','status','jenis')->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->groupBy('tb_absen.id')->get();
 
-            // return $getAbsenPegawai;
-
-           if (count($getAbsenPegawai) > 0) {
-               $pegawai_data[] = $getAbsenPegawai;
-           }else{
-               $pegawai = pegawai::select('nama','nip')->where('id',$value->id)->first();
-               $pegawai_data[][0] =[
-                    'pegawai' =>$pegawai
-               ];
-           }
+               if (count($getAbsenPegawai) > 0) {
+                   $pegawai_data[] = $getAbsenPegawai;
+               }else{
+                   $pegawai = pegawai::select('nama','nip')->where('id',$value->id)->first();
+                   $pegawai_data[][0] =[
+                        'pegawai' =>$pegawai
+                   ];
+               }
         }
 
-        $jml_hari = $this->jmlHariKerja($startDate, $endDate);
+        // return $pegawai_data;
+
+        // $jml_hari = $this->jmlHariKerja($startDate, $endDate);
 
         return $result = [
             'satuan_kerja' => $satuan_kerja_,
-            'hari_kerja' => count($jml_hari['hari_kerja']),
+            'hari_kerja' => count($jmlHariKerja['hari_kerja']),
             'pegawai' => $pegawai_data
         ];
         
