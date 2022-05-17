@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 //     return  $request->user();
 // });
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+Route::get('/view-rekapByUser/{start_date}/{end_date}/{id_pegawai}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'viewrekapByUser']);
 // Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/register-user', [App\Http\Controllers\AuthController::class, 'register_user']); 
@@ -211,7 +212,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('laporan-rekapitulasi-absen')->group(function () {
-        Route::get('/rekapByUser/{start_date}/{end_date}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'rekapByUser']); 
+        Route::get('/rekapByUser/{start_date}/{end_date}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'rekapByUser']);
         Route::get('/rekapByOpd/{start_date}/{end_date}/{satuan_kerja}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'rekapByAdminOpd']);      
     });
 
