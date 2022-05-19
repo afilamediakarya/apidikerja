@@ -168,6 +168,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/list', [App\Http\Controllers\reviewController::class, 'list']);    
         Route::post('/store', [App\Http\Controllers\reviewController::class, 'store']);
          Route::get('/skpbyId/{type}', [App\Http\Controllers\reviewController::class, 'skpbyId']);    
+        Route::get('/group_list', [App\Http\Controllers\reviewController::class, 'group_list']); 
     });
 
     Route::prefix('review_realisasi')->group(function () {

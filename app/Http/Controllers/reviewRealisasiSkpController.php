@@ -66,32 +66,6 @@ class reviewRealisasiSkpController extends Controller
 
           }
 
-        // foreach ($getData as $key => $value) {
-        //     $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->where('id_pegawai',$value->id_pegawai)->first();
-        //     if (isset($res)) {
-                
-        //         $getReview = review_realisasi_skp::where('id_skp',$res->id_skp)->get()->pluck('kesesuaian')->toArray();
-        //         if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
-        //             $status = 'Belum Sesuai';
-        //         }
-        //         else if(in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false){
-        //             $status = 'Selesai';
-        //         }else{
-        //             $status = 'Belum Review';
-        //         }
-
-        //         $myArray[$key] = [
-        //             'nama'=>$res->nama,
-        //             'nip'=>$res->nip,
-        //             'jenis_jabatan'=>$res->jenis_jabatan,
-        //             'id_skp'=>$res->id_skp,
-        //             'id_pegawai'=>$res->id_pegawai,
-        //             'status'=>$status,
-        //         ];
-                
-        //     }
-        // }
-
         if ($myArray) {
             return response()->json([
                 'message' => 'Success',
