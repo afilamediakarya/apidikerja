@@ -22,7 +22,7 @@ class skpController extends Controller
     public function list(){
         $result = [];
         $groupSkpAtasan = [];
-
+        $skpChild = '';
         $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('tb_skp.id_skp_atasan')->get();
 
@@ -51,6 +51,8 @@ class skpController extends Controller
            
             if ($getRencanaKerjaAtasan != []) {
                 $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('id_pegawai',Auth::user()->id_pegawai)->get();
+            }else{
+                $skpChild = [];
             }
             $result[$key]['atasan'] = $getRencanaKerjaAtasan;
             $result[$key]['skp_child'] = $skpChild;
