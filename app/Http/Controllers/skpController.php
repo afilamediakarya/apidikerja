@@ -37,13 +37,21 @@ class skpController extends Controller
            }else{
              $getKegiatan= DB::table('tb_kegiatan')->select('id','nama_kegiatan','kode_kegiatan')->where('id',$value->id_skp_atasan)->first();
 
-             $getRencanaKerjaAtasan = [
-                'id' => $getKegiatan->id,
-                'rencana_kerja' =>$getKegiatan->nama_kegiatan
-             ];
+             if (isset($getKegiatan)) {
+                $getRencanaKerjaAtasan = [
+                    'id' => $getKegiatan->id,
+                    'rencana_kerja' =>$getKegiatan->nama_kegiatan
+                 ];
+             }else{
+
+             }
+
+             
            }
            
-            $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('id_pegawai',Auth::user()->id_pegawai)->get();
+            if (isset($getRencanaKerjaAtasan)) {
+                $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('id_pegawai',Auth::user()->id_pegawai)->get();
+            }
             $result[$key]['atasan'] = $getRencanaKerjaAtasan;
             $result[$key]['skp_child'] = $skpChild;
       
