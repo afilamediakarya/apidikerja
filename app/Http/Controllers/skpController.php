@@ -43,13 +43,13 @@ class skpController extends Controller
                     'rencana_kerja' =>$getKegiatan->nama_kegiatan
                  ];
              }else{
-
+                 $getRencanaKerjaAtasan = [];
              }
 
              
            }
            
-            if (isset($getRencanaKerjaAtasan)) {
+            if ($getRencanaKerjaAtasan != []) {
                 $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('id_pegawai',Auth::user()->id_pegawai)->get();
             }
             $result[$key]['atasan'] = $getRencanaKerjaAtasan;
