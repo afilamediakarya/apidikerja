@@ -260,14 +260,9 @@ class skpController extends Controller
         $result = [];
         $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
-        // return $checkDataAtasan;
 
         if (isset($jabatanByPegawai)) {
-            // $getJabatan = jabatan::where('id',$atasan['id_penilai'])->first();
-
             if (!is_null($jabatanByPegawai->parent_id)) {
-                
-
                 if ($jabatanByPegawai->level != "1") {
                     $atasan = DB::table('tb_jabatan')->where('id',$jabatanByPegawai->parent_id)->first();
                     $getSkp = skp::where('id_pegawai',$atasan->id_pegawai)->get();

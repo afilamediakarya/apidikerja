@@ -214,9 +214,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('laporan-rekapitulasi-absen')->group(function () {
         Route::get('/rekapByUser/{start_date}/{end_date}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'rekapByUser']);
+        Route::get('/rekapByOpd/{start_date}/{end_date}/{satuan_kerja}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'rekapByAdminOpd']);  
         Route::get('/rekapByOpd/{start_date}/{end_date}/{satuan_kerja}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'rekapByAdminOpd']);      
     });
 
+    Route::prefix('laporan')->group(function () {
+        Route::get('/skp', [App\Http\Controllers\laporanController::class, 'laporanSkp']);      
+    });
 });
 
 
