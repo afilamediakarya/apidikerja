@@ -24,11 +24,14 @@ class laporanController extends Controller
         $result = [];
         $groupSkpAtasan = [];
         $skpChild = '';
+        $atasan = '';
         $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         
         $jabatan_atasan = DB::table('tb_jabatan')->where('id',$jabatanByPegawai->parent_id)->first();
 
-        $atasan = DB::table('tb_jabatan')->select('tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai','tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja','tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id',$jabatan_atasan->id_pegawai)->first();
+        if (isset($jabatan_atasan->id_pegawai)) {
+            $atasan = DB::table('tb_jabatan')->select('tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai','tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja','tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id',$jabatan_atasan->id_pegawai)->first();
+        }
 
         $current = DB::table('tb_jabatan')->select('tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai','tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja','tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id',Auth::user()->id_pegawai)->first();       
         // return $jabatanByPegawai;
@@ -69,9 +72,6 @@ class laporanController extends Controller
             $result['skp'][$key]['skp_child'] = $skpChild;
       
         }      
-
- 
-
 
         if ($result) {
             return response()->json([
