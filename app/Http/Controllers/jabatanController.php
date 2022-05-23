@@ -64,7 +64,7 @@ class jabatanController extends Controller
         $data->parent_id = $request->parent_id;
         $data->nama_jabatan = $request->nama_jabatan;
         $data->status_jabatan = $request->status_jabatan;
-        $data->pembayaran_tpp = $request->pembayaran_tpp;
+        $data->pembayaran_tpp = str_replace(',','',$request->pembayaran_tpp);
         $data->save();
 
         if ($data) {
@@ -120,7 +120,7 @@ class jabatanController extends Controller
         $data->parent_id = $request->parent_id;
         $data->nama_jabatan = $request->nama_jabatan;
         $data->status_jabatan = $request->status_jabatan;
-        $data->pembayaran_tpp = $request->pembayaran_tpp;
+        $data->pembayaran_tpp = str_replace(',','',$request->pembayaran_tpp);
         $data->save();
 
         if ($data) {
