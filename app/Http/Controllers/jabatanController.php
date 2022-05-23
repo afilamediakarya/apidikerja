@@ -105,7 +105,6 @@ class jabatanController extends Controller
             'parent_id' => Rule::requiredIf($request->level > 1),
             'pembayaran_tpp' => 'required',
             'nama_jabatan' => 'required',
-            'level' => 'required|numeric',
             'status_jabatan' => 'required'
         ]);
 
