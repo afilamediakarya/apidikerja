@@ -40,11 +40,10 @@ class jabatanController extends Controller
        
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
-            'id_kelas_jabatan' => 'required|numeric',
+            'id_jenis_jabatan' => 'required|numeric',
             'parent_id' => Rule::requiredIf($request->level > 1),
-            'nama_struktur' => 'required',
+            'pembayaran_tpp' => 'required',
             'nama_jabatan' => 'required',
-            'level' => 'required|numeric',
             'status_jabatan' => 'required'
         ]);
 
@@ -60,13 +59,12 @@ class jabatanController extends Controller
 
         $data = new jabatan();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
-        $data->id_kelas_jabatan = $request->id_kelas_jabatan;
+        $data->id_jenis_jabatan = $request->id_jenis_jabatan;
         $data->id_pegawai = $request->id_pegawai;
         $data->parent_id = $request->parent_id;
-        $data->nama_struktur = $request->nama_struktur;
         $data->nama_jabatan = $request->nama_jabatan;
-        $data->level = $request->level;
         $data->status_jabatan = $request->status_jabatan;
+        $data->pembayaran_tpp = $request->pembayaran_tpp;
         $data->save();
 
         if ($data) {
@@ -103,9 +101,9 @@ class jabatanController extends Controller
     public function update($params,Request $request){
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
-            'id_kelas_jabatan' => 'required|numeric',
+            'id_jenis_jabatan' => 'required|numeric',
             'parent_id' => Rule::requiredIf($request->level > 1),
-            'nama_struktur' => 'required',
+            'pembayaran_tpp' => 'required',
             'nama_jabatan' => 'required',
             'level' => 'required|numeric',
             'status_jabatan' => 'required'
@@ -117,13 +115,12 @@ class jabatanController extends Controller
 
         $data = jabatan::where('id',$params)->first();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
-        $data->id_kelas_jabatan = $request->id_kelas_jabatan;
-           $data->id_pegawai = $request->id_pegawai;
+        $data->id_jenis_jabatan = $request->id_jenis_jabatan;
+        $data->id_pegawai = $request->id_pegawai;
         $data->parent_id = $request->parent_id;
-        $data->nama_struktur = $request->nama_struktur;
         $data->nama_jabatan = $request->nama_jabatan;
-        $data->level = $request->level;
         $data->status_jabatan = $request->status_jabatan;
+        $data->pembayaran_tpp = $request->pembayaran_tpp;
         $data->save();
 
         if ($data) {
