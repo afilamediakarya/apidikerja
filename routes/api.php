@@ -210,6 +210,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/delete/{params}', [App\Http\Controllers\jabatanController::class, 'delete']);
         Route::get('/get-option-jabatan-atasan/{params}/{id_satuan_kerja}', [App\Http\Controllers\jabatanController::class, 'jabatanAtasan']);     
         Route::get('/pegawaiBySatuanKerja', [App\Http\Controllers\jabatanController::class, 'getPegawaiBySatuanKerja']);  
+        Route::get('/get-option-jenis-jabatan', [App\Http\Controllers\jabatanController::class, 'getOptionJenisJabatan']);
     });
 
     Route::prefix('laporan-rekapitulasi-absen')->group(function () {

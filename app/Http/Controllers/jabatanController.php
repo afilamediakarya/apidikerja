@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Validator;
 use App\Models\jabatan;
 use App\Models\pegawai;
+use App\Models\jenis_jabatan;
 use Auth;
 use DB;
 use Illuminate\Validation\Rule;
@@ -186,5 +187,18 @@ class jabatanController extends Controller
 
         return response()->json($result);
 
+    }
+
+    public function getOptionJenisJabatan(){
+        $data = jenis_jabatan::all();
+
+        foreach ($data as $key => $value) {
+            $result[$key] = [
+                'id' => $value->id,
+                'value'=> $value->jenis_jabatan
+            ];
+        }
+
+        return response()->json($result);
     }
 }

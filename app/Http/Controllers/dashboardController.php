@@ -156,10 +156,10 @@ class dashboardController extends Controller
 
 		// INFO TPP
 			$nilai_besaran_tpp = 0;
-			$besaran_tpp = jabatan::where('id_pegawai',Auth::user()->id_pegawai)->first();
-			if ($besaran_tpp) {
-				$nilai_besaran_tpp = $besaran_tpp['kelas_jabatan']['besaran_tpp'];
-			}
+			// $besaran_tpp = jabatan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+			// if ($besaran_tpp) {
+			// 	$nilai_besaran_tpp = $besaran_tpp['kelas_jabatan']['besaran_tpp'];
+			// }
 			// Tunjangan Prestasi Kerja
 			// return $get_pegawai;
 			if (isset($get_pegawai)) {
