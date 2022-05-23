@@ -203,6 +203,7 @@ class jabatanController extends Controller
     }
 
     public function getParent($params){
+        $result = [];
         $current_jenis_jabatan = jenis_jabatan::where('id',$params)->first();
         $current_user = pegawai::where('id',Auth::user()->id_pegawai)->first();
         // return $current_jenis_jabatan['level'];
