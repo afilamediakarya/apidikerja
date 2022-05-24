@@ -88,8 +88,7 @@ class skpController extends Controller
     public function skp_kepala($request){
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
-            'id_skp_atasan' => 'required|numeric',
-            'jenis' => 'required',
+            'jenis_kinerja' => 'required',
             'rencana_kerja' => 'required',
             'tahun' => 'required',
         ]);
@@ -101,8 +100,7 @@ class skpController extends Controller
         $skp = new skp();
         $skp->id_pegawai = Auth::user()->id_pegawai;
         $skp->id_satuan_kerja = $request->id_satuan_kerja;
-        $skp->id_skp_atasan = $request->id_skp_atasan;
-        $skp->jenis = $request->jenis;
+        $skp->jenis_kinerja = $request->jenis_kinerja;
         $skp->rencana_kerja = $request->rencana_kerja;
         $skp->tahun = $request->tahun;
         $skp->save();
