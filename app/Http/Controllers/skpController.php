@@ -258,28 +258,33 @@ class skpController extends Controller
 
     public function optionSkp(){
         $result = [];
-        $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        // $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        $jabatanByPegawai = DB::table('tb_jabatan')->select('tb_jabatan.parent_id','tb_jenis_jabatan.level')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
 
         if (isset($jabatanByPegawai)) {
             if (!is_null($jabatanByPegawai->parent_id)) {
                 if ($jabatanByPegawai->level != "1") {
                     $atasan = DB::table('tb_jabatan')->where('id',$jabatanByPegawai->parent_id)->first();
-                    $getSkp = skp::where('id_pegawai',$atasan->id_pegawai)->get();
-                    foreach ($getSkp as $key => $value) {
-                        $result[$key] = [
-                            'id' => $value->id,
-                            'value'=> $value->rencana_kerja
-                        ];
+                    // return $atasan;
+                    
+                    if (isset($atasan)) {
+                        $getSkp = skp::where('id_pegawai',$atasan->id_pegawai)->get();
+                        foreach ($getSkp as $key => $value) {
+                            $result[$key] = [
+                                'id' => $value->id,
+                                'value'=> $value->rencana_kerja
+                            ];
+                        }
                     }
+
+                   
                 
                      return response()->json([
                         'message' => 'Success',
                         'status' => true,
                         'data' => $result
                     ]);
-
-                }else{
 
                 }   
 
