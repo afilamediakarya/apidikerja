@@ -100,7 +100,7 @@ class skpController extends Controller
         $skp = new skp();
         $skp->id_pegawai = Auth::user()->id_pegawai;
         $skp->id_satuan_kerja = $request->id_satuan_kerja;
-        $skp->jenis_kinerja = $request->jenis_kinerja;
+        $skp->jenis = $request->jenis_kinerja;
         $skp->rencana_kerja = $request->rencana_kerja;
         $skp->tahun = $request->tahun;
         $skp->save();
