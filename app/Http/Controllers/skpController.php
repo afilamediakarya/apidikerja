@@ -141,7 +141,7 @@ class skpController extends Controller
         for ($i=0; $i < count($request->aspek_skp); $i++) { 
                 $aspek = new aspek_skp();
                 $aspek->id_skp = $skp->id;
-                $aspek->aspek_skp = "ikmi";
+                $aspek->aspek_skp = "iki";
                 $aspek->iki = $request->indikator_kerja_individu[$i];
                 $aspek->satuan = $request->satuan[$i];
                 $aspek->save();
@@ -315,7 +315,7 @@ class skpController extends Controller
         for ($i=0; $i < count($request->aspek_skp); $i++) { 
                 $aspek = new aspek_skp();
                 $aspek->id_skp = $skp->id;
-                $aspek->aspek_skp = "ikmi";
+                $aspek->aspek_skp = "iki";
                 $aspek->iki = $request->indikator_kerja_individu[$i];
                 $aspek->satuan = $request->satuan[$i];
                 $aspek->save();
