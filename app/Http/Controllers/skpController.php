@@ -76,7 +76,87 @@ class skpController extends Controller
     }
 
     public function store(Request $request){
-        // return $request;
+     
+        if($request->type_skp == 'kepala'){
+            return $this->skp_kepala($request);
+        }else{
+            return $this->skp_pegawai($request);
+        }
+        
+    }
+
+    public function skp_kepala($request){
+        $validator = Validator::make($request->all(),[
+            'id_satuan_kerja' => 'required|numeric',
+            'id_skp_atasan' => 'required|numeric',
+            'jenis' => 'required',
+            'rencana_kerja' => 'required',
+            'tahun' => 'required',
+        ]);
+
+        if($validator->fails()){
+            return response()->json($validator->errors(),422);       
+        }
+        
+        $skp = new skp();
+        $skp->id_pegawai = Auth::user()->id_pegawai;
+        $skp->id_satuan_kerja = $request->id_satuan_kerja;
+        $skp->id_skp_atasan = $request->id_skp_atasan;
+        $skp->jenis = $request->jenis;
+        $skp->rencana_kerja = $request->rencana_kerja;
+        $skp->tahun = $request->tahun;
+        $skp->save();
+
+        for ($i=0; $i < 13; $i++) { 
+            $review_realisasi_skp = new review_realisasi_skp();
+            $review_realisasi_skp->id_skp = $skp->id;
+            $review_realisasi_skp->kesesuaian = 'tidak';
+            $review_realisasi_skp->bulan = $i+1;
+            $review_realisasi_skp->save();
+        }
+
+        for ($i=0; $i < count($request->aspek_skp); $i++) { 
+                $aspek = new aspek_skp();
+                $aspek->id_skp = $skp->id;
+                $aspek->aspek_skp = $request->type_skp;
+                $aspek->iki = $request->indikator_kerja_individu[$i];
+                $aspek->satuan = $request->satuan[$i];
+                $aspek->save();
+
+                for ($x=0; $x < 12; $x++) { 
+                    $realisasi_skp = new realisasi_skp();
+                    $realisasi_skp->id_aspek_skp = $aspek->id;
+                    $realisasi_skp->realisasi_bulanan = 0;
+                    $realisasi_skp->bulan = $x+1;
+                    $realisasi_skp->save();
+                }
+
+                for ($x=0; $x < count($request->target_[$i]); $x++) { 
+                    $target = new target_skp();
+                    $target->id_aspek_skp = $aspek->id;
+                    $target->target = $request->target_[$i][$x];
+                    $target->bulan = $x+1;
+                    $target->save();
+                }
+                
+        }
+
+        if ($skp) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $skp
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ],422);
+        }
+
+    }
+
+    public function skp_pegawai($request){
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
             'id_skp_atasan' => 'required|numeric',
