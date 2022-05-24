@@ -19,8 +19,33 @@ use Validator;
 use Auth;
 class skpController extends Controller
 {
-    public function list(){
-        $result = [];
+    public function list($params){
+        if ($params == 'kepala') {
+            return $this->list_skp_kepala();
+        }else{
+            return $this->list_skp_pegawai();
+        }
+    }
+
+    public function list_skp_kepala(){
+          $skp = skp::with('aspek_skp')->where('id_pegawai',Auth::user()->id_pegawai)->get();     
+        if ($skp) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $skp
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'empty data',
+                'status' => false,
+                 'data' => $skp
+            ]);
+        }
+    }
+
+    public function list_skp_pegawai(){
+         $result = [];
         $groupSkpAtasan = [];
         $skpChild = '';
         $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
