@@ -15,6 +15,10 @@ class jabatan extends Model
         return $this->hasOne('App\Models\pegawai', 'id', 'id_pegawai');
     }
 
+    public function jenis_jabatan() {
+        return $this->hasOne('App\Models\jenis_jabatan', 'id', 'id_jenis_jabatan');
+    }
+
     public function satuan_kerja() {
         return $this->hasOne('App\Models\satuan_kerja', 'id', 'id_satuan_kerja');
     }

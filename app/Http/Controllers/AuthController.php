@@ -9,6 +9,7 @@ use Auth;
 use Validator;
 use App\Models\User;
 use App\Models\pegawai;
+use App\Models\jabatan;
 use Illuminate\Validation\ValidationException;
 use DB;
 class AuthController extends Controller
@@ -23,11 +24,21 @@ class AuthController extends Controller
                 ->json(['message' => 'Unauthorized'], 401);
         }
 
+        $level_ = [];
+
         $user = User::where('username', $request['username'])->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
         $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
 
-        $jabatan = DB::table('tb_jabatan')->select('tb_jenis_jabatan.level')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+        // $jabatan = DB::table('tb_jabatan')->select('tb_jenis_jabatan.')->join('tb_jenis_jabatan','tb_jabatan.id','=','tb_jenis_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+
+        $jabatan = jabatan::with('jenis_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+        // return $jabatan;
+        if (isset($jabatan)) {
+            foreach ($jabatan as $key => $value) {
+                $level_[] = $value['jenis_jabatan']['level'];
+            }
+        }
 
         return response()->json([
             'message' => 'Hi '.$user->username.', Berhasil Login',
@@ -35,7 +46,7 @@ class AuthController extends Controller
             'role' => $user->role,
             'current' => $user,
             'check_atasan'=> $data,
-            'level_jabatan' => $jabatan,
+            'level_jabatan' => max($level_),
             'token_type' => 'Bearer', 
         ]);
     }
