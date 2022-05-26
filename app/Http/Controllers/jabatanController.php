@@ -83,7 +83,7 @@ class jabatanController extends Controller
     }
 
     public function show($params){
-        $data = jabatan::where('id',$params)->first();
+        $data = jabatan::with('jenis_jabatan')->where('id',$params)->first();
 
         if ($data) {
             return response()->json([
