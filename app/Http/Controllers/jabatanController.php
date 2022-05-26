@@ -177,10 +177,18 @@ class jabatanController extends Controller
         $data = pegawai::where('id_satuan_kerja',$current_user['id_satuan_kerja'])->get();
 
         foreach ($data as $key => $value) {
-            $result[$key] = [
-                'id' => $value->id,
-                'value'=> $value->nama
-            ];
+            if ($key == 0) {
+                $result[] = [
+                    'id' => '',
+                    'value'=> 'Kosong'
+                ];
+            } else {
+                $result[] = [
+                    'id' => $value->id,
+                    'value'=> $value->nama
+                ];
+            }
+            
         }
 
         return response()->json($result);
