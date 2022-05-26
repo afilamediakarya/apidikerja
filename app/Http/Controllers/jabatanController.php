@@ -83,13 +83,32 @@ class jabatanController extends Controller
     }
 
     public function show($params){
-        $data = jabatan::with('jenis_jabatan')->where('id',$params)->first();
+        $result = [];
+        $data = jabatan::where('id',$params)->first();
+        $parent = jabatan::where('id',$data->parent_id)->first();
+        // return $parent;
 
-        if ($data) {
+        $result = [
+            'id' => $data->id,
+            'id_satuan_kerja' => $data->id_satuan_kerja,
+            'nama_jabatan' => $data->nama_jabatan,
+            'id_jenis_jabatan' => $data->id_jenis_jabatan,
+            'nilai_jabatan' =>  $data->nilai_jabatan,
+            'status_jabatan' => $data->status_jabatan,
+            'pegawai' => $data->pegawai,
+            'pembayaran_tpp' => $data->pembayaran_tpp,
+            'parent_id' => [
+                'id' => $parent->id,
+                'nama' => $parent['pegawai']['nama'].' - '.$parent->nama_jabatan
+            ],
+        ];
+
+
+        if ($result) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $data
+                'data' => $result
             ]);
         }else{
             return response()->json([
