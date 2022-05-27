@@ -443,7 +443,7 @@ class skpController extends Controller
     public function optionSkp(){
         $result = [];
         // $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        $jabatanByPegawai = DB::table('tb_jabatan')->select('tb_jabatan.parent_id','tb_jenis_jabatan.level')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        $jabatanByPegawai = DB::table('tb_jabatan')->select('tb_jabatan.parent_id','tb_jenis_jabatan.level')->join('tb_jenis_jabatan','tb_jabatan.id_jenis_jabatan','=','tb_jenis_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
 
         if (isset($jabatanByPegawai)) {
