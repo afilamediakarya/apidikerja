@@ -24,6 +24,7 @@ class AuthController extends Controller
                 ->json(['message' => 'Unauthorized'], 401);
         }
 
+        $level = 0;
         $level_ = [];
 
         $user = User::where('username', $request['username'])->firstOrFail();
@@ -40,13 +41,19 @@ class AuthController extends Controller
             }
         }
 
+        if (count($level_) > 0) {
+           $level = max($level_)
+        }else{
+            $level = 0;
+        }
+
         return response()->json([
             'message' => 'Hi '.$user->username.', Berhasil Login',
             'access_token' => $token, 
             'role' => $user->role,
             'current' => $user,
             'check_atasan'=> $data,
-            'level_jabatan' => max($level_),
+            'level_jabatan' => $level,
             'token_type' => 'Bearer', 
         ]);
     }
