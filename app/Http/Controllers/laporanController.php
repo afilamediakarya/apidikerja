@@ -20,8 +20,49 @@ use Auth;
 
 class laporanController extends Controller
 {
-    public function laporanSkp(){
+    public function laporanSkp($params){
+          if ($params == 'kepala') {
+            return $this->laporanSkpKepala();
+        }else{
+            return $this->laporanSkpPegawai();
+        }
+    }   
+
+    public function laporanSkpKepala(){
         $result = [];
+        $atasan = '';
+        $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        
+        $jabatan_atasan = DB::table('tb_jabatan')->where('id',$jabatanByPegawai->parent_id)->first();
+
+        if (isset($jabatan_atasan->id_pegawai)) {
+            $atasan = DB::table('tb_jabatan')->select('tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai','tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja','tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id',$jabatan_atasan->id_pegawai)->first();
+        }
+
+        $current = DB::table('tb_jabatan')->select('tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai','tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja','tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id',Auth::user()->id_pegawai)->first();
+        $skp = skp::with('aspek_skp')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+
+        $result['atasan'] = $atasan;
+        $result['pegawai_dinilai'] = $current;
+        $result['skp'] = $skp;
+        
+        if ($result) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $result
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'empty data',
+                'status' => false,
+                 'data' => $result
+            ]);
+        }
+    }   
+
+    public function laporanSkpPegawai(){
+         $result = [];
         $groupSkpAtasan = [];
         $skpChild = '';
         $atasan = '';
@@ -86,7 +127,6 @@ class laporanController extends Controller
                  'data' => $result
             ]);
         }
-    }      
-
+    }
 
 }

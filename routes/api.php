@@ -221,7 +221,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('laporan')->group(function () {
-        Route::get('/skp', [App\Http\Controllers\laporanController::class, 'laporanSkp']);      
+        Route::get('/skp/{level}', [App\Http\Controllers\laporanController::class, 'laporanSkp']);      
     });
 });
 
