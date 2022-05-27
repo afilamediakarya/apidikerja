@@ -42,7 +42,7 @@ class AuthController extends Controller
         }
 
         if (count($level_) > 0) {
-           $level = max($level_)
+           $level = max($level_);
         }else{
             $level = 0;
         }
