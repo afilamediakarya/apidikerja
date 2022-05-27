@@ -98,9 +98,10 @@ class jabatanController extends Controller
             'pegawai' => $data->pegawai,
             'pembayaran_tpp' => $data->pembayaran_tpp,
             'parent_id' => [
-                'id' => $parent->id,
-                'nama' => $parent['pegawai']['nama'].' - '.$parent->nama_jabatan
+                'parent_id' => $parent->id,
+                'jenis_jabatan' => $data->id_jenis_jabatan,
             ],
+            
         ];
 
 
@@ -136,7 +137,7 @@ class jabatanController extends Controller
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->id_jenis_jabatan = $request->id_jenis_jabatan;
         $data->id_pegawai = $request->id_pegawai;
-        $data->parent_id = $request->parent_id;
+         $data->parent_id = $request->parent_id;
         $data->nama_jabatan = $request->nama_jabatan;
         $data->status_jabatan = $request->status_jabatan;
         $data->pembayaran_tpp = $request->pembayaran_tpp;
