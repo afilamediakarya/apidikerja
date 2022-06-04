@@ -84,9 +84,15 @@ class jabatanController extends Controller
 
     public function show($params){
         $result = [];
+        $parent_ = '';
         $data = jabatan::where('id',$params)->first();
         $parent = jabatan::where('id',$data->parent_id)->first();
-        // return $parent;
+
+        if (isset($parent)) {
+            $parent_ = $parent->id;
+        }else{
+            $parent_ = $parent;
+        }
 
         $result = [
             'id' => $data->id,
@@ -98,7 +104,7 @@ class jabatanController extends Controller
             'pegawai' => $data->pegawai,
             'pembayaran_tpp' => $data->pembayaran_tpp,
             'parent_id' => [
-                'parent_id' => $parent->id,
+                'parent_id' => $parent_,
                 'jenis_jabatan' => $data->id_jenis_jabatan,
             ],
             
