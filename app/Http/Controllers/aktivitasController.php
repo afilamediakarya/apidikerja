@@ -12,7 +12,7 @@ use DB;
 class aktivitasController extends Controller
 {
     public function list(){
-        $data = aktivitas::latest()->get();
+        $data = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->latest()->get();
 
         if ($data) {
             return response()->json([
@@ -119,8 +119,8 @@ class aktivitasController extends Controller
     }
 
     public function store(Request $request){
+        // return $request;
         $validator = Validator::make($request->all(),[
-            'id_pegawai' => 'required|numeric',
             'id_skp' => 'required|numeric',
             'nama_aktivitas' => 'required|string',
             'keterangan' => 'required',
@@ -128,12 +128,11 @@ class aktivitasController extends Controller
             'waktu_awal' => 'required',
             'waktu_akhir' => 'required',
             'tanggal' => 'required|date',
-            'tahun'=> 'required',
             'hasil' => 'required|numeric'
         ]);
 
         if($validator->fails()){
-            return response()->json($validator->errors());       
+            return response()->json($validator->errors(),422);       
         }
 
         $data = new aktivitas();
@@ -145,7 +144,7 @@ class aktivitasController extends Controller
         $data->waktu_awal = $request->waktu_awal;
         $data->waktu_akhir = $request->waktu_akhir;
         $data->tanggal = $request->tanggal;
-        $data->tahun = $request->tahun;
+        $data->tahun = date('Y');
         $data->hasil = $request->hasil;
         $data->save();
 
@@ -183,15 +182,13 @@ class aktivitasController extends Controller
 
     public function update($params,Request $request){
         $validator = Validator::make($request->all(),[
-            'id_pegawai' => 'required|numeric',
             'id_skp' => 'required|numeric',
             'nama_aktivitas' => 'required|string',
             'keterangan' => 'required',
-             'satuan' => 'required|string',
+            'satuan' => 'required|string',
             'waktu_awal' => 'required',
             'waktu_akhir' => 'required',
             'tanggal' => 'required|date',
-            'tahun'=> 'required',
             'hasil' => 'required|numeric'
         ]);
 
@@ -200,7 +197,7 @@ class aktivitasController extends Controller
         }
 
         $data = aktivitas::where('id',$params)->first();
-        $data->id_pegawai =Auth::user()->id_pegawai;
+        $data->id_pegawai = Auth::user()->id_pegawai;
         $data->id_skp = $request->id_skp;
         $data->nama_aktivitas = $request->nama_aktivitas;
         $data->keterangan = $request->keterangan;
@@ -208,7 +205,7 @@ class aktivitasController extends Controller
         $data->waktu_awal = $request->waktu_awal;
         $data->waktu_akhir = $request->waktu_akhir;
         $data->tanggal = $request->tanggal;
-        $data->tahun = $request->tahun;
+        $data->tahun = date('Y');
         $data->hasil = $request->hasil;
         $data->save();
 

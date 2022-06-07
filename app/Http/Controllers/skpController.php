@@ -272,7 +272,6 @@ class skpController extends Controller
 
 
     public function update($params,Request $request){
-
         if($request->type_skp == 'kepala'){
             return $this->update_skp_kepala($params,$request);
         }else{
@@ -444,11 +443,15 @@ class skpController extends Controller
         $result = [];
         // $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         $jabatanByPegawai = DB::table('tb_jabatan')->select('tb_jabatan.parent_id','tb_jenis_jabatan.level')->join('tb_jenis_jabatan','tb_jabatan.id_jenis_jabatan','=','tb_jenis_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        // return $jabatanByPegawai;
         $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
-
+  
         if (isset($jabatanByPegawai)) {
+
             if (!is_null($jabatanByPegawai->parent_id)) {
-                if ($jabatanByPegawai->level != "1") {
+        
+                if ($jabatanByPegawai->level !== 1) {
+
                     $atasan = DB::table('tb_jabatan')->where('id',$jabatanByPegawai->parent_id)->first();
                     // return $atasan;
                     
@@ -470,6 +473,12 @@ class skpController extends Controller
                         'data' => $result
                     ]);
 
+                }else{
+                    return response()->json([
+                        'message' => 'Success',
+                        'status' => true,
+                        'data' => $result
+                    ]);
                 }   
 
             }else{
@@ -482,7 +491,7 @@ class skpController extends Controller
                             'value'=> $value->nama_kegiatan
                         ];
                     }
-                    // return $result;
+                    
                     return response()->json([
                      'message' => 'Success',
                            'status' => true,
