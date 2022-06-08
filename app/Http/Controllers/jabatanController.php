@@ -230,6 +230,7 @@ class jabatanController extends Controller
     public function getParent($params){
         $result = [];
         $current_jenis_jabatan = jenis_jabatan::where('id',$params)->first();
+        
         $current_user = pegawai::where('id',Auth::user()->id_pegawai)->first();
         // return $current_jenis_jabatan['level'];
         $getParent = DB::table('tb_jabatan')->select('tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_jabatan.id_pegawai','tb_jabatan.id')->join('tb_pegawai','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')->where('tb_jenis_jabatan.level','<',$current_jenis_jabatan['level'])->where('tb_jabatan.id_satuan_kerja',$current_user['id_satuan_kerja'])->get();
@@ -237,12 +238,12 @@ class jabatanController extends Controller
         // return $getParent;
         
         foreach ($getParent as $key => $value) {
-            if ($value->id_pegawai != $current_user->id) {
+            // if ($value->id_pegawai != $current_user->id) {
                 $result[] = [
                     'id' => $value->id,
                     'value'=> $value->nama.' - '.$value->nama_jabatan
                 ];    
-            }   
+            // }   
         }
 
         return response()->json($result);
