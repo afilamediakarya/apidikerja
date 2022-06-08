@@ -199,22 +199,15 @@ class jabatanController extends Controller
 
     public function getPegawaiBySatuanKerja(){
         $current_user = pegawai::where('id',Auth::user()->id_pegawai)->first();
+        // return $current_user;
 
         $data = pegawai::where('id_satuan_kerja',$current_user['id_satuan_kerja'])->get();
 
         foreach ($data as $key => $value) {
-            if ($key == 0) {
-                $result[] = [
-                    'id' => '',
-                    'value'=> 'Kosong'
-                ];
-            } else {
-                $result[] = [
-                    'id' => $value->id,
-                    'value'=> $value->nama
-                ];
-            }
-            
+            $result[] = [
+                'id' => $value->id,
+                'value'=> $value->nama
+            ];            
         }
 
         return response()->json($result);
@@ -222,7 +215,7 @@ class jabatanController extends Controller
     }
 
     public function getOptionJenisJabatan(){
-        $data = jenis_jabatan::all();
+        $data = jenis_jabatan::orderBy('id', 'DESC')->get();
 
         foreach ($data as $key => $value) {
             $result[$key] = [

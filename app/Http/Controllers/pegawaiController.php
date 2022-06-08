@@ -215,7 +215,7 @@ class pegawaiController extends Controller
 
     public function optionAgama(){
         $result = [];
-        $data = DB::table('tb_agama')->latest()->get();
+        $data = DB::table('tb_agama')->orderBy('id', 'ASC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'value'=> $value->nama_agama
@@ -226,7 +226,7 @@ class pegawaiController extends Controller
 
     public function optionStatusKawin(){
         $result = [];
-        $data = DB::table('tb_status_kawin')->latest()->get();
+        $data = DB::table('tb_status_kawin')->orderBy('id', 'ASC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'value'=> $value->nama_status_kawin
@@ -237,7 +237,7 @@ class pegawaiController extends Controller
 
     public function optionGolongan(){
         $result = [];
-        $data = DB::table('tb_golongan')->latest()->get();
+        $data = DB::table('tb_golongan')->orderBy('id', 'ASC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'value'=> $value->nama_golongan
@@ -248,7 +248,7 @@ class pegawaiController extends Controller
 
     public function optionStatusPegawai(){
         $result = [];
-        $data = DB::table('tb_status_pegawai')->latest()->get();
+        $data = DB::table('tb_status_pegawai')->orderBy('id', 'ASC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'value'=> $value->nama_status_pegawai
@@ -259,7 +259,7 @@ class pegawaiController extends Controller
 
     public function pendidikanTerakhir(){
         $result = [];
-        $data = DB::table('tb_pendidikan')->latest()->get();
+        $data = DB::table('tb_pendidikan')->orderBy('id', 'DESC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'value'=> $value->nama_pendidikan
@@ -270,7 +270,7 @@ class pegawaiController extends Controller
 
     public function optionEselon(){
         $result = [];
-        $data = DB::table('tb_eselon')->latest()->get();
+        $data = DB::table('tb_eselon')->orderBy('id', 'ASC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'value'=> $value->nama_eselon

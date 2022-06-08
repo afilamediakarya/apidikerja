@@ -43,10 +43,7 @@ class reviewRealisasiSkpController extends Controller
             $getDataStatus = [];
               foreach ($llo as $vv => $bb) {
                  $getReview = review_realisasi_skp::where('id_skp',$bb->id_skp)->get()->pluck('kesesuaian')->toArray();
-                 // $getDataStatus[] = $getReview; 
                 }
-
-                // return $getDataStatus;
                   if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
                     $status = 'Belum Sesuai';
                 }

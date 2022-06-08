@@ -31,4 +31,9 @@ class skp extends Model
         return $this->hasOne('App\Models\review_skp','id_skp' ,'id');
     }
 
+      public function reviewRealisasiSkp(){
+        return $this->hasMany('App\Models\review_realisasi_skp','id_skp','id');
+    }
+
+
 }
