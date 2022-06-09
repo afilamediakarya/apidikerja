@@ -15,10 +15,11 @@ class jabatanController extends Controller
     public function list(){
         $data = '';
         if (Auth::user()->role == 'super_admin') {
-           $data = jabatan::latest()->get();
+           $data = DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_jenis_jabatan.level','tb_satuan_kerja.nama_satuan_kerja','tb_jabatan.id_satuan_kerja')->join('tb_satuan_kerja','tb_jabatan.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')->orderBy('tb_jenis_jabatan.level', 'ASC')->get();
         }else{
             $pegawai = pegawai::select('id_satuan_kerja')->where('id',Auth::user()->id_pegawai)->first();
-            $data = jabatan::where('id_satuan_kerja',$pegawai->id_satuan_kerja)->latest()->get();
+            // $data = jabatan::where('id_satuan_kerja',$pegawai->id_satuan_kerja)->latest()->get();
+            $data = DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_jenis_jabatan.level','tb_satuan_kerja.nama_satuan_kerja','tb_jabatan.id_satuan_kerja')->join('tb_satuan_kerja','tb_jabatan.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')->where('tb_jabatan.id_satuan_kerja',$pegawai->id_satuan_kerja)->orderBy('tb_jenis_jabatan.level', 'ASC')->get();
         }
         
 

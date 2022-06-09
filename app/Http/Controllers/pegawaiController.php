@@ -20,12 +20,15 @@ class pegawaiController extends Controller
         }else{
             $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
             if (isset($pegawai)) {
-                $data = pegawai::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->latest()->get();
+                // $data = pegawai::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->latest()->get();
+                $data = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama','tb_pegawai.nip','tb_jabatan.nama_jabatan','tb_jenis_jabatan.level')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')->where('tb_pegawai.id_satuan_kerja',$pegawai['id_satuan_kerja'])->orderBy('tb_jenis_jabatan.level', 'ASC')->get();
             }else{
                 $data = [];
             }
            
         }
+
+        // return $data;
 
         if ($data) {
             return response()->json([
@@ -39,6 +42,20 @@ class pegawaiController extends Controller
                 'status' => false
             ]);
         }
+    }
+
+    public function pegawaiBySatuanKerja($params){
+        $result = [];
+        $data = pegawai::where('id_satuan_kerja',$params)->get();
+
+        foreach ($data as $key => $value) {
+            $result[] = [
+                'id' => $value->id,
+                'value'=> $value->nama
+            ];    
+        }
+
+       return response()->json($result);
     }
 
     public function store(Request $request){
@@ -133,25 +150,49 @@ class pegawaiController extends Controller
 
     public function update($params, Request $request){
 
-        $validator = Validator::make($request->all(),[
-            'id_satuan_kerja' => 'required',
-            'nama' => 'required|string',
-            'tempat_lahir' => 'required',
-            'tanggal_lahir' => 'required|date',
-            'nip' => 'required|numeric',
-            'golongan' => 'required',
-            'tmt_golongan' => 'required',
-            'eselon' => 'required',
-            'tmt_pegawai' => 'required|date',
-            'jenis_kelamin' => 'required',
-            'agama' => 'required',
-            'status_perkawinan' => 'required',
-            'pendidikan' => 'required',
-            'lulus_pendidikan' => 'required',
-            'pendidikan_struktural' => 'required',
-            'lulus_pendidikan_struktural' => 'required',
-            'jurusan' => 'required',
-        ]);
+        if ($request->type == 'pegawai') {
+            $validator = Validator::make($request->all(),[
+                'id_satuan_kerja' => 'required',
+                'nama' => 'required|string',
+                'tempat_lahir' => 'required',
+                'tanggal_lahir' => 'required|date',
+                'nip' => 'required|numeric',
+                'golongan' => 'required',
+                'tmt_golongan' => 'required',
+                'eselon' => 'required',
+                'tmt_pegawai' => 'required|date',
+                'jenis_kelamin' => 'required',
+                'agama' => 'required',
+                'status_perkawinan' => 'required',
+                'pendidikan' => 'required',
+                'lulus_pendidikan' => 'required',
+                'pendidikan_struktural' => 'required',
+                'lulus_pendidikan_struktural' => 'required',
+                'jurusan' => 'required',
+            ]);
+        } else {
+               $validator = Validator::make($request->all(),[
+                'id_satuan_kerja' => 'required',
+                'nama' => 'required|string',
+                'tempat_lahir' => 'required',
+                'tanggal_lahir' => 'required|date',
+                'nip' => 'required|numeric',
+                'golongan' => 'required',
+                'tmt_golongan' => 'required',
+                'tmt_pegawai' => 'required|date',
+                'jenis_kelamin' => 'required',
+                'agama' => 'required',
+                'status_perkawinan' => 'required',
+                'pendidikan' => 'required',
+                'lulus_pendidikan' => 'required',
+                'pendidikan_struktural' => 'required',
+                'lulus_pendidikan_struktural' => 'required',
+                'jurusan' => 'required',
+            ]);
+        }
+        
+
+    
 
         if($validator->fails()){
             return response()->json($validator->errors());       
