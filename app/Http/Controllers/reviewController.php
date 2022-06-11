@@ -225,7 +225,7 @@ class reviewController extends Controller
     }
 
     public function store(Request $request){
-        // return $request->all();
+     
         $validator = Validator::make($request->all(),[
             'id_skp' => 'required|array',
             'keterangan' => 'required|array',

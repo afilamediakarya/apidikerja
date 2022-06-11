@@ -28,18 +28,26 @@ class skpController extends Controller
     }
 
     public function list_skp_kepala(){
-          $skp = skp::with('aspek_skp')->where('id_pegawai',Auth::user()->id_pegawai)->get();     
-        if ($skp) {
+        $result =[];
+        $skpUtama = skp::with('aspek_skp')->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+        $skpTambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get(); 
+
+        $result = [
+            'utama' => $skpUtama,
+            'tambahan' => $skpTambahan
+        ];
+
+        if ($result) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $skp
+                'data' => $result
             ]);
         }else{
             return response()->json([
                 'message' => 'empty data',
                 'status' => false,
-                 'data' => $skp
+                 'data' => $result
             ]);
         }
     }
@@ -75,12 +83,15 @@ class skpController extends Controller
            }
            
             if ($getRencanaKerjaAtasan != []) {
-                $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('id_pegawai',Auth::user()->id_pegawai)->get();
+                $skpUtama = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+                $skpTambahan = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
             }else{
-                $skpChild = [];
+                $skpUtama = [];
+                 $skpTambahan = [];
             }
             $result[$key]['atasan'] = $getRencanaKerjaAtasan;
-            $result[$key]['skp_child'] = $skpChild;
+            $result[$key]['skp_utama'] = $skpUtama;
+            $result[$key]['skp_tambahan'] = $skpTambahan;
       
         }      
 
@@ -182,7 +193,7 @@ class skpController extends Controller
     public function skp_pegawai($request){
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
-            'id_skp_atasan' => 'required|numeric',
+            // 'id_skp_atasan' => 'required|numeric',
             'jenis' => 'required',
             'rencana_kerja' => 'required',
             'tahun' => 'required',
@@ -280,6 +291,22 @@ class skpController extends Controller
       
     }
 
+    public function checkSkpAtasan($params){
+        // return $params;
+        $status = '';
+        $data = DB::table('tb_skp')->where('id_skp_atasan',$params)->get();
+
+        if (count($data) > 0) {
+            $status = true; 
+        }else{
+            $status = false;
+        }
+
+        return $status;
+        
+
+    }
+
     public function update_skp_kepala($params,$request){
 
         $validator = Validator::make($request->all(),[
@@ -292,8 +319,6 @@ class skpController extends Controller
         if($validator->fails()){
             return response()->json($validator->errors(),422);       
         }
-
-        $clearSkp = $this->delete($params);
         
         $skp = new skp();
         $skp->id_pegawai = Auth::user()->id_pegawai;
@@ -337,6 +362,16 @@ class skpController extends Controller
                 
         }
 
+          $check = $this->checkSkpAtasan($params);
+
+            if ($check == true) {
+                 DB::table('tb_skp')
+                ->where('id_skp_atasan', $params)
+                ->update(['id_skp_atasan' => $skp->id]);
+             } 
+
+            $clearSkp = $this->delete($params);
+
         if ($skp) {
             return response()->json([
                 'message' => 'Success',
@@ -353,6 +388,7 @@ class skpController extends Controller
 
 
     public function update_skp_pegawai($params,$request){
+        // return $this->checkSkpAtasan($params); 
         $validator = Validator::make($request->all(),[
             'id_satuan_kerja' => 'required|numeric',
             'id_skp_atasan' => 'required|numeric',
@@ -366,9 +402,9 @@ class skpController extends Controller
         }
 
 
-        $clearSkp = $this->delete($params);
+       
 
-        if ($clearSkp) {
+        // if ($clearSkp) {
             $skp = new skp();
             $skp->id_pegawai = Auth::user()->id_pegawai;
             $skp->id_satuan_kerja = $request->id_satuan_kerja;
@@ -394,6 +430,16 @@ class skpController extends Controller
                 }
             }
 
+            $check = $this->checkSkpAtasan($params);
+
+            if ($check == true) {
+                 DB::table('tb_skp')
+                ->where('id_skp_atasan', $params)
+                ->update(['id_skp_atasan' => $skp->id]);
+             } 
+
+            $clearSkp = $this->delete($params);
+
             if ($skp) {
                 return response()->json([
                     'message' => 'Success',
@@ -406,7 +452,7 @@ class skpController extends Controller
                     'status' => false
                 ],422);
             }
-        }
+        // }
     }
 
     public function delete($params){

@@ -46,8 +46,6 @@ class informasiController extends Controller
             return response()->json($validator->errors());       
         }
 
-       
-
         $data = new informasi();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->judul = $request->judul;
