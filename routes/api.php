@@ -123,7 +123,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/store', [App\Http\Controllers\skpController::class, 'store']);  
         Route::get('/show/{params}', [App\Http\Controllers\skpController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\skpController::class, 'update']);  
-        Route::delete('/delete/{params}', [App\Http\Controllers\skpController::class, 'delete']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\skpController::class, 'destroy']);  
         Route::get('/get-option-satuan', [App\Http\Controllers\skpController::class, 'satuan']);  
         Route::get('/get-option-sasaran-kinerja', [App\Http\Controllers\skpController::class, 'optionSkp']);  
     });

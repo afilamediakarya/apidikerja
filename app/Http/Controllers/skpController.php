@@ -466,6 +466,26 @@ class skpController extends Controller
         }
     }
 
+    public function destroy($params){
+
+        $check = $this->checkSkpAtasan($params);
+
+        if ($check > 0) {
+             return response()->json([
+                'message' => 'failed',
+                'status' => false,
+            ]);
+        }else{
+            $data = skp::where('id',$params)->first();
+            $data->delete();
+
+             return response()->json([
+                'message' => 'Success',
+                'status' => true,
+            ]);
+        } 
+    }
+
     public function satuan(){
         $result = [];
         $data = satuan::where('status','active')->latest()->get();
