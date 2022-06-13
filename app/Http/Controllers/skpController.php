@@ -283,6 +283,7 @@ class skpController extends Controller
 
 
     public function update($params,Request $request){
+        // return $request->type_skp;
         if($request->type_skp == 'kepala'){
             return $this->update_skp_kepala($params,$request);
         }else{
@@ -296,14 +297,7 @@ class skpController extends Controller
         $status = '';
         $data = DB::table('tb_skp')->where('id_skp_atasan',$params)->get();
 
-        if (count($data) > 0) {
-            $status = true; 
-        }else{
-            $status = false;
-        }
-
-        return $status;
-        
+        return count($data);    
 
     }
 
@@ -364,7 +358,7 @@ class skpController extends Controller
 
           $check = $this->checkSkpAtasan($params);
 
-            if ($check == true) {
+            if ($check > 0) {
                  DB::table('tb_skp')
                 ->where('id_skp_atasan', $params)
                 ->update(['id_skp_atasan' => $skp->id]);
@@ -432,11 +426,11 @@ class skpController extends Controller
 
             $check = $this->checkSkpAtasan($params);
 
-            if ($check == true) {
+            if ($check > 0) {
                  DB::table('tb_skp')
                 ->where('id_skp_atasan', $params)
                 ->update(['id_skp_atasan' => $skp->id]);
-             } 
+            } 
 
             $clearSkp = $this->delete($params);
 
