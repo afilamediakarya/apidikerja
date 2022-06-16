@@ -53,7 +53,6 @@ class skpController extends Controller
     }
 
     public function list_skp_pegawai(){
-        $tes = [];
          $result = [];
         $groupSkpAtasan = [];
         $skpChild = '';
@@ -399,10 +398,7 @@ class skpController extends Controller
         }
 
 
-       
-
-        // if ($clearSkp) {
-            $skp = new skp();
+            $skp = skp::where('id',$params)->first();
             $skp->id_pegawai = Auth::user()->id_pegawai;
             $skp->id_satuan_kerja = $request->id_satuan_kerja;
             $skp->id_skp_atasan = $request->id_skp_atasan;
@@ -412,14 +408,14 @@ class skpController extends Controller
             $skp->save();
 
             foreach ($request['aspek'] as $key => $value) {
-                $aspek = new aspek_skp();
+                $aspek = aspek_skp::where('id',$value['id'])->first();
                 $aspek->id_skp = $skp->id;
                 $aspek->aspek_skp = $value['type_aspek'];
                 $aspek->iki = $value['iki'];
                 $aspek->satuan = $value['satuan'];
                 $aspek->save();
                 foreach ($value['target'] as $index => $res) {
-                    $target = new target_skp();
+                    $target = target_skp::where('id',$value['id_target'][$index])->first();
                     $target->id_aspek_skp = $aspek->id;
                     $target->target = $res;
                     $target->bulan = $index+1;
@@ -427,15 +423,44 @@ class skpController extends Controller
                 }
             }
 
-            $check = $this->checkSkpAtasan($params);
+       
 
-            if ($check > 0) {
-                 DB::table('tb_skp')
-                ->where('id_skp_atasan', $params)
-                ->update(['id_skp_atasan' => $skp->id]);
-            } 
 
-            $clearSkp = $this->delete($params);
+        // if ($clearSkp) {
+            // $skp = new skp();
+            // $skp->id_pegawai = Auth::user()->id_pegawai;
+            // $skp->id_satuan_kerja = $request->id_satuan_kerja;
+            // $skp->id_skp_atasan = $request->id_skp_atasan;
+            // $skp->jenis = $request->jenis;
+            // $skp->rencana_kerja = $request->rencana_kerja;
+            // $skp->tahun = $request->tahun;
+            // $skp->save();
+
+            // foreach ($request['aspek'] as $key => $value) {
+            //     $aspek = new aspek_skp();
+            //     $aspek->id_skp = $skp->id;
+            //     $aspek->aspek_skp = $value['type_aspek'];
+            //     $aspek->iki = $value['iki'];
+            //     $aspek->satuan = $value['satuan'];
+            //     $aspek->save();
+            //     foreach ($value['target'] as $index => $res) {
+            //         $target = new target_skp();
+            //         $target->id_aspek_skp = $aspek->id;
+            //         $target->target = $res;
+            //         $target->bulan = $index+1;
+            //         $target->save();
+            //     }
+            // }
+
+            // $check = $this->checkSkpAtasan($params);
+
+            // if ($check > 0) {
+            //      DB::table('tb_skp')
+            //     ->where('id_skp_atasan', $params)
+            //     ->update(['id_skp_atasan' => $skp->id]);
+            // } 
+
+            // $clearSkp = $this->delete($params);
 
             if ($skp) {
                 return response()->json([

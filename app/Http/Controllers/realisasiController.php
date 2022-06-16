@@ -56,21 +56,97 @@ class realisasiController extends Controller
     }
 
     public function list_realisasi_skp_pegawai(){
-         $result = [];
+        //  $result = [];
+        // $groupSkpAtasan = [];
+        // $skpUtama = '';
+        // $skpTambahan = '';
+        // $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        // $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('tb_skp.id_skp_atasan')->get();
+
+        // foreach ($get_skp_atasan as $key => $value) {
+        //     $getRencanaKerjaAtasan = '';
+        //    if (!is_null($jabatanByPegawai->parent_id)) {
+        //        $getSkpAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
+        //         $getRencanaKerjaAtasan = [
+        //         'id' => $getSkpAtasan->id,
+        //         'rencana_kerja' =>$getSkpAtasan->rencana_kerja
+        //      ];
+        //    }else{
+        //      $getKegiatan= DB::table('tb_kegiatan')->select('id','nama_kegiatan','kode_kegiatan')->where('id',$value->id_skp_atasan)->first();
+
+        //      if (isset($getKegiatan)) {
+        //         $getRencanaKerjaAtasan = [
+        //             'id' => $getKegiatan->id,
+        //             'rencana_kerja' =>$getKegiatan->nama_kegiatan
+        //          ];
+        //      }else{
+        //          $getRencanaKerjaAtasan = [];
+        //      }
+
+             
+        //    }
+           
+        //     if ($getRencanaKerjaAtasan != []) {
+
+        //         $skpUtama = skp::with('aspek_skp','reviewRealisasiSkp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+
+        //             foreach ($skpUtama as $keys => $values) {
+        //                 $getReview = $values['reviewRealisasiSkp']->pluck('kesesuaian')->toArray();
+                            
+        //                    if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
+        //                         $status_review = 'Belum Sesuai';
+        //                     }
+        //                     else if(in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false){
+        //                         $status_review = 'Selesai';
+        //                     }else{
+        //                         $status_review = 'Belum Review';
+        //                     }
+
+        //                  $skpUtama[$keys]['status_review'] = $status_review;    
+        //             }
+
+        //             $skpTambahan = skp::with('aspek_skp','reviewRealisasiSkp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+
+        //                foreach ($skpTambahan as $keys => $values) {
+        //                 $getReview = $values['reviewRealisasiSkp']->pluck('kesesuaian')->toArray();
+                            
+        //                    if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
+        //                         $status_review = 'Belum Sesuai';
+        //                     }
+        //                     else if(in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false){
+        //                         $status_review = 'Selesai';
+        //                     }else{
+        //                         $status_review = 'Belum Review';
+        //                     }
+
+        //                  $skpTambahan[$keys]['status_review'] = $status_review;    
+        //             }
+
+        //     }else{
+        //         $skpUtama = [];
+        //         $skpTambahan = [];
+        //     }
+        //     $result[$key]['atasan'] = $getRencanaKerjaAtasan;
+        //     $result[$key]['skp_utama'] = $skpUtama;
+        //     $result[$key]['skp_tambahan'] = $skpTambahan;
+        // }      
+
+        $result = [];
         $groupSkpAtasan = [];
-        $skpUtama = '';
-        $skpTambahan = '';
+        $skpChild = '';
         $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('tb_skp.id_skp_atasan')->get();
+        $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('tb_skp.id_skp_atasan')->where('jenis','utama')->get();
 
         foreach ($get_skp_atasan as $key => $value) {
-            $getRencanaKerjaAtasan = '';
+            $getRencanaKerjaAtasan = [];
            if (!is_null($jabatanByPegawai->parent_id)) {
-               $getSkpAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
+              if (!is_null($value->id_skp_atasan)) {
+                   $getSkpAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->where('jenis','utama')->first();
                 $getRencanaKerjaAtasan = [
-                'id' => $getSkpAtasan->id,
-                'rencana_kerja' =>$getSkpAtasan->rencana_kerja
-             ];
+                    'id' => $getSkpAtasan->id,
+                    'rencana_kerja' =>$getSkpAtasan->rencana_kerja
+                 ];
+              }
            }else{
              $getKegiatan= DB::table('tb_kegiatan')->select('id','nama_kegiatan','kode_kegiatan')->where('id',$value->id_skp_atasan)->first();
 
@@ -85,10 +161,11 @@ class realisasiController extends Controller
 
              
            }
+
+           $tes[] = $getRencanaKerjaAtasan;
            
             if ($getRencanaKerjaAtasan != []) {
-
-                $skpUtama = skp::with('aspek_skp','reviewRealisasiSkp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+                $skpUtama = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
 
                     foreach ($skpUtama as $keys => $values) {
                         $getReview = $values['reviewRealisasiSkp']->pluck('kesesuaian')->toArray();
@@ -105,32 +182,29 @@ class realisasiController extends Controller
                          $skpUtama[$keys]['status_review'] = $status_review;    
                     }
 
-                    $skpTambahan = skp::with('aspek_skp','reviewRealisasiSkp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
-
-                       foreach ($skpTambahan as $keys => $values) {
-                        $getReview = $values['reviewRealisasiSkp']->pluck('kesesuaian')->toArray();
-                            
-                           if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
-                                $status_review = 'Belum Sesuai';
-                            }
-                            else if(in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false){
-                                $status_review = 'Selesai';
-                            }else{
-                                $status_review = 'Belum Review';
-                            }
-
-                         $skpTambahan[$keys]['status_review'] = $status_review;    
-                    }
-
-            }else{
-                $skpUtama = [];
-                $skpTambahan = [];
             }
-            $result[$key]['atasan'] = $getRencanaKerjaAtasan;
-            $result[$key]['skp_utama'] = $skpUtama;
-            $result[$key]['skp_tambahan'] = $skpTambahan;
+            $result['utama'][$key]['atasan'] = $getRencanaKerjaAtasan;
+            $result['utama'][$key]['skp'] = $skpUtama;
         }      
 
+        $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+
+        foreach ($skp_tambahan as $keys => $values) {
+            $getReview = $values['reviewRealisasiSkp']->pluck('kesesuaian')->toArray();
+                
+               if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
+                    $status_review = 'Belum Sesuai';
+                }
+                else if(in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false){
+                    $status_review = 'Selesai';
+                }else{
+                    $status_review = 'Belum Review';
+                }
+
+             $skp_tambahan[$keys]['status_review'] = $status_review;    
+        }
+
+        $result['tambahan'] = $skp_tambahan;
 
         if ($result) {
             return response()->json([
