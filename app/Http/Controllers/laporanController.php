@@ -82,13 +82,16 @@ class laporanController extends Controller
         $result['pegawai_dinilai'] = $current;
 
         foreach ($get_skp_atasan as $key => $value) {
-            $getRencanaKerjaAtasan = '';
+            $getRencanaKerjaAtasan = [];
            if (!is_null($jabatanByPegawai->parent_id)) {
                $getSkpAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
-                $getRencanaKerjaAtasan = [
-                'id' => $getSkpAtasan->id,
-                'rencana_kerja' =>$getSkpAtasan->rencana_kerja
-             ];
+               if (isset($getSkpAtasan)) {
+                   $getRencanaKerjaAtasan = [
+                    'id' => $getSkpAtasan->id,
+                    'rencana_kerja' =>$getSkpAtasan->rencana_kerja
+                 ];
+               }
+                
            }else{
              $getKegiatan= DB::table('tb_kegiatan')->select('id','nama_kegiatan','kode_kegiatan')->where('id',$value->id_skp_atasan)->first();
 
