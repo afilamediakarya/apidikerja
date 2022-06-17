@@ -94,7 +94,7 @@ class laporanRekapitulasiabsenController extends Controller
                         $temps_absensi['kmk']['kmk_90_keatas'][] = $selisih_waktu;
                     }
                     if ($selisih_waktu > 0 ) {
-                        $keterangan = 'Telat '.$selisih_waktu.' menit';
+                        $keterangan = 'Telat '.$selisih_waktu. ' menit';
                     }else{
                         $keterangan = 'Tepat waktu';
                     }
@@ -113,7 +113,7 @@ class laporanRekapitulasiabsenController extends Controller
                     }
 
                     if ($selisih_waktu > 0 ) {
-                        $keterangan = 'Cepat '.$selisih_waktu.' menit';
+                         $keterangan = 'Cepat '.$selisih_waktu.' menit';
                     }else{
                         $keterangan = 'Tepat waktu';
                     }
@@ -334,23 +334,23 @@ class laporanRekapitulasiabsenController extends Controller
             $waktu_absen = strtotime($waktu); 
             $diff = $waktu_absen - $waktu_tetap_absen;
         }else{
-            $waktu_tetap_absen = strtotime('17:00:00');
+            $waktu_tetap_absen = strtotime('16:00:00');
             $waktu_absen = strtotime($waktu); 
             $diff = $waktu_tetap_absen - $waktu_absen;
             // return $diff;
         }
 
         if ($diff > 0) {
-            $jam = floor($diff/3600);
-            $selisih_waktu = $diff%3600;
-            $menit = floor($selisih_waktu/60);
+            // $jam = floor($diff/3600);
+            // $selisih_waktu = $diff%3600;
+            $menit = floor($diff/60);
         }else{
             $diff = 0;
         }
 
         
 
-        return $selisih_waktu;
+        return $menit;
     }
 
     public function jmlHariKerja($startDate, $endDate){

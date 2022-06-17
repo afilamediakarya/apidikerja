@@ -81,9 +81,13 @@ class laporanController extends Controller
         $result['atasan'] = $atasan;
         $result['pegawai_dinilai'] = $current;
 
+        // return $get_skp_atasan;
+
         foreach ($get_skp_atasan as $key => $value) {
             $getRencanaKerjaAtasan = [];
            if (!is_null($jabatanByPegawai->parent_id)) {
+              
+              if (!is_null($value->id_skp_atasan)) {
                $getSkpAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
                if (isset($getSkpAtasan)) {
                    $getRencanaKerjaAtasan = [
@@ -91,31 +95,40 @@ class laporanController extends Controller
                     'rencana_kerja' =>$getSkpAtasan->rencana_kerja
                  ];
                }
+              }
                 
            }else{
-             $getKegiatan= DB::table('tb_kegiatan')->select('id','nama_kegiatan','kode_kegiatan')->where('id',$value->id_skp_atasan)->first();
+             // $getKegiatan= DB::table('tb_kegiatan')->select('id','nama_kegiatan','kode_kegiatan')->where('id',$value->id_skp_atasan)->first();
 
-             if (isset($getKegiatan)) {
-                $getRencanaKerjaAtasan = [
-                    'id' => $getKegiatan->id,
-                    'rencana_kerja' =>$getKegiatan->nama_kegiatan
-                 ];
-             }else{
-                 $getRencanaKerjaAtasan = [];
-             }
+             // if (isset($getKegiatan)) {
+             //    $getRencanaKerjaAtasan = [
+             //        'id' => $getKegiatan->id,
+             //        'rencana_kerja' =>$getKegiatan->nama_kegiatan
+             //     ];
+             // }
 
              
            }
            
             if ($getRencanaKerjaAtasan != []) {
-                $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('id_pegawai',Auth::user()->id_pegawai)->get();
+                $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('id_pegawai',Auth::user()->id_pegawai)->where('jenis','utama')->get();
             }else{
                 $skpChild = [];
             }
-            $result['skp'][$key]['atasan'] = $getRencanaKerjaAtasan;
-            $result['skp'][$key]['skp_child'] = $skpChild;
+            
+            if (count($getRencanaKerjaAtasan) > 0 && count($skpChild) > 0) {
+                $result['skp']['utama'][$key]['atasan'] = $getRencanaKerjaAtasan;
+                $result['skp']['utama'][$key]['skp_child'] = $skpChild;
+            }
       
         }      
+
+          $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+
+        if (count($skp_tambahan) > 0) {
+           $result['skp']['tambahan'] = $skp_tambahan;
+        }
+
 
         if ($result) {
             return response()->json([
