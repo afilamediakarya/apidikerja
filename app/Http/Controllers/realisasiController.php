@@ -332,4 +332,22 @@ class realisasiController extends Controller
             ]);
         }
     }
+
+    public function realisasiKuantitas($params,$id_skp){
+        $num = 0;
+        $aktivitas = DB::table('tb_aktivitas')->whereMonth('tanggal','=',$params)->where('id_pegawai',Auth::user()->id_pegawai)->where('id_skp',$id_skp)->get();
+        // return $aktivitas;
+
+        if (count($aktivitas) > 0) {
+            foreach ($aktivitas as $key => $value) {
+                $num += $value->hasil;
+            }
+        }
+
+        return response()->json([
+            'message' => 'Success',
+            'status' => true,
+            'data' => $num
+        ]);
+    }
 }

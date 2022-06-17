@@ -82,25 +82,40 @@ class reviewRealisasiSkpController extends Controller
         
               $result = [];
              $groupSkpAtasan = [];
-
+             $tes = [];
             $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',$params)->groupBy('tb_skp.id_skp_atasan')->get();
 
         // return $get_skp_atasan;
 
-        foreach ($get_skp_atasan as $key => $value) {
-            $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
-            $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',$params)->get();
-            foreach ($skpChild as $xx => $vv) {
-                $realisasi_bulan = DB::table('tb_review_realisasi_skp')->where('id_skp',$vv->id)->where('bulan',$bulan)->first();   
-                $result[$key]['atasan'] = $getSkpByAtasan;
-                $result[$key]['skp_child'] = $skpChild;
-                $result[$key]['skp_child'][$xx]['realisasi_bulan'] = $realisasi_bulan;
+        if (!is_null($get_skp_atasan)) {
+               foreach ($get_skp_atasan as $key => $value) {
+                    $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
+                    if (!is_null($getSkpByAtasan)) {
+                        $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',$params)->get();
+                        foreach ($skpChild as $xx => $vv) {
+                            $realisasi_bulan = DB::table('tb_review_realisasi_skp')->where('id_skp',$vv->id)->where('bulan',$bulan)->first();   
+                            $result['utama'][$key]['atasan'] = $getSkpByAtasan;
+                            $result['utama'][$key]['skp_child'] = $skpChild;
+                            $result['utama'][$key]['skp_child'][$xx]['realisasi_bulan'] = $realisasi_bulan;
+                        }
+                    }
+                    
+                    
+                    // $result[$key]['atasan'] = $getSkpByAtasan;
+                    // $result[$key]['skp_child'] = $skpChild;
+              
+                }  
+        }    
+
+        $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+
+        if (count($skp_tambahan) > 0) {
+            foreach ($skp_tambahan as $yy => $vals) {
+                $realisasi_bulan = DB::table('tb_review_realisasi_skp')->where('id_skp',$vals->id)->where('bulan',$bulan)->first();   
+                $result['tambahan'] = $skp_tambahan;
+                $result['tambahan'][$yy]['realisasi_bulan'] = $realisasi_bulan;
             }
-            
-            // $result[$key]['atasan'] = $getSkpByAtasan;
-            // $result[$key]['skp_child'] = $skpChild;
-      
-        }      
+        }
 
 
         if ($result) {
