@@ -158,9 +158,9 @@ class laporanRekapitulasiabsenController extends Controller
          
         }
 
-        $jml_potongan_kehadiran = (count($temps_absensi['alpa']) * 3) + (count($temps_absensi['kmk']['kmk_30'])) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90'])) + (count($temps_absensi['kmk']['kmk_90_keatas'])) + (count($temps_absensi['cpk']['cpk_30'])) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90'])) + count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5;
-
-        $persentase_pemotongan_tunjangan = ($jml_potongan_kehadiran / 100) * 0.4;
+        $jml_potongan_kehadiran = (count($temps_absensi['alpa']) * 3) + (count($temps_absensi['kmk']['kmk_30'])*0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90'])*1.25) + (count($temps_absensi['kmk']['kmk_90_keatas'])*1.5) + (count($temps_absensi['cpk']['cpk_30'])*0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90'])*1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
+        
+        $persentase_pemotongan_tunjangan = $jml_potongan_kehadiran * 0.4;
 
         $result['jml_hari_kerja'] = count($rekapAbsen);
         $result['kehadiran'] = count($jml_kehadiran);
@@ -300,9 +300,9 @@ class laporanRekapitulasiabsenController extends Controller
          
         }
 
-        $jml_potongan_kehadiran = (count($temps_absensi['alpa']) * 3) + (count($temps_absensi['kmk']['kmk_30'])) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90'])) + (count($temps_absensi['kmk']['kmk_90_keatas'])) + (count($temps_absensi['cpk']['cpk_30'])) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90'])) + count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5;
-
-        $persentase_pemotongan_tunjangan = ($jml_potongan_kehadiran / 100) * 0.4;
+        $jml_potongan_kehadiran = (count($temps_absensi['alpa']) * 3) + (count($temps_absensi['kmk']['kmk_30'])*0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90'])*1.25) + (count($temps_absensi['kmk']['kmk_90_keatas'])*1.5) + (count($temps_absensi['cpk']['cpk_30'])*0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90'])*1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
+        
+        $persentase_pemotongan_tunjangan = $jml_potongan_kehadiran * 0.4;
 
         $result['jml_hari_kerja'] = count($rekapAbsen);
         $result['kehadiran'] = count($jml_kehadiran);
