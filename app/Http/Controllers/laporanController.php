@@ -68,7 +68,10 @@ class laporanController extends Controller
         $atasan = '';
         $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         
-        $jabatan_atasan = DB::table('tb_jabatan')->where('id',$jabatanByPegawai->parent_id)->first();
+        if (isset($jabatanByPegawai)) {
+            $jabatan_atasan = DB::table('tb_jabatan')->where('id',$jabatanByPegawai->parent_id)->first();
+        }
+        
 
         if (isset($jabatan_atasan->id_pegawai)) {
             $atasan = DB::table('tb_jabatan')->select('tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai','tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja','tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id',$jabatan_atasan->id_pegawai)->first();
@@ -120,7 +123,7 @@ class laporanController extends Controller
                 $result['skp']['utama'][$key]['atasan'] = $getRencanaKerjaAtasan;
                 $result['skp']['utama'][$key]['skp_child'] = $skpChild;
             }
-      
+        
         }      
 
           $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
