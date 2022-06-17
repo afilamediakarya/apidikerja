@@ -67,7 +67,7 @@ class laporanController extends Controller
         $skpChild = '';
         $atasan = '';
         $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        
+        return $jabatanByPegawai;
         if (isset($jabatanByPegawai)) {
             $jabatan_atasan = DB::table('tb_jabatan')->where('id',$jabatanByPegawai->parent_id)->first();
         }
