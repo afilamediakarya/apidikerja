@@ -82,15 +82,20 @@ class dashboardController extends Controller
 		$list_pegawai = [];
 		$result = [];
 		$temporary = [];
+		$getJabatanByCurrentParent = [];
 
 		$getJabatanPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-		$getJabatanAtasan = DB::table('tb_jabatan')->where('id',$getJabatanPegawai->parent_id)->first();
+		// return $getJabatanPegawai;
+		if (isset($getJabatanPegawai)) {
+			$getJabatanAtasan = DB::table('tb_jabatan')->where('id',$getJabatanPegawai->parent_id)->first();
 		$getJabatanByCurrentParent = jabatan::where('parent_id',$getJabatanPegawai->id)->get();
+		}
 	
 	
 		$countAktivitas = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->count();
 
-		foreach ($getJabatanByCurrentParent as $key => $value) {
+		if (count($getJabatanByCurrentParent) > 0) {
+			foreach ($getJabatanByCurrentParent as $key => $value) {
 		
 			$res = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_pegawai.id',$value->id_pegawai)->get();
 
@@ -119,18 +124,20 @@ class dashboardController extends Controller
 				];
 			}
 		}
+		}
 	
 
 		// INFO PEGAWAI
 		$info_pegawai = [];
 		$get_pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
+		// return $get_pegawai;
 
 		if (isset($info_pegawai)) {
 			$info_pegawai = [
 				'nama' => $get_pegawai['nama'],
 				'nip' => $get_pegawai['nip'],
 				'pangkat' => $get_pegawai['golongan'],
-				'jabatan' => $getJabatanPegawai->nama_jabatan,
+				'jabatan' => isset($getJabatanPegawai->nama_jabatan) ? $getJabatanPegawai->nama_jabatan : '-',
 				'Instansi' => $get_pegawai['satuan_kerja']['nama_satuan_kerja']
 			];
 		}

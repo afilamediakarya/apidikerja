@@ -266,13 +266,25 @@ class reviewController extends Controller
 
         // return $get_skp_atasan;
 
-        foreach ($get_skp_atasan as $key => $value) {
-            $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
-            $skpChild = skp::with('aspek_skp','review_skp')->where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',$params)->get();
-            $result[$key]['atasan'] = $getSkpByAtasan;
-            $result[$key]['skp_child'] = $skpChild;
-      
+        if (!is_null($get_skp_atasan)) {
+            foreach ($get_skp_atasan as $key => $value) {
+                $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
+                if (!is_null($getSkpByAtasan)) {
+                    $skpChild = skp::with('aspek_skp','review_skp')->where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',$params)->get();
+                    $result['utama'][$key]['atasan'] = $getSkpByAtasan;
+                    $result['utama'][$key]['skp_child'] = $skpChild;
+                }
+              
+            }
         }      
+
+         $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',$params)->get();
+
+        if (count($skp_tambahan) > 0) {
+            foreach ($skp_tambahan as $yy => $vals) {
+                $result['tambahan'] = $skp_tambahan;
+            }
+        }
 
 
         if ($result) {

@@ -99,15 +99,12 @@ class reviewRealisasiSkpController extends Controller
                             $result['utama'][$key]['skp_child'][$xx]['realisasi_bulan'] = $realisasi_bulan;
                         }
                     }
-                    
-                    
-                    // $result[$key]['atasan'] = $getSkpByAtasan;
-                    // $result[$key]['skp_child'] = $skpChild;
+
               
                 }  
         }    
 
-        $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+        $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',$params)->get();
 
         if (count($skp_tambahan) > 0) {
             foreach ($skp_tambahan as $yy => $vals) {

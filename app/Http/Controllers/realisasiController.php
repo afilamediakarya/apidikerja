@@ -163,7 +163,7 @@ class realisasiController extends Controller
            }
 
            $tes[] = $getRencanaKerjaAtasan;
-           
+           $keterangan = '';
             if ($getRencanaKerjaAtasan != []) {
                 $skpUtama = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
 
@@ -172,14 +172,22 @@ class realisasiController extends Controller
                             
                            if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
                                 $status_review = 'Belum Sesuai';
+                                $keterangan = 'Penilai tidak menyetujui, karena tidak sesuai dengan realisasi';
+                                $color = 'warning';
                             }
                             else if(in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false){
                                 $status_review = 'Selesai';
+                                $keterangan = 'Penilai telah menyetujui';
+                                $color = 'success';
                             }else{
                                 $status_review = 'Belum Review';
+                                $keterangan = 'Penilai belum melakukan review';
+                                $color = 'danger';
                             }
 
-                         $skpUtama[$keys]['status_review'] = $status_review;    
+                        $skpUtama[$keys]['status_review'] = $status_review;   
+                        $skpUtama[$keys]['label'] = $keterangan; 
+                        $skpUtama[$keys]['color'] = $color;    
                     }
 
             }
@@ -194,14 +202,22 @@ class realisasiController extends Controller
                 
                if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
                     $status_review = 'Belum Sesuai';
+                    $keterangan = 'Penilai tidak menyetujui, karena tidak sesuai dengan realisasi';
+                       $color = 'warning';
                 }
                 else if(in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false){
                     $status_review = 'Selesai';
+                    $keterangan = 'Penilai telah menyetujui';
+                       $color = 'success';
                 }else{
                     $status_review = 'Belum Review';
+                    $keterangan = 'Penilai belum melakukan review';
+                       $color = 'danger';
                 }
 
              $skp_tambahan[$keys]['status_review'] = $status_review;    
+             $skp_tambahan[$keys]['label'] = $keterangan;    
+              $skp_tambahan[$keys]['color'] = $color;    
         }
 
         $result['tambahan'] = $skp_tambahan;
