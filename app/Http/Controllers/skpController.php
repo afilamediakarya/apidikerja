@@ -84,7 +84,6 @@ class skpController extends Controller
              
            }
 
-           $tes[] = $getRencanaKerjaAtasan;
            
             if ($getRencanaKerjaAtasan != []) {
                 $skpUtama = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
@@ -95,7 +94,11 @@ class skpController extends Controller
 
         $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
 
-        $result['tambahan'] = $skp_tambahan;
+        if (count($skp_tambahan) > 0) {
+           $result['tambahan'] = $skp_tambahan;
+        }
+
+        
 
 
         if ($result) {

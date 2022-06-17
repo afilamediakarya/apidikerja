@@ -82,12 +82,15 @@ class dashboardController extends Controller
 		$list_pegawai = [];
 		$result = [];
 		$temporary = [];
-		$getPegawai = atasan::where('id_penilai',Auth::user()->id_pegawai)->get();
-		$getAtasan = jabatan::where('id_pegawai',Auth::user()->id_pegawai)->first();
+
+		$getJabatanPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+		$getJabatanAtasan = DB::table('tb_jabatan')->where('id',$getJabatanPegawai->parent_id)->first();
+		$getJabatanByCurrentParent = jabatan::where('parent_id',$getJabatanPegawai->id)->get();
+	
 	
 		$countAktivitas = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->count();
 
-		foreach ($getPegawai as $key => $value) {
+		foreach ($getJabatanByCurrentParent as $key => $value) {
 		
 			$res = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_pegawai.id',$value->id_pegawai)->get();
 
@@ -120,26 +123,27 @@ class dashboardController extends Controller
 
 		// INFO PEGAWAI
 		$info_pegawai = [];
-		$get_pegawai = pegawai::with('skp')->where('id',Auth::user()->id_pegawai)->first();
+		$get_pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
+
 		if (isset($info_pegawai)) {
 			$info_pegawai = [
 				'nama' => $get_pegawai['nama'],
 				'nip' => $get_pegawai['nip'],
-				'pangkat' => $get_pegawai['golongan_pangkat'],
-				'jabatan' => $get_pegawai['jenis_jabatan'],
+				'pangkat' => $get_pegawai['golongan'],
+				'jabatan' => $getJabatanPegawai->nama_jabatan,
 				'Instansi' => $get_pegawai['satuan_kerja']['nama_satuan_kerja']
 			];
 		}
 		$info_penilai = [];
-		if (isset($getAtasan)) {
-			// return $getAtasan;
-			$get_penilai = pegawai::where('id',$getAtasan->id_pegawai)->first();
-			// return $get_penilai;
+		if (isset($getJabatanAtasan)) {
+			
+			$get_penilai = pegawai::where('id',$getJabatanAtasan->id_pegawai)->first();
+			
 			$info_penilai = [
 				'nama' => $get_penilai['nama'],
 				'nip' => $get_penilai['nip'],
-				'pangkat' => $get_penilai['golongan_pangkat'],
-				'jabatan' => $get_penilai['jenis_jabatan'],
+				'pangkat' => $get_penilai['golongan'],
+				'jabatan' => $getJabatanAtasan->nama_jabatan,
 				'Instansi' => $get_penilai['satuan_kerja']['nama_satuan_kerja']
 			];	
 		}
@@ -200,7 +204,7 @@ class dashboardController extends Controller
 
 		$result = [
     		'jumlah_skp' => $getSkp,
-    		'pegawai_diniai' => count($getPegawai),
+    		'pegawai_diniai' => count($getJabatanByCurrentParent),
 			'aktivitas' => $countAktivitas,
 			'informasi_pegawai' => $info_pegawai,
 			'informasi_penilai' => $info_penilai,

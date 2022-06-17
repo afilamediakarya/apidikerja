@@ -82,6 +82,7 @@ class laporanRekapitulasiabsenController extends Controller
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
                     $selisih_waktu = $this->konvertWaktu('checkin',$v->waktu_absen);
+                    // return $selisih_waktu;
              
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
                         $temps_absensi['kmk']['kmk_30'][] = $selisih_waktu;
@@ -331,25 +332,25 @@ class laporanRekapitulasiabsenController extends Controller
         if ($params == 'checkin') {
             $waktu_tetap_absen = strtotime('08:00:00');
             $waktu_absen = strtotime($waktu); 
-            $diff = $waktu_absen - $waktu_tetap_absen;
+            $diff = ($waktu_absen - $waktu_tetap_absen) * 1440;
         }else{
             $waktu_tetap_absen = strtotime('17:00:00');
             $waktu_absen = strtotime($waktu); 
-            $diff = $waktu_tetap_absen - $waktu_absen;
+            $diff = ($waktu_tetap_absen - $waktu_absen) * 1440;
             // return $diff;
         }
 
         if ($diff > 0) {
             $jam = floor($diff/(60*60));
             $menit = $diff - $jam * (60*60);
-            $selisih_waktu = floor($menit/60);
+            $selisih_waktu = $menit/60;
         }else{
-            $selisih_waktu = 0;
+            $diff = 0;
         }
 
         
 
-        return $selisih_waktu;
+        return $jam.' jam, '.;;
     }
 
     public function jmlHariKerja($startDate, $endDate){
