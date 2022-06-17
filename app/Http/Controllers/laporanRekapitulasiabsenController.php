@@ -332,11 +332,11 @@ class laporanRekapitulasiabsenController extends Controller
         if ($params == 'checkin') {
             $waktu_tetap_absen = strtotime('08:00:00');
             $waktu_absen = strtotime($waktu); 
-            $diff = ($waktu_absen - $waktu_tetap_absen) * 1440;
+            $diff = $waktu_absen - $waktu_tetap_absen;
         }else{
             $waktu_tetap_absen = strtotime('17:00:00');
             $waktu_absen = strtotime($waktu); 
-            $diff = ($waktu_tetap_absen - $waktu_absen) * 1440;
+            $diff = $waktu_tetap_absen - $waktu_absen;
             // return $diff;
         }
 
@@ -350,7 +350,7 @@ class laporanRekapitulasiabsenController extends Controller
 
         
 
-        return $jam.' jam, '.;;
+        return $selisih_waktu;
     }
 
     public function jmlHariKerja($startDate, $endDate){
