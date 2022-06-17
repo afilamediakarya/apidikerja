@@ -341,9 +341,9 @@ class laporanRekapitulasiabsenController extends Controller
         }
 
         if ($diff > 0) {
-            $jam = floor($diff/(60*60));
-            $menit = $diff - $jam * (60*60);
-            $selisih_waktu = $menit/60;
+            $jam = floor($diff/3600);
+            $selisih_waktu = $diff%3600;
+            $menit = floor($selisih_waktu/60);
         }else{
             $diff = 0;
         }
