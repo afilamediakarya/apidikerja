@@ -110,8 +110,6 @@ class laporanRekapitulasiabsenController extends Controller
                         $temps_absensi['cpk']['cpk_90'][] = $selisih_waktu;;
                     }elseif($selisih_waktu >= 91){
                         $temps_absensi['cpk']['cpk_90_keatas'][] = $selisih_waktu;
-                    }elseif(!isset($selisih_waktu)){
-                        $temps_absensi['cpk']['cpk_90_keatas'][] = $selisih_waktu;
                     }
 
                     if ($selisih_waktu > 0 ) {
@@ -253,8 +251,6 @@ class laporanRekapitulasiabsenController extends Controller
                     }elseif($selisih_waktu >= 61 && $selisih_waktu <= 90){
                         $temps_absensi['cpk']['cpk_90'][] = $selisih_waktu;;
                     }elseif($selisih_waktu >= 91){
-                        $temps_absensi['cpk']['cpk_90_keatas'][] = $selisih_waktu;
-                    }elseif(!isset($selisih_waktu)){
                         $temps_absensi['cpk']['cpk_90_keatas'][] = $selisih_waktu;
                     }
                 
