@@ -110,6 +110,8 @@ class laporanRekapitulasiabsenController extends Controller
                         $temps_absensi['cpk']['cpk_90'][] = $selisih_waktu;;
                     }elseif($selisih_waktu >= 91){
                         $temps_absensi['cpk']['cpk_90_keatas'][] = $selisih_waktu;
+                    }elseif(!isset($selisih_waktu)){
+                        $temps_absensi['cpk']['cpk_90_keatas'][] = $selisih_waktu;
                     }
 
                     if ($selisih_waktu > 0 ) {
@@ -243,7 +245,7 @@ class laporanRekapitulasiabsenController extends Controller
                 }else{
                     $jml_kehadiran[] = $v->jenis;
                     $selisih_waktu = $this->konvertWaktu('checkout',$v->waktu_absen);
-          
+                    
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
                         $temps_absensi['cpk']['cpk_30'][] = $selisih_waktu;
                     }elseif($selisih_waktu >= 31 && $selisih_waktu <= 60){
@@ -252,7 +254,10 @@ class laporanRekapitulasiabsenController extends Controller
                         $temps_absensi['cpk']['cpk_90'][] = $selisih_waktu;;
                     }elseif($selisih_waktu >= 91){
                         $temps_absensi['cpk']['cpk_90_keatas'][] = $selisih_waktu;
+                    }elseif(!isset($selisih_waktu)){
+                        $temps_absensi['cpk']['cpk_90_keatas'][] = $selisih_waktu;
                     }
+                
 
                     if ($selisih_waktu > 0 ) {
                         $keterangan = 'Cepat '.$selisih_waktu.' menit';
