@@ -20,10 +20,11 @@ class laporanRekapitulasiabsenController extends Controller
             }
         }
 
-        for ($i=0; $i < count($params); $i++) { 
-           $temps[] = $params[$i];
+        if (isset($params['weekend'])) {
+            for ($i=0; $i < count($params['weekend']); $i++) { 
+               $temps[] = $params['weekend'][$i];
+            }
         }
-
 
         return $temps;
     }
@@ -34,7 +35,7 @@ class laporanRekapitulasiabsenController extends Controller
         $getDatatanggal= [];
         
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
-        $hariLibur = $this->cekHariLibur($jmlHariKerja['weekend']);
+        $hariLibur = $this->cekHariLibur($jmlHariKerja);
         $jml_kehadiran = [];
         $temps_absensi = [
             'kmk' => [
@@ -77,10 +78,12 @@ class laporanRekapitulasiabsenController extends Controller
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
             $getAbsen = DB::table('tb_absen')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$value['date'])->get();
+            
             foreach ($getAbsen as $i => $v) {
-                // jml_kehadiran
+                // return $v;
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
+
                     $selisih_waktu = $this->konvertWaktu('checkin',$v->waktu_absen);
                     // return $selisih_waktu;
              
@@ -99,6 +102,7 @@ class laporanRekapitulasiabsenController extends Controller
                         $keterangan = 'Tepat waktu';
                     }
                 }else{
+                   
                     $jml_kehadiran[] = $v->jenis;
                     $selisih_waktu = $this->konvertWaktu('checkout',$v->waktu_absen);
           
@@ -130,6 +134,21 @@ class laporanRekapitulasiabsenController extends Controller
               
             }
 
+
+                if (count($dataAbsen) == 1) {
+                    if ($dataAbsen[0]['status_absen'] == 'hadir') {
+                        $jml_kehadiran[] = 'checkout';
+                    }
+                    $dataAbsen[1] = [
+                          'jenis' => 'checkout',
+                        'status_absen' => 'hadir',
+                        'waktu_absen' => '14:00:00',
+                        'keterangan' => 'cepat 90 menit'
+                    ];
+                    $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
+                }
+
+
                 if ($value['date'] > date('Y-m-d')) {
                     $rekapAbsen[$key] = [
                         'tanggal' =>$value['date'],
@@ -155,12 +174,17 @@ class laporanRekapitulasiabsenController extends Controller
                    }
                 }
 
+                // return $rekapAbsen;
          
         }
+
+        // return $temps_absensi;
+
 
         $jml_potongan_kehadiran = (count($temps_absensi['alpa']) * 3) + (count($temps_absensi['kmk']['kmk_30'])*0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90'])*1.25) + (count($temps_absensi['kmk']['kmk_90_keatas'])*1.5) + (count($temps_absensi['cpk']['cpk_30'])*0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90'])*1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
         
         $persentase_pemotongan_tunjangan = $jml_potongan_kehadiran * 0.4;
+
 
         $result['jml_hari_kerja'] = count($rekapAbsen);
         $result['kehadiran'] = count($jml_kehadiran);
@@ -190,7 +214,7 @@ class laporanRekapitulasiabsenController extends Controller
         $getDatatanggal= [];
         
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
-        $hariLibur = $this->cekHariLibur($jmlHariKerja['weekend']);
+        $hariLibur = $this->cekHariLibur($jmlHariKerja);
         $jml_kehadiran = [];
         $temps_absensi = [
             'kmk' => [
@@ -386,7 +410,7 @@ class laporanRekapitulasiabsenController extends Controller
         $startTime = strtotime($startDate);
         $endTime = strtotime($endDate);
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
-        $hariLibur = $this->cekHariLibur($jmlHariKerja['weekend']);
+        $hariLibur = $this->cekHariLibur($jmlHariKerja);
 
          for ( $i = $startTime; $i <= $endTime; $i = $i + 86400 ) {
 
