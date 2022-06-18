@@ -225,6 +225,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('laporan')->group(function () {
         Route::get('/skp/{level}', [App\Http\Controllers\laporanController::class, 'laporanSkp']);      
     });
+
+     Route::prefix('bankom')->group(function () {
+        Route::get('/list', [App\Http\Controllers\bankomController::class, 'list']);  
+        Route::post('/store', [App\Http\Controllers\bankomController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\bankomController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\bankomController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\bankomController::class, 'delete']);  
+    });
 });
 
 
