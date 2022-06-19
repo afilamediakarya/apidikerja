@@ -46,11 +46,6 @@ class laporanController extends Controller
         $skpUtama = skp::with('aspek_skp')->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
         $skpTambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get(); 
 
-        // $skp = [
-        //     'utama' => $skpUtama,
-        //     'tambahan' => $skpTambahan
-        // ];
-
 
         $result['atasan'] = $atasan;
         $result['pegawai_dinilai'] = $current;
