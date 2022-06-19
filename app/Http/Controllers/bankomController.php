@@ -33,7 +33,8 @@ class bankomController extends Controller
             'nama_pelatihan' => 'required|string',
             'jenis_pelatihan' => 'required',
             'jumlah_jp' => 'required|numeric',
-            'waktu_pelaksanaan' => 'required',
+              'waktu_awal' => 'required',
+            'waktu_akhir' => 'required',
             'sertifikat' => 'required|mimes:pdf|max:2048'
         ]);
 
@@ -46,8 +47,8 @@ class bankomController extends Controller
         $data->nama_pelatihan = $request->nama_pelatihan;
         $data->jenis_pelatihan = $request->jenis_pelatihan;
         $data->jumlah_jp = $request->jumlah_jp;
-        $data->waktu_pelaksanaan = $request->waktu_pelaksanaan;
-      
+        $data->waktu_awal = $request->waktu_awal;
+         $data->waktu_akhir = $request->waktu_akhir;
         if (isset($request->sertifikat)) {
             if ($request->hasFile('sertifikat')) {
                 $file = $request->file('sertifikat');
@@ -94,7 +95,8 @@ class bankomController extends Controller
             'nama_pelatihan' => 'required|string',
             'jenis_pelatihan' => 'required',
             'jumlah_jp' => 'required|numeric',
-            'waktu_pelaksanaan' => 'required',
+            'waktu_awal' => 'required',
+            'waktu_akhir' => 'required',
             'sertifikat' => 'mimes:pdf|max:2048'
         ]);
 
@@ -107,7 +109,9 @@ class bankomController extends Controller
         $data->nama_pelatihan = $request->nama_pelatihan;
         $data->jenis_pelatihan = $request->jenis_pelatihan;
         $data->jumlah_jp = $request->jumlah_jp;
-        $data->waktu_pelaksanaan = $request->waktu_pelaksanaan;
+        $data->waktu_awal = $request->waktu_awal;
+         $data->waktu_akhir = $request->waktu_akhir;
+
         
         if (isset($request->gambar)) {
             if ($request->hasFile('sertifikat')) {

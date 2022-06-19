@@ -156,7 +156,9 @@ class realisasiController extends Controller
               $skp_tambahan[$keys]['color'] = $color;    
         }
 
-        $result['tambahan'] = $skp_tambahan;
+        if (count($skp_tambahan) > 0) {
+            $result['tambahan'] = $skp_tambahan;
+        }
 
         if ($result) {
             return response()->json([
