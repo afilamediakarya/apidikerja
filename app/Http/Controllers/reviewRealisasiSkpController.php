@@ -30,7 +30,7 @@ class reviewRealisasiSkpController extends Controller
 
              foreach ($groupId as $x => $vv) {
 
-                $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->where('id_pegawai',$vv)->get();
+                $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_jabatan.nama_jabatan')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->where('tb_jabatan.id_pegawai',$vv)->get();
 
                 if (count($res) > 0) {
                     array_push($groupSkpPegawai,$res);
@@ -38,6 +38,8 @@ class reviewRealisasiSkpController extends Controller
 
               }      
         }
+
+        // return $groupSkpPegawai;
 
           foreach ($groupSkpPegawai as $bnb => $llo) {
             $getDataStatus = [];
@@ -56,7 +58,7 @@ class reviewRealisasiSkpController extends Controller
                 $myArray[$bnb] = [
                     'nama'=>$llo[0]->nama,
                     'nip'=>$llo[0]->nip,
-                    'jenis_jabatan'=>$llo[0]->jenis_jabatan,
+                    'jenis_jabatan'=>$llo[0]->nama_jabatan,
                     'id_pegawai'=>$llo[0]->id_pegawai,
                     'status'=>$status,
                 ];
