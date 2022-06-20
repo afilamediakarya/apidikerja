@@ -31,16 +31,24 @@ class AuthController extends Controller
 
         $user = User::where('username', $request['username'])->firstOrFail();
 
-        if (!isset($user)) {
-           
-               return response()->json([
-                'status' => 'Gagal Login',
-                'messages_' => 'Data Pengguna tidak di temukan'
-            ],422);
-        }
+
+        
         // return $user;
         
         $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
+
+         if ($user['role'] == 'admin_opd' || $user['role'] == 'super_admin') {
+               $token = $user->createToken('auth_token')->plainTextToken; 
+                 return response()->json([
+                'message' => 'Hi '.$user->username.', Berhasil Login',
+                'access_token' => $token, 
+                'role' => $user->role,
+                'current' => $user,
+                'check_atasan'=> $data,
+                'level_jabatan' => $level,
+                'token_type' => 'Bearer', 
+            ]);
+        }
 
         // $jabatan = DB::table('tb_jabatan')->select('tb_jenis_jabatan.')->join('tb_jenis_jabatan','tb_jabatan.id','=','tb_jenis_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->get();
 
