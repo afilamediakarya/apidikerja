@@ -28,7 +28,7 @@ class AuthController extends Controller
         $level_ = [];
 
         $user = User::where('username', $request['username'])->firstOrFail();
-        retur $user;
+        return $user;
         $token = $user->createToken('auth_token')->plainTextToken;
         $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
 
