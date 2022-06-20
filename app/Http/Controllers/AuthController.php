@@ -26,19 +26,27 @@ class AuthController extends Controller
 
         $level = 0;
         $level_ = [];
+        $status_login = true;
+        $token = '';
 
         $user = User::where('username', $request['username'])->firstOrFail();
         // return $user;
-        $token = $user->createToken('auth_token')->plainTextToken;
+        
         $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
 
         // $jabatan = DB::table('tb_jabatan')->select('tb_jenis_jabatan.')->join('tb_jenis_jabatan','tb_jabatan.id','=','tb_jenis_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->get();
 
         $jabatan = jabatan::with('jenis_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
-        return $jabatan;
+    
         if (isset($jabatan)) {
             foreach ($jabatan as $key => $value) {
-                $level_[] = $value['jenis_jabatan']['level'];
+                if (!is_null($value['jenis_jabatan'])) {
+                    $level_[] = $value['jenis_jabatan']['level'];   
+                    $token = $user->createToken('auth_token')->plainTextToken; 
+                }else{
+                    $status_login = false;
+                }
+                
             }
         }
 
@@ -55,6 +63,7 @@ class AuthController extends Controller
             'current' => $user,
             'check_atasan'=> $data,
             'level_jabatan' => $level,
+            'status_login' => $status_login
             'token_type' => 'Bearer', 
         ]);
     }
