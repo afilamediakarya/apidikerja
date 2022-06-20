@@ -21,15 +21,23 @@ class AuthController extends Controller
         if (!Auth::attempt($request->only('username', 'password')))
         {
             return response()
-                ->json(['message' => 'Unauthorized'], 401);
+                ->json(['message' => 'Unauthorized','messages_' => 'Data Pengguna tidak di temukan'], 401);
         }
 
         $level = 0;
         $level_ = [];
-        $status_login = true;
+        $status_login_fails = '';
         $token = '';
 
         $user = User::where('username', $request['username'])->firstOrFail();
+
+        if (!isset($user)) {
+           
+               return response()->json([
+                'status' => 'Gagal Login',
+                'messages_' => 'Data Pengguna tidak di temukan'
+            ],422);
+        }
         // return $user;
         
         $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
@@ -37,17 +45,22 @@ class AuthController extends Controller
         // $jabatan = DB::table('tb_jabatan')->select('tb_jenis_jabatan.')->join('tb_jenis_jabatan','tb_jabatan.id','=','tb_jenis_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->get();
 
         $jabatan = jabatan::with('jenis_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
-    
-        if (isset($jabatan)) {
+        
+        if (count($jabatan) > 0) {
+
             foreach ($jabatan as $key => $value) {
                 if (!is_null($value['jenis_jabatan'])) {
+                    
                     $level_[] = $value['jenis_jabatan']['level'];   
                     $token = $user->createToken('auth_token')->plainTextToken; 
                 }else{
-                    $status_login = false;
+
+                    $status_login_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
                 }
                 
             }
+        }else{
+             $status_login_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
         }
 
         if (count($level_) > 0) {
@@ -56,16 +69,26 @@ class AuthController extends Controller
             $level = 0;
         }
 
-        return response()->json([
-            'message' => 'Hi '.$user->username.', Berhasil Login',
-            'access_token' => $token, 
-            'role' => $user->role,
-            'current' => $user,
-            'check_atasan'=> $data,
-            'level_jabatan' => $level,
-            'status_login' => $status_login
-            'token_type' => 'Bearer', 
-        ]);
+
+
+        if ($token !== '') {
+            return response()->json([
+                'message' => 'Hi '.$user->username.', Berhasil Login',
+                'access_token' => $token, 
+                'role' => $user->role,
+                'current' => $user,
+                'check_atasan'=> $data,
+                'level_jabatan' => $level,
+                'token_type' => 'Bearer', 
+            ]);
+        }else{
+              return response()->json([
+                'message' => 'Gagal Login',
+                 'messages_' => $status_login_fails
+            ],422);
+        }
+
+        
     }
 
     public function register_user(Request $request){
