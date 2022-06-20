@@ -35,7 +35,7 @@ class AuthController extends Controller
         // $jabatan = DB::table('tb_jabatan')->select('tb_jenis_jabatan.')->join('tb_jenis_jabatan','tb_jabatan.id','=','tb_jenis_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->get();
 
         $jabatan = jabatan::with('jenis_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
-        // return $jabatan;
+        return $jabatan;
         if (isset($jabatan)) {
             foreach ($jabatan as $key => $value) {
                 $level_[] = $value['jenis_jabatan']['level'];
