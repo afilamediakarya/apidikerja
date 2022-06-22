@@ -233,6 +233,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/update/{params}', [App\Http\Controllers\bankomController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\bankomController::class, 'delete']);  
     });
+
+       Route::prefix('lokasi')->group(function () {
+        Route::get('/list', [App\Http\Controllers\lokasiController::class, 'list']);  
+          Route::get('/optionLokasi', [App\Http\Controllers\lokasiController::class, 'optionLokasi']);  
+        Route::post('/store', [App\Http\Controllers\lokasiController::class, 'store']);  
+        Route::get('/show/{params}', [App\Http\Controllers\lokasiController::class, 'show']);  
+        Route::post('/update/{params}', [App\Http\Controllers\lokasiController::class, 'update']);  
+        Route::delete('/delete/{params}', [App\Http\Controllers\lokasiController::class, 'delete']);  
+    });
 });
 
 

@@ -45,7 +45,8 @@ class jabatanController extends Controller
             'parent_id' => Rule::requiredIf($request->level > 1),
             'pembayaran_tpp' => 'required',
             'nama_jabatan' => 'required',
-            'status_jabatan' => 'required'
+            'status_jabatan' => 'required',
+             'id_lokasi' => 'required'
         ]);
 
         if($validator->fails()){
@@ -66,6 +67,7 @@ class jabatanController extends Controller
         $data->nama_jabatan = $request->nama_jabatan;
         $data->status_jabatan = $request->status_jabatan;
         $data->pembayaran_tpp = $request->pembayaran_tpp;
+        $data->id_lokasi = $request->id_lokasi;
         $data->nilai_jabatan = str_replace(',','',$request->nilai_jabatan);
         $data->save();
 
@@ -98,6 +100,7 @@ class jabatanController extends Controller
         $result = [
             'id' => $data->id,
             'id_satuan_kerja' => $data->id_satuan_kerja,
+            'id_lokasi' => $data->id_lokasi,
             'nama_jabatan' => $data->nama_jabatan,
             'id_jenis_jabatan' => $data->id_jenis_jabatan,
             'nilai_jabatan' =>  $data->nilai_jabatan,
@@ -133,7 +136,8 @@ class jabatanController extends Controller
             'parent_id' => Rule::requiredIf($request->level > 1),
             'pembayaran_tpp' => 'required',
             'nama_jabatan' => 'required',
-            'status_jabatan' => 'required'
+            'status_jabatan' => 'required',
+            'id_lokasi' => 'required'
         ]);
 
         if($validator->fails()){
@@ -148,6 +152,7 @@ class jabatanController extends Controller
         $data->nama_jabatan = $request->nama_jabatan;
         $data->status_jabatan = $request->status_jabatan;
         $data->pembayaran_tpp = $request->pembayaran_tpp;
+        $data->id_lokasi = $request->id_lokasi;
         $data->nilai_jabatan = str_replace(',','',$request->nilai_jabatan);
         $data->save();
 

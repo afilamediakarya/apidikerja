@@ -30,5 +30,9 @@ class satuan_kerja extends Model
         return $this->belongsTo('App\Models\skp','id_skp','id');
     }
 
+    public function lokasi(){
+        return $this->belongsTo('App\Models\lokasi','id_satuan_kerja','id');
+    }
+
     
 }
