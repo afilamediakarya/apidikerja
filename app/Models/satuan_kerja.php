@@ -9,6 +9,8 @@ class satuan_kerja extends Model
 {
     use HasFactory;
     protected $table ='tb_satuan_kerja';
+    protected $with = ['lokasi'];
+
 
     public function pegawai(){
         return $this->belongsTo('App\Models\pegawai','id_satuan_kerja','id');
@@ -31,7 +33,7 @@ class satuan_kerja extends Model
     }
 
     public function lokasi(){
-        return $this->belongsTo('App\Models\lokasi','id_satuan_kerja','id');
+        return $this->hasMany('App\Models\lokasi','id_satuan_kerja','id');
     }
 
     

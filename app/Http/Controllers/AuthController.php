@@ -28,22 +28,46 @@ class AuthController extends Controller
         $level_ = [];
         $status_login_fails = '';
         $token = '';
+        $current = [];
 
-        $user = User::where('username', $request['username'])->firstOrFail();
-
-
+        $userss = User::where('username', $request['username'])->firstOrFail();
+        $user = DB::table('users')->select('users.id','users.id_pegawai','users.role','users.username','tb_pegawai.id_satuan_kerja','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.id','tb_satuan_kerja.nama_satuan_kerja','tb_lokasi.nama_lokasi','tb_lokasi.lat','tb_lokasi.long')->join('tb_pegawai','users.id_pegawai','=','tb_pegawai.id')->where('users.username',$request['username'])->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_lokasi','tb_jabatan.id_lokasi','=','tb_lokasi.id')->first();
         
         // return $user;
-        
-        $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
+        $current = [
+            'id' => $user->id,
+            'role' => $user->role,
+            'username' => $user->username,
+            'id_pegawai' => $user->id_pegawai,
+            'pegawai' => [
+                'id' => $user->id_pegawai,
+                'id_satuan_kerja' => $user->id_satuan_kerja,
+                'nama' => $user->nama,
+                'nip' => $user->nip,
+                'satuan_kerja' => [
+                    'id' => $user->id_satuan_kerja,
+                    'nama_satuan_kerja' => $user->nama_satuan_kerja
+                ],
+                'lokasi' => [
+                    'nama_lokasi' => $user->nama_lokasi,
+                    'lat_location' => $user->lat,
+                    'long_location' => $user->long
+                ],
+            ],
 
-         if ($user['role'] == 'admin_opd' || $user['role'] == 'super_admin') {
-               $token = $user->createToken('auth_token')->plainTextToken; 
+        ];
+       // return $current;
+       //  return $user;
+
+        $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();    
+
+         if ($current['role'] == 'admin_opd' || $current['role'] == 'super_admin') {
+               $token = $userss->createToken('auth_token')->plainTextToken; 
                  return response()->json([
-                'message' => 'Hi '.$user->username.', Berhasil Login',
+                'message' => 'Hi '.$current['username'].', Berhasil Login',
                 'access_token' => $token, 
-                'role' => $user->role,
-                'current' => $user,
+                'role' => $current['role'],
+                'current' => $current,
                 'check_atasan'=> $data,
                 'level_jabatan' => $level,
                 'token_type' => 'Bearer', 
@@ -60,7 +84,8 @@ class AuthController extends Controller
                 if (!is_null($value['jenis_jabatan'])) {
                     
                     $level_[] = $value['jenis_jabatan']['level'];   
-                    $token = $user->createToken('auth_token')->plainTextToken; 
+                    $token = $userss->createToken('auth_token')->plainTextToken; 
+                 
                 }else{
 
                     $status_login_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
@@ -81,10 +106,10 @@ class AuthController extends Controller
 
         if ($token !== '') {
             return response()->json([
-                'message' => 'Hi '.$user->username.', Berhasil Login',
+                'message' => 'Hi '.$current['username'].', Berhasil Login',
                 'access_token' => $token, 
-                'role' => $user->role,
-                'current' => $user,
+                'role' => $current['role'],
+                'current' => $current,
                 'check_atasan'=> $data,
                 'level_jabatan' => $level,
                 'token_type' => 'Bearer', 

@@ -11,7 +11,8 @@ class lokasiController extends Controller
 {
 
     public function optionLokasi(){
-        $data = lokasi::select('id','nama_lokasi')->latest()->get();
+
+        $data = lokasi::select('id','nama_lokasi')->where('id_satuan_kerja',Auth::user()->pegawai['id_satuan_kerja'])->latest()->get();
         return response()->json($data);
     }
 
