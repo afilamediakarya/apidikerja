@@ -15,17 +15,21 @@ class pegawaiController extends Controller
     
     public function list(){
         $data = '';
-        if (Auth::user()->role == 'admin') {
-            $data = pegawai::latest()->get();
+     
+        if (Auth::user()->role == 'super_admin') {
+            // $data = pegawai::latest()->get();
+            $data = pegawai::select('id','nama','nip','golongan')->latest()->get();
         }else{
             $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
             if (isset($pegawai)) {
-                    $data = pegawai::select('id','nama','nip','golongan','eselon')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->latest()->get();
+                    $data = pegawai::select('id','nama','nip','golongan')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->latest()->get();
                 // $data = pegawai::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->latest()->get();
                 // $data = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama','tb_pegawai.nip','tb_jabatan.nama_jabatan','tb_jenis_jabatan.level')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')->where('tb_pegawai.id_satuan_kerja',$pegawai['id_satuan_kerja'])->orderBy('tb_jenis_jabatan.level', 'ASC')->get();
             }else{
                 $data = [];
             }
+
+
            
         }
 
@@ -69,15 +73,15 @@ class pegawaiController extends Controller
             'nip' => 'required|numeric|unique:tb_pegawai',
             'golongan' => 'required',
             'tmt_golongan' => 'required|date',
-            'eselon' => 'required',
-            'tmt_pegawai' => 'required|date',
+            // 'eselon' => 'required',
+            // 'tmt_pegawai' => 'required|date',
             'jenis_kelamin' => 'required',
             'agama' => 'required',
             'status_perkawinan' => 'required',
             'pendidikan' => 'required',
             'lulus_pendidikan' => 'required',
-            'pendidikan_struktural' => 'required',
-            'lulus_pendidikan_struktural' => 'required',
+            // 'pendidikan_struktural' => 'required',
+            // 'lulus_pendidikan_struktural' => 'required',
             'jurusan' => 'required',
         ]);
 
@@ -95,16 +99,16 @@ class pegawaiController extends Controller
         $data->nip = $request->nip;
         $data->golongan = $request->golongan;
         $data->tmt_golongan = $request->tmt_golongan;
-        $data->eselon = $request->eselon;
-        $data->jenis_jabatan = $request->jenis_jabatan;
-        $data->tmt_pegawai = $request->tmt_pegawai;
+        // $data->eselon = $request->eselon;
+        // $data->jenis_jabatan = $request->jenis_jabatan;
+        // $data->tmt_pegawai = $request->tmt_pegawai;
         $data->jenis_kelamin = $request->jenis_kelamin;
         $data->agama = $request->agama;
         $data->status_perkawinan = $request->status_perkawinan;
         $data->pendidikan = $request->pendidikan;
         $data->lulus_pendidikan = $request->lulus_pendidikan;
-        $data->pendidikan_struktural = $request->pendidikan_struktural;
-        $data->lulus_pendidikan_struktural = $request->lulus_pendidikan_struktural;
+        // $data->pendidikan_struktural = $request->pendidikan_struktural;
+        // $data->lulus_pendidikan_struktural = $request->lulus_pendidikan_struktural;
         $data->jurusan = $request->jurusan;
         $data->face_character = $request->face_character;
         $data->save();
@@ -160,15 +164,15 @@ class pegawaiController extends Controller
                 'nip' => 'required|numeric',
                 'golongan' => 'required',
                 'tmt_golongan' => 'required',
-                'eselon' => 'required',
-                'tmt_pegawai' => 'required|date',
+                // 'eselon' => 'required',
+                // 'tmt_pegawai' => 'required|date',
                 'jenis_kelamin' => 'required',
                 'agama' => 'required',
                 'status_perkawinan' => 'required',
                 'pendidikan' => 'required',
                 'lulus_pendidikan' => 'required',
-                'pendidikan_struktural' => 'required',
-                'lulus_pendidikan_struktural' => 'required',
+                // 'pendidikan_struktural' => 'required',
+                // 'lulus_pendidikan_struktural' => 'required',
                 'jurusan' => 'required',
             ]);
         } else {
@@ -180,14 +184,14 @@ class pegawaiController extends Controller
                 'nip' => 'required|numeric',
                 'golongan' => 'required',
                 'tmt_golongan' => 'required',
-                'tmt_pegawai' => 'required|date',
+                // 'tmt_pegawai' => 'required|date',
                 'jenis_kelamin' => 'required',
                 'agama' => 'required',
                 'status_perkawinan' => 'required',
                 'pendidikan' => 'required',
                 'lulus_pendidikan' => 'required',
-                'pendidikan_struktural' => 'required',
-                'lulus_pendidikan_struktural' => 'required',
+                // 'pendidikan_struktural' => 'required',
+                // 'lulus_pendidikan_struktural' => 'required',
                 'jurusan' => 'required',
             ]);
         }
@@ -207,16 +211,16 @@ class pegawaiController extends Controller
         $data->nip = $request->nip;
         $data->golongan = $request->golongan;
         $data->tmt_golongan = $request->tmt_golongan;
-        $data->eselon = $request->eselon;
-        $data->jenis_jabatan = $request->jenis_jabatan;
-        $data->tmt_pegawai = $request->tmt_pegawai;
+        // $data->eselon = $request->eselon;
+        // $data->jenis_jabatan = $request->jenis_jabatan;
+        // $data->tmt_pegawai = $request->tmt_pegawai;
         $data->jenis_kelamin = $request->jenis_kelamin;
         $data->agama = $request->agama;
         $data->status_perkawinan = $request->status_perkawinan;
         $data->pendidikan = $request->pendidikan;
         $data->lulus_pendidikan = $request->lulus_pendidikan;
-        $data->pendidikan_struktural = $request->pendidikan_struktural;
-        $data->lulus_pendidikan_struktural = $request->lulus_pendidikan_struktural;
+        // $data->pendidikan_struktural = $request->pendidikan_struktural;
+        // $data->lulus_pendidikan_struktural = $request->lulus_pendidikan_struktural;
         $data->jurusan = $request->jurusan;
         if (isset($request->face_character)) {
             $data->face_character = $request->face_character;
