@@ -9,9 +9,9 @@ class lokasi extends Model
 {
     use HasFactory;
     protected $table = 'tb_lokasi';
-    // protected $with = ['satuan_kerja'];
+    protected $with = ['satuan_kerja'];
 
      public function satuan_kerja(){
-        return $this->belongsTo('App\Models\satuan_kerja','id','id_satuan_kerja');
+        return $this->hasOne('App\Models\satuan_kerja','id','id_satuan_kerja');
     }
 }

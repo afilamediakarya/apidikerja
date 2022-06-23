@@ -248,9 +248,6 @@ class AuthController extends Controller
             ],422);
         }  
 
-
-
-
         if ($current) {
             return response()->json([
                 'message' => 'Success',
