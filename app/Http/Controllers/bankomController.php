@@ -10,6 +10,34 @@ use DB;
 
 class bankomController extends Controller
 {
+
+    public function laporan($params,$satker,$year,$id_pegawai){
+        if ($params == 'rekap') {
+            return $this->listByOpd($satker,$year);
+        } else {
+            return $this->byPegawai($id_pegawai,$year);
+        }
+    }
+
+    public function listByOpd($params,$year){
+        $result = [];
+        $data = DB::table('tb_bankom')->select('tb_pegawai.id','tb_pegawai.nama')->join('tb_pegawai','tb_bankom.id_pegawai','=','tb_pegawai.id')->whereYear('waktu_akhir',$year)->where('tb_pegawai.id_satuan_kerja',$params)->groupBy('tb_pegawai.id')->get();
+
+        foreach ($data as $key => $value) {
+            $result[] = [
+              'nama'  => $value->nama,
+              'bankom' => DB::table('tb_bankom')->select('nama_pelatihan','jenis_pelatihan','waktu_awal','waktu_akhir','jumlah_jp')->where('id_pegawai',$value->id)->get(),  
+            ];
+        }
+
+        return $result;
+    }
+
+    public function byPegawai($params,$year){
+         $data = bankom::where('id_pegawai',$params)->whereYear('waktu_akhir',$year)->latest()->get();
+         return $data;
+    }
+
     public function list(){
         $data = bankom::where('id_pegawai',Auth::user()->id_pegawai)->latest()->get();
 
@@ -73,7 +101,7 @@ class bankomController extends Controller
         }
     }
 
-     public function show($params){
+    public function show($params){
         $data = bankom::where('id',$params)->first();
 
         if ($data) {

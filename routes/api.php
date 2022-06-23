@@ -227,7 +227,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
      Route::prefix('bankom')->group(function () {
-        Route::get('/list', [App\Http\Controllers\bankomController::class, 'list']);  
+        Route::get('/list', [App\Http\Controllers\bankomController::class, 'list']); 
+        Route::get('/laporan/{type}/{satker}/{year}/{id_pegawai}', [App\Http\Controllers\bankomController::class, 'laporan']);  
         Route::post('/store', [App\Http\Controllers\bankomController::class, 'store']);  
         Route::get('/show/{params}', [App\Http\Controllers\bankomController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\bankomController::class, 'update']);  
