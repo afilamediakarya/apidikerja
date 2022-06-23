@@ -15,9 +15,6 @@ use DB;
 class AuthController extends Controller
 {
     public function login(Request $request){
-        
-        
-        
         if (!Auth::attempt($request->only('username', 'password')))
         {
             return response()
@@ -28,46 +25,22 @@ class AuthController extends Controller
         $level_ = [];
         $status_login_fails = '';
         $token = '';
-        $current = [];
 
-        $userss = User::where('username', $request['username'])->firstOrFail();
-        $user = DB::table('users')->select('users.id','users.id_pegawai','users.role','users.username','tb_pegawai.id_satuan_kerja','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.id','tb_satuan_kerja.nama_satuan_kerja','tb_lokasi.nama_lokasi','tb_lokasi.lat','tb_lokasi.long')->join('tb_pegawai','users.id_pegawai','=','tb_pegawai.id')->where('users.username',$request['username'])->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_lokasi','tb_jabatan.id_lokasi','=','tb_lokasi.id')->first();
+        $user = User::where('username', $request['username'])->firstOrFail();
+
+
         
         // return $user;
-        $current = [
-            'id' => $user->id,
-            'role' => $user->role,
-            'username' => $user->username,
-            'id_pegawai' => $user->id_pegawai,
-            'pegawai' => [
-                'id' => $user->id_pegawai,
-                'id_satuan_kerja' => $user->id_satuan_kerja,
-                'nama' => $user->nama,
-                'nip' => $user->nip,
-                'satuan_kerja' => [
-                    'id' => $user->id_satuan_kerja,
-                    'nama_satuan_kerja' => $user->nama_satuan_kerja
-                ],
-                'lokasi' => [
-                    'nama_lokasi' => $user->nama_lokasi,
-                    'lat_location' => $user->lat,
-                    'long_location' => $user->long
-                ],
-            ],
+        
+        $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
 
-        ];
-       // return $current;
-       //  return $user;
-
-        $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();    
-
-         if ($current['role'] == 'admin_opd' || $current['role'] == 'super_admin') {
-               $token = $userss->createToken('auth_token')->plainTextToken; 
+         if ($user['role'] == 'admin_opd' || $user['role'] == 'super_admin') {
+               $token = $user->createToken('auth_token')->plainTextToken; 
                  return response()->json([
-                'message' => 'Hi '.$current['username'].', Berhasil Login',
+                'message' => 'Hi '.$user->username.', Berhasil Login',
                 'access_token' => $token, 
-                'role' => $current['role'],
-                'current' => $current,
+                'role' => $user->role,
+                'current' => $user,
                 'check_atasan'=> $data,
                 'level_jabatan' => $level,
                 'token_type' => 'Bearer', 
@@ -84,8 +57,7 @@ class AuthController extends Controller
                 if (!is_null($value['jenis_jabatan'])) {
                     
                     $level_[] = $value['jenis_jabatan']['level'];   
-                    $token = $userss->createToken('auth_token')->plainTextToken; 
-                 
+                    $token = $user->createToken('auth_token')->plainTextToken; 
                 }else{
 
                     $status_login_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
@@ -106,10 +78,10 @@ class AuthController extends Controller
 
         if ($token !== '') {
             return response()->json([
-                'message' => 'Hi '.$current['username'].', Berhasil Login',
+                'message' => 'Hi '.$user->username.', Berhasil Login',
                 'access_token' => $token, 
-                'role' => $current['role'],
-                'current' => $current,
+                'role' => $user->role,
+                'current' => $user,
                 'check_atasan'=> $data,
                 'level_jabatan' => $level,
                 'token_type' => 'Bearer', 
@@ -120,8 +92,7 @@ class AuthController extends Controller
                  'messages_' => $status_login_fails
             ],422);
         }
-
-        
+ 
     }
 
     public function register_user(Request $request){
@@ -229,6 +200,56 @@ class AuthController extends Controller
 
     public function current_user(){
           $data = User::findOrFail(Auth::user()->id);
+        // $current = [];
+
+        // $user = DB::table('users')->select('users.id','users.id_pegawai','users.role','users.username','users.email','tb_pegawai.id_satuan_kerja','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.id','tb_pegawai.face_character','tb_pegawai.tempat_lahir','tb_pegawai.golongan','tb_pegawai.tmt_golongan','tb_pegawai.tmt_pegawai','tb_pegawai.jenis_kelamin','tb_pegawai.agama','tb_pegawai.tanggal_lahir','tb_satuan_kerja.nama_satuan_kerja','tb_satuan_kerja.inisial_satuan_kerja','tb_satuan_kerja.kode_satuan_kerja','tb_satuan_kerja.status_kepala','tb_lokasi.nama_lokasi','tb_lokasi.lat','tb_lokasi.long')->join('tb_pegawai','users.id_pegawai','=','tb_pegawai.id')->where('users.id',Auth::user()->id)->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_lokasi','tb_jabatan.id_lokasi','=','tb_lokasi.id')->first();
+
+        // if (isset($user)) {
+        //    $current = [
+        //         'id' => $user->id,
+        //         'id_pegawai' => $user->id_pegawai,
+        //         'role' => $user->role,
+        //         'username' => $user->username,
+        //         'email' => $user->email,
+        //         'pegawai' => [
+        //             'id' => $user->id_pegawai,
+        //             'id_satuan_kerja' => $user->id_satuan_kerja,
+        //             'nama' => $user->nama,
+        //             'tempat_lahir' => $user->tempat_lahir,
+        //             'tanggal_lahir' => $user->tanggal_lahir,
+        //             'nip' => $user->nip,
+        //             'golongan' => $user->golongan,
+        //             'tmt_golongan' => $user->tmt_golongan,
+        //             'tmt_pegawai' => $user->tmt_pegawai,
+        //             'jenis_kelamin' => $user->jenis_kelamin,
+        //             'agama' => $user->agama,
+        //             'status_perkawinan' => $user->status_perkawinan,
+        //             'pendidikan' => $user->pendidikan,
+        //             'jurusan' => $user->jurusan,
+        //             'lulus_pendidikan' => $user->lulus_pendidikan,
+        //             'face_character' => $user->face_character,
+        //             'satuan_kerja' => [
+        //                 'id' => $user->id_satuan_kerja,
+        //                 'nama_satuan_kerja' => $user->nama_satuan_kerja,
+        //                 'inisial_satuan_kerja' => $user->inisial_satuan_kerja,
+        //                 'kode_satuan_kerja' => $user->kode_satuan_kerja,
+        //                 'lat_location' => $user->lat,
+        //                 'long_location' => $user->long,
+        //                 'status_kepala' => $user->status_kepala
+        //             ],
+                    
+        //         ],
+        //     ];
+        // }else{
+        //      return response()->json([
+        //         'message' => 'Gagal Login',
+        //          'messages_' => 'Jabatan tidak di temukan, Mohon hubungi admin opd'
+        //     ],422);
+        // }  
+
+
+
+
         if ($data) {
             return response()->json([
                 'message' => 'Success',
