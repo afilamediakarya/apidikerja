@@ -152,12 +152,17 @@ class absenController extends Controller
     }
 
     public function checkAbsen(){
+        $status_ = '';
         $dt = date('Y-m-d');
         $time_now = date('H:i:s');
         $status_checkin = false;
         $status_checkout = false;
         $data = absen::where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->get();
         // return $data;
+        if (count($data) > 0) {
+            $status_ = $data[0]['status'];
+        }
+
         if (isset($data)) {
           
             foreach ($data as $key => $value) {
@@ -172,45 +177,14 @@ class absenController extends Controller
             return response()->json([
                 'checkin' => $status_checkin,
                 'checkout' => $status_checkout,
+                'status' => $status_
             ]);
         }else{
             return response()->json([
                   'checkin' => $status_checkin,
                   'checkout' => $status_checkout,
+                  'status' => $status_
             ]);
         }
-        
-
-        // if ($time_now > '12:00:01') {
-        //     $data = absen::where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->where('jenis','checkout')->first();
-            
-        //     if (isset($data)) {
-        //         return response()->json([
-        //             'message' => 'Anda sudah absen checkout',
-        //             'status' => false,
-        //         ]);
-        //     }else{
-        //         return response()->json([
-        //             'message' => 'Anda belum absen checkout',
-        //             'status' => true,
-        //         ]);
-        //     }
-
-        // }else{
-        //     $data = absen::where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->where('jenis','checkin')->first();
-            
-        //     if (isset($data)) {
-        //         return response()->json([
-        //             'message' => 'Anda sudah absen checkin',
-        //             'status' => false,
-        //         ]);
-        //     }else{
-        //         return response()->json([
-        //             'message' => 'Anda belum absen checkin',
-        //             'status' => true,
-        //         ]);
-        //     }
-
-        // }
     }
 }
