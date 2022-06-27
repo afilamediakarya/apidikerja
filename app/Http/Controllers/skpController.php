@@ -88,9 +88,10 @@ class skpController extends Controller
            
             if ($getRencanaKerjaAtasan != []) {
                 $skpUtama = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
-                $result['utama'][$key]['atasan'][] = $getRencanaKerjaAtasan;
-                $result['utama'][$key]['skp'][] = $skpUtama;
             }
+
+            $result['utama'][$key]['atasan'] = $getRencanaKerjaAtasan;
+            $result['utama'][$key]['skp'] = $skpUtama;
             
         }      
 
