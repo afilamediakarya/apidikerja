@@ -55,6 +55,7 @@ class skpController extends Controller
     public function list_skp_pegawai(){
          $result = [];
         $groupSkpAtasan = [];
+        $skpUtama = '';
         $skpChild = '';
         $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
         $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('tb_skp.id_skp_atasan')->where('jenis','utama')->get();
