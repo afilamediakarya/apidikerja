@@ -14,7 +14,7 @@ class pegawaiController extends Controller
 {
     
     public function list_tes(){
-        return $data = pegawai::all();
+        return $data = pegawai::select('id','nama','nip','golongan')->latest()->get();
     }
 
     public function list(){
