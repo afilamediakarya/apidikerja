@@ -27,8 +27,6 @@ class pegawaiController extends Controller
             $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
             if (isset($pegawai)) {
                     $data = pegawai::select('id','nama','nip','golongan')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->latest()->get();
-                // $data = pegawai::where('id_satuan_kerja',$pegawai['id_satuan_kerja'])->latest()->get();
-                // $data = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama','tb_pegawai.nip','tb_jabatan.nama_jabatan','tb_jenis_jabatan.level')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')->where('tb_pegawai.id_satuan_kerja',$pegawai['id_satuan_kerja'])->orderBy('tb_jenis_jabatan.level', 'ASC')->get();
             }else{
                 $data = [];
             }
