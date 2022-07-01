@@ -13,6 +13,10 @@ use Auth;
 class pegawaiController extends Controller
 {
     
+    public function list_tes(){
+        return $data = pegawai::all();
+    }
+
     public function list(){
         $data = '';
      
