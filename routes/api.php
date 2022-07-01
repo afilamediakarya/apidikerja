@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 //     return  $request->user();
 // });
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+      Route::get('/tes/list', [App\Http\Controllers\pegawaiController::class, 'list']);  
 Route::get('/view-rekapByUser/{start_date}/{end_date}/{id_pegawai}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'viewrekapByUser']);
 // Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -61,7 +62,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('pegawai')->group(function () {
-        Route::get('/list', [App\Http\Controllers\pegawaiController::class, 'list']);  
+        // Route::get('/list', [App\Http\Controllers\pegawaiController::class, 'list']);  
         Route::get('/BySatuanKerja/{params}', [App\Http\Controllers\pegawaiController::class, 'pegawaiBySatuanKerja']);  
         Route::post('/store', [App\Http\Controllers\pegawaiController::class, 'store']);  
         Route::get('/show/{params}', [App\Http\Controllers\pegawaiController::class, 'show']);  
