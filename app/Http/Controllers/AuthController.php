@@ -15,6 +15,7 @@ use DB;
 class AuthController extends Controller
 {
     public function login(Request $request){
+
         if (!Auth::attempt($request->only('username', 'password')))
         {
             return response()
@@ -27,12 +28,11 @@ class AuthController extends Controller
         $token = '';
 
         $user = User::where('username', $request['username'])->firstOrFail();
-
-
-        
+         
         // return $user;
         
-        $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
+        // $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
+        $data = '';
 
          if ($user['role'] == 'admin_opd' || $user['role'] == 'super_admin') {
                $token = $user->createToken('auth_token')->plainTextToken; 
@@ -47,9 +47,7 @@ class AuthController extends Controller
             ]);
         }
 
-        // $jabatan = DB::table('tb_jabatan')->select('tb_jenis_jabatan.')->join('tb_jenis_jabatan','tb_jabatan.id','=','tb_jenis_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->get();
-
-        $jabatan = jabatan::with('jenis_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+        $jabatan = jabatan::with('jenis_jabatan')->select('id','id_jenis_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
         
         if (count($jabatan) > 0) {
 
@@ -61,8 +59,7 @@ class AuthController extends Controller
                 }else{
 
                     $status_login_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
-                }
-                
+                }   
             }
         }else{
              $status_login_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
@@ -73,8 +70,6 @@ class AuthController extends Controller
         }else{
             $level = 0;
         }
-
-
 
         if ($token !== '') {
             return response()->json([
