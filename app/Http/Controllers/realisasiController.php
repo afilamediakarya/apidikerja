@@ -98,7 +98,7 @@ class realisasiController extends Controller
              
            }
 
-           $tes[] = $getRencanaKerjaAtasan;
+           // $tes[] = $getRencanaKerjaAtasan;
            $keterangan = '';
             if ($getRencanaKerjaAtasan != []) {
                 $skpUtama = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
@@ -127,8 +127,11 @@ class realisasiController extends Controller
                     }
 
             }
-            $result['utama'][$key]['atasan'] = $getRencanaKerjaAtasan;
-            $result['utama'][$key]['skp'] = $skpUtama;
+            
+            if (count($getRencanaKerjaAtasan) > 0) {
+                $result['utama'][$key]['atasan'] = $getRencanaKerjaAtasan;
+                 $result['utama'][$key]['skp'] = $skpUtama;
+            }
         }      
 
         $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
