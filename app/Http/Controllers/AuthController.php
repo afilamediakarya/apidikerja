@@ -231,6 +231,8 @@ class AuthController extends Controller
                         'nama_lokasi' => $user->nama_lokasi,
                         'lat_location' => $user->lat,
                         'long_location' => $user->long,
+                        'lokasi_apel_lat' => '-5.5585896680010904',
+                        'lokasi_apel_long' => '120.19320969890903',
                         'status_kepala' => $user->status_kepala
                     ],
                     
