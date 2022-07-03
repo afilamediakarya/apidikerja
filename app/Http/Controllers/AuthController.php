@@ -87,7 +87,6 @@ class AuthController extends Controller
                  'messages_' => $status_login_fails
             ],422);
         }
- 
     }
 
     public function register_user(Request $request){
