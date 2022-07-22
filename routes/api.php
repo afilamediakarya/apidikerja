@@ -159,9 +159,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('absen')->group(function () {
         Route::get('/list', [App\Http\Controllers\absenController::class, 'list']);
+         Route::get('/list-filter-absen/{satuan_kerja}/{tanggal}/{valid}', [App\Http\Controllers\absenController::class, 'list_filter_absen']);
         Route::get('/get-time-now', [App\Http\Controllers\absenController::class, 'getTime']);  
         Route::post('/store', [App\Http\Controllers\absenController::class, 'store']);  
-        Route::get('/show/{params}', [App\Http\Controllers\absenController::class, 'show']);  
+        Route::get('/show/{pegawai}/{tanggal}/{valid}', [App\Http\Controllers\absenController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\absenController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\absenController::class, 'delete']);  
         Route::get('/check-absen', [App\Http\Controllers\absenController::class, 'checkAbsen']);  
