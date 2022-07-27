@@ -122,6 +122,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('skp')->group(function () {
         Route::get('/list/{params}', [App\Http\Controllers\skpController::class, 'list']);  
         Route::post('/store', [App\Http\Controllers\skpController::class, 'store']);  
+        Route::post('/store-bulanan', [App\Http\Controllers\skpController::class, 'store_bulanan']);  
+        Route::post('/update-bulanan/{params}', [App\Http\Controllers\skpController::class, 'update_bulanan']);  
         Route::get('/show/{params}', [App\Http\Controllers\skpController::class, 'show']);  
         Route::post('/update/{params}', [App\Http\Controllers\skpController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\skpController::class, 'destroy']);  
@@ -166,6 +168,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/update/{params}', [App\Http\Controllers\absenController::class, 'update']);  
         Route::delete('/delete/{params}', [App\Http\Controllers\absenController::class, 'delete']);  
         Route::get('/check-absen', [App\Http\Controllers\absenController::class, 'checkAbsen']);  
+        Route::get('/check-absen-admin/{id_pegawai}/{tanggal}', [App\Http\Controllers\absenController::class, 'absenCheckAdmin']);  
+        Route::post('/change-validation', [App\Http\Controllers\absenController::class, 'change_validation']);
     });
 
     Route::prefix('review_skp')->group(function () {

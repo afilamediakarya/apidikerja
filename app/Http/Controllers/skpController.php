@@ -20,12 +20,84 @@ use Auth;
 class skpController extends Controller
 {
     public function list($params){
-        if ($params == 'kepala') {
-            return $this->list_skp_kepala();
+        
+        $tahun =  request('tahun', date('Y'));
+        $type =  request('type');
+        $result = array();
+
+        if ($type == 'tahunan') {
+             if ($params == 'pegawai') {
+               $result = skp::with('aspek_skp')->where('tahun',$tahun)->where('id_pegawai',Auth::user()->id_pegawai)->orderBy('jenis','ASC')->get();
+               foreach ($result as $key => $value) {
+                if (!is_null($value->id_skp_atasan)) {
+                    $value->skp_atasan = DB::table('tb_skp')->where('id',$value->id_skp_atasan)->first()->rencana_kerja;
+                }else{
+                    $value->skp_atasan = '-';
+                }
+   
+                   if ($value->jenis == 'utama') {
+                       $value->jenis_kinerja = 'A. Kinerja Utama';
+                   } else {
+                       $value->jenis_kinerja = 'B. Kinerja Tambahan';
+                   }
+               }
+            } else {
+               $result = skp::with('aspek_skp')->where('tahun',$tahun)->where('id_pegawai',Auth::user()->id_pegawai)->orderBy('jenis','ASC')->get();
+               foreach ($result as $key => $value) {
+                   if ($value->jenis == 'utama') {
+                       $value->jenis_kinerja = 'A. Kinerja Utama';
+                   } else {
+                       $value->jenis_kinerja = 'B. Kinerja Tambahan';
+                   }
+               }
+            } 
         }else{
-            return $this->list_skp_pegawai();
+            $skp_filter =  DB::table('tb_skp')->select('tb_skp.id','tb_skp.id_skp_atasan')->join('tb_aspek_skp','tb_aspek_skp.id_skp','tb_skp.id')->join('tb_target_skp','tb_target_skp.id_aspek_skp','tb_aspek_skp.id')->groupBy('tb_skp.id')->where('tb_skp.tahun',$tahun)->where('id_pegawai',Auth::user()->id_pegawai)->where('tb_target_skp.bulan',request('bulan'))->get();
+
+            if ($params == 'pegawai') {
+               foreach($skp_filter as $index => $val){
+                    $data = skp::with('aspek_skp')->where('id',$val->id)->orderBy('jenis','ASC')->first();
+                    $data->skp_atasan = DB::table('tb_skp')->where('id',$val->id_skp_atasan)->first()->rencana_kerja;
+                    if ($data->jenis == 'utama') {
+                        $data->jenis_kinerja = 'A. Kinerja Utama';
+                    } else {
+                        $data->jenis_kinerja = 'B. Kinerja Tambahan';
+                    }
+                   $result[$index] = $data; 
+               }
+
+            } else {
+                foreach($skp_filter as $index => $val){
+                    $data = skp::with('aspek_skp')->where('id',$val->id)->orderBy('jenis','ASC')->first();
+                    if ($data->jenis == 'utama') {
+                        $data->jenis_kinerja = 'A. Kinerja Utama';
+                    } else {
+                        $data->jenis_kinerja = 'B. Kinerja Tambahan';
+                    }
+                   $result[$index] = $data; 
+               }
+            } 
+
+        }
+
+       
+
+        if ($result) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $result
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'empty data',
+                'status' => false,
+                 'data' => $result
+            ]);
         }
     }
+
+    
 
     public function list_skp_kepala(){
         $result =[];
@@ -105,9 +177,6 @@ class skpController extends Controller
            $result['tambahan'] = $skp_tambahan;
         }
 
-        
-
-
         if ($result) {
             return response()->json([
                 'message' => 'Success',
@@ -124,96 +193,6 @@ class skpController extends Controller
     }
 
     public function store(Request $request){
-     
-        if($request->type_skp == 'kepala'){
-            return $this->skp_kepala($request);
-        }else{
-            return $this->skp_pegawai($request);
-        }
-        
-    }
-
-    public function skp_kepala($request){
-        $validator = Validator::make($request->all(),[
-            'id_satuan_kerja' => 'required|numeric',
-            'jenis_kinerja' => 'required',
-            'rencana_kerja' => 'required',
-            'tahun' => 'required',
-        ]);
-
-        if($validator->fails()){
-            return response()->json($validator->errors(),422);       
-        }
-        
-        $skp = new skp();
-        $skp->id_pegawai = Auth::user()->id_pegawai;
-        $skp->id_satuan_kerja = $request->id_satuan_kerja;
-        $skp->jenis = $request->jenis_kinerja;
-        $skp->rencana_kerja = $request->rencana_kerja;
-        $skp->tahun = $request->tahun;
-        $skp->save();
-
-        for ($i=0; $i < 13; $i++) { 
-            $review_realisasi_skp = new review_realisasi_skp();
-            $review_realisasi_skp->id_skp = $skp->id;
-            $review_realisasi_skp->kesesuaian = 'tidak';
-            $review_realisasi_skp->bulan = $i+1;
-            $review_realisasi_skp->save();
-        }
-
-        for ($i=0; $i < count($request->indikator_kerja_individu); $i++) { 
-                $aspek = new aspek_skp();
-                $aspek->id_skp = $skp->id;
-                $aspek->aspek_skp = "iki";
-                $aspek->iki = $request->indikator_kerja_individu[$i];
-                $aspek->satuan = $request->satuan[$i];
-                $aspek->save();
-
-                for ($x=0; $x < 12; $x++) { 
-                    $realisasi_skp = new realisasi_skp();
-                    $realisasi_skp->id_aspek_skp = $aspek->id;
-                    $realisasi_skp->realisasi_bulanan = 0;
-                    $realisasi_skp->bulan = $x+1;
-                    $realisasi_skp->save();
-                }
-
-                for ($x=0; $x < count($request->target_[$i]); $x++) { 
-                    $target = new target_skp();
-                    $target->id_aspek_skp = $aspek->id;
-                    $target->target = $request->target_[$i][$x];
-                    $target->bulan = $x+1;
-                    $target->save();
-                }
-                
-        }
-
-        if ($skp) {
-            return response()->json([
-                'message' => 'Success',
-                'status' => true,
-                'data' => $skp
-            ]);
-        }else{
-            return response()->json([
-                'message' => 'Failed',
-                'status' => false
-            ],422);
-        }
-
-    }
-
-    public function skp_pegawai($request){
-        $validator = Validator::make($request->all(),[
-            'id_satuan_kerja' => 'required|numeric',
-            // 'id_skp_atasan' => 'required|numeric',
-            'jenis' => 'required',
-            'rencana_kerja' => 'required',
-            'tahun' => 'required',
-        ]);
-
-        if($validator->fails()){
-            return response()->json($validator->errors(),422);       
-        }
         
         $skp = new skp();
         $skp->id_pegawai = Auth::user()->id_pegawai;
@@ -229,13 +208,12 @@ class skpController extends Controller
         $review->kesesuaian = 'tidak';
         $review->save();
 
-        for ($i=0; $i < 13; $i++) { 
             $review_realisasi_skp = new review_realisasi_skp();
             $review_realisasi_skp->id_skp = $skp->id;
             $review_realisasi_skp->kesesuaian = 'tidak';
-            $review_realisasi_skp->bulan = $i+1;
+            $review_realisasi_skp->bulan = '0';
             $review_realisasi_skp->save();
-        }
+        
 
         foreach ($request['aspek'] as $key => $value) {
             $aspek = new aspek_skp();
@@ -245,21 +223,17 @@ class skpController extends Controller
             $aspek->satuan = $value['satuan'];
             $aspek->save();
 
-            for ($x=0; $x < 12; $x++) { 
-                $realisasi_skp = new realisasi_skp();
+            $realisasi_skp = new realisasi_skp();
                 $realisasi_skp->id_aspek_skp = $aspek->id;
                 $realisasi_skp->realisasi_bulanan = 0;
-                $realisasi_skp->bulan = $x+1;
+                $realisasi_skp->bulan = '0';
                 $realisasi_skp->save();
-            }
 
-            foreach ($value['target'] as $index => $res) {
-                $target = new target_skp();
+               $target = new target_skp();
                 $target->id_aspek_skp = $aspek->id;
-                $target->target = $res;
-                $target->bulan = $index+1;
+                $target->target = $value['target'];
+                $target->bulan = '0';
                 $target->save();
-            }
         }
 
 
@@ -268,6 +242,42 @@ class skpController extends Controller
                 'message' => 'Success',
                 'status' => true,
                 'data' => $skp
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ],422);
+        }
+        
+    }
+
+    public function store_bulanan(Request $request){
+
+            $review_realisasi_skp = new review_realisasi_skp();
+            $review_realisasi_skp->id_skp = $request['rencana_kerja'];
+            $review_realisasi_skp->kesesuaian = 'tidak';
+            $review_realisasi_skp->bulan = $request['bulan'];
+            $review_realisasi_skp->save();
+
+        foreach ($request['id_aspek'] as $key => $value) {
+                $target = new target_skp();
+                $target->id_aspek_skp = $value;
+                $target->target = $request['target'][$key];
+                $target->bulan = $request['bulan'];
+                $target->save();
+
+                $realisasi_skp = new realisasi_skp();
+                $realisasi_skp->id_aspek_skp = $value;
+                $realisasi_skp->realisasi_bulanan = 0;
+                $realisasi_skp->bulan = $request['bulan'];
+                $realisasi_skp->save();
+        }
+        if ($target) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $target
             ]);
         }else{
             return response()->json([
@@ -295,13 +305,91 @@ class skpController extends Controller
 
 
     public function update($params,Request $request){
+        $skp = skp::where('id',$params)->first();
+            $skp->id_pegawai = Auth::user()->id_pegawai;
+            $skp->id_satuan_kerja = $request->id_satuan_kerja;
+            $skp->id_skp_atasan = $request->id_skp_atasan;
+            $skp->jenis = $request->jenis;
+            $skp->rencana_kerja = $request->rencana_kerja;
+            $skp->tahun = $request->tahun;
+            $skp->save();
+
+            foreach ($request['aspek'] as $key => $value) {
+                $aspek = aspek_skp::where('id',$value['id'])->first();
+                $aspek->id_skp = $skp->id;
+                $aspek->aspek_skp = $value['type_aspek'];
+                $aspek->iki = $value['iki'];
+                $aspek->satuan = $value['satuan'];
+                $aspek->save();
+                
+                $target = target_skp::where('id',$value['id_target'])->first();
+                $target->id_aspek_skp = $aspek->id;
+                $target->target = $value['target'];
+                $target->bulan = '0';
+                $target->save();
+
+            }
+
+            if (count($request->aspek_additional) > 0) {
+                foreach ($request['aspek_additional'] as $index => $val) {
+                    $aspek_add = new aspek_skp();
+                    $aspek_add->id_skp = $skp->id;
+                    $aspek_add->aspek_skp = $val['type_aspek'];
+                    $aspek_add->iki = $val['iki'];
+                    $aspek_add->satuan = $val['satuan'];
+                    $aspek_add->save();
+                    
+                    $target_add = new target_skp();
+                    $target_add->id_aspek_skp = $aspek_add->id;
+                    $target_add->target = $val['target'];
+                    $target_add->bulan = '0';
+                    $target_add->save();
+                }
+            }
+
+
+            if ($skp) {
+                return response()->json([
+                    'message' => 'Success',
+                    'status' => true,
+                    'data' => $skp
+                ]);
+            }else{
+                return response()->json([
+                    'message' => 'Failed',
+                    'status' => false
+                ],422);
+            }
+
         // return $request->type_skp;
-        if($request->type_skp == 'kepala'){
-            return $this->update_skp_kepala($params,$request);
-        }else{
-            return $this->update_skp_pegawai($params,$request);
-        }
+        // if($request->type_skp == 'kepala'){
+        //     return $this->update_skp_kepala($params,$request);
+        // }else{
+        //     return $this->update_skp_pegawai($params,$request);
+        // }
       
+    }
+
+    public function update_bulanan($params,Request $request){
+        foreach ($request['id_aspek'] as $key => $value) {
+                $target = target_skp::where('id',$request['id_target'][$key])->first();
+                $target->id_aspek_skp = $value;
+                $target->target = $request['target'][$key];
+                $target->bulan = $request['bulan'];
+                $target->save();
+        }
+        if ($target) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $target
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ],422);
+        }
     }
 
     public function checkSkpAtasan($params){
@@ -505,23 +593,27 @@ class skpController extends Controller
     }
 
     public function destroy($params){
+        $type = request('type');
+        if ($type == 'tahunan') {
+            $check = $this->checkSkpAtasan($params);
+            if ($check > 0) {
+                return response()->json([
+                    'message' => 'failed',
+                    'status' => false,
+                ]);
+            }else{
+                $data = skp::where('id',$params)->first();
+                $data->delete();
 
-        $check = $this->checkSkpAtasan($params);
-
-        if ($check > 0) {
-             return response()->json([
-                'message' => 'failed',
-                'status' => false,
-            ]);
+                return response()->json([
+                    'message' => 'Success',
+                    'status' => true,
+                ]);
+            } 
         }else{
-            $data = skp::where('id',$params)->first();
-            $data->delete();
-
-             return response()->json([
-                'message' => 'Success',
-                'status' => true,
-            ]);
-        } 
+            
+        }
+        
     }
 
     public function satuan(){

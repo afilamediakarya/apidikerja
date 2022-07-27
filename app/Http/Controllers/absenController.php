@@ -8,6 +8,7 @@ use Validator;
 use Carbon\Carbon;
 use Auth;
 use DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 class absenController extends Controller
 {
@@ -38,13 +39,24 @@ class absenController extends Controller
         }
 
         $result = array();
+        $absen = array();
         foreach ($pegawaiBySatuanKerja as $key => $value) {
            $data = array();
-           $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->where('validation',$valid)->get();
+            if ($valid == 'semua') {
+                $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->get();
+            }else{
+                $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->where('validation',$valid)->get();
+            }
+
+            
+            
+
            if (count($absen) > 0) {
             $data['id'] = $value->id;
             $data['nama_pegawai'] = $value->nama;
+            $data['waktu_pulang'] = '-';
             foreach ($absen as $k => $val) {
+               
                 if ($val->jenis == 'checkin') {
                    $data['waktu_masuk'] = $val->waktu_absen; 
                    $data['validation'] = $val->validation;
@@ -55,7 +67,10 @@ class absenController extends Controller
                 }
             }
 
-            $result[] = $data;
+            // if (in_array("waktu_masuk", $data) == true) {
+                $result[] = $data;
+            // }
+         
 
            }
           
@@ -93,16 +108,42 @@ class absenController extends Controller
             return response()->json($validator->errors());       
         }
 
+        $status = $request->status;
+        $validation_ = 0;
+        $user_update = '';
+        if (!isset($request->validation)) {
+            $user_update = Auth::user()->id_pegawai;
+            if ($request->jenis == 'checkout') {
+                $check_absen = json_decode($this->checkAbsen()->content(), true)['status'];
+                if ($check_absen == 'hadir' || $check_absen == 'apel') {
+                    $validation_ = 1;
+                }
+                $status = 'hadir';
+                
+            }else{
+                if ($status == 'hadir' || $status == 'apel') {
+                    $validation_ = 1;
+                }elseif ($status == 'dinas luar' || $status == 'izin' || $status == 'sakit') {
+                    $validation_ = 0;
+                }
+            
+            }
+
+        }else{
+            $validation_ = $request->validation;
+            $user_update = $request->user_update;
+        }
+
         $data = new absen();
         $data->id_pegawai = $request->id_pegawai;
         $data->tanggal_absen = $request->tanggal_absen;
         $data->waktu_absen = $request->waktu_absen;
-        $data->status = $request->status;
+        $data->status = $status;
         $data->jenis = $request->jenis;
         $data->location_auth = $request->location_auth;
         $data->face_auth = $request->face_auth;
-        $data->user_update = $request->user_update;
-        $data->validation = $request->validation;
+        $data->user_update = $user_update;
+        $data->validation = $validation_;
         $data->tahun = date('Y');
         $data->save();
 
@@ -128,18 +169,21 @@ class absenController extends Controller
     public function show($pegawai, $tanggal,$valid){
         $data = array();
         $satker = DB::table('tb_pegawai')->select('id_satuan_kerja')->where('id',$pegawai)->first();
-        $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status')->where('id_pegawai',$pegawai)->where('tanggal_absen',$tanggal)->where('validation',$valid)->get();
+        $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$pegawai)->where('tanggal_absen',$tanggal)->where('validation',$valid)->get();
 
-                   if (count($absen) > 0) {
-            $data['id_pegawai'] = $pegawai;
-            $data['id_satuan_kerja'] = $satker->id_satuan_kerja;
+          if (count($absen) > 0) {
+            $data['satker'] = [
+                'satuan_kerja' => $satker->id_satuan_kerja,
+                'id_pegawai' => $pegawai
+            ];
             foreach ($absen as $k => $val) {
                 if ($val->jenis == 'checkin') {
-                   $data['waktu_masuk'] = $val->waktu_absen; 
+                   $data['waktu_absen_masuk'] = $val->waktu_absen; 
                    $data['validation'] = $val->validation;
-                   $data['status'] = $val->status; 
+                   $data['status'] = Str::slug($val->status,'_'); 
+                   $data['tanggal'] = $val->tanggal_absen; 
                 }else{
-                    $data['waktu_pulang'] = $val->waktu_absen;
+                    $data['waktu_absen_pulang'] = $val->waktu_absen;
                 }
             }
            }
@@ -159,31 +203,22 @@ class absenController extends Controller
     }
 
     public function update($params,Request $request){
-        $validator = Validator::make($request->all(),[
-            'id_pegawai' => 'required|numeric',
-            'tanggal_absen' => 'required|date',
-            'waktu_absen' => 'required',
-            'status' => 'required',
-            'jenis' => 'required',
-            'location_auth' => 'required',
-            'face_auth' => 'required'
-        ]);
+        // return $request->all();
+        $data = array();
+        $absen = DB::table('tb_absen')->where('tanggal_absen',$request->tanggal_absen)->where('id_pegawai',$params)->get();
 
-        if($validator->fails()){
-            return response()->json($validator->errors());       
+        foreach ($absen as $key => $value) {
+            $data = absen::where('id',$value->id)->first();
+            $data->id_pegawai = $request->id_pegawai;
+            $data->tanggal_absen = $request->tanggal_absen;
+            if ($value->jenis == 'checkin') {
+                $data->waktu_absen = $request->waktu_absen_masuk;
+                $data->status = $request->status; 
+            }else{
+                $data->waktu_absen = $request->waktu_absen_pulang;
+            }
+            $data->save();   
         }
-
-        $data = absen::where('id',$params)->first();
-        $data->id_pegawai = $request->id_pegawai;
-        $data->tanggal_absen = $request->tanggal_absen;
-        $data->waktu_absen = $request->waktu_absen;
-        $data->status = $request->status;
-        $data->jenis = $request->jenis;
-        $data->location_auth = $request->location_auth;
-        $data->face_auth = $request->face_auth;
-        $data->tahun = date('Y');
-        $data->save();
-
         if ($data) {
             return response()->json([
                 'message' => 'Success',
@@ -227,6 +262,40 @@ class absenController extends Controller
         $status_checkin = false;
         $status_checkout = false;
         $data = absen::where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->get();
+        if (count($data) > 0) {
+            $status_ = $data[0]['status'];
+        }
+
+        if (isset($data)) {
+          
+            foreach ($data as $key => $value) {
+                if ($value['jenis'] == 'checkin') {
+                    $status_checkin = true;
+                }else{
+                    $status_checkout = true;
+                }
+
+            }
+                        
+            return response()->json([
+                'checkin' => $status_checkin,
+                'checkout' => $status_checkout,
+                'status' => $status_
+            ]);
+        }else{
+            return response()->json([
+                  'checkin' => $status_checkin,
+                  'checkout' => $status_checkout,
+                  'status' => $status_
+            ]);
+        }
+    }
+
+    public function absenCheckAdmin($id_pegawai,$tanggal_absen){
+        $status_ = '';
+        $status_checkin = false;
+        $status_checkout = false;
+        $data = absen::where('id_pegawai',$id_pegawai)->where('tanggal_absen',$tanggal_absen)->get();
         // return $data;
         if (count($data) > 0) {
             $status_ = $data[0]['status'];
@@ -256,4 +325,29 @@ class absenController extends Controller
             ]);
         }
     }
+
+    public function change_validation(Request $request){
+
+         $absen = DB::table('tb_absen')->where('tanggal_absen',$request->tanggal)->where('id_pegawai',$request->id_pegawai)->get();
+         foreach ($absen as $key => $value) {
+
+             $validation_ = DB::table('tb_absen')
+              ->where('id', $value->id)
+              ->update(['validation' => $request->valid]);
+         }
+
+        if ($validation_) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $validation_
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
 }

@@ -242,7 +242,15 @@ class aktivitasController extends Controller
 
     public function optionSkp(){
         $result = [];
-        $data = skp::where('id_pegawai',Auth::user()->id_pegawai)->latest()->get();
+        $data = array();
+        $tahun = request('tahun');
+
+        if (isset($tahun)) {
+                    $data = skp::where('id_pegawai',Auth::user()->id_pegawai)->latest()->where('tahun',$tahun)->get();
+        }else{
+                    $data = skp::where('id_pegawai',Auth::user()->id_pegawai)->latest()->where('tahun',date('Y'))->get();
+        }
+
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'id' => $value->id,

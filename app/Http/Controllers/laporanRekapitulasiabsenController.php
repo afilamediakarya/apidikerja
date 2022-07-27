@@ -54,14 +54,6 @@ class laporanRekapitulasiabsenController extends Controller
         ];
         // return $hariLibur;
         for ( $i = $startTime; $i <= $endTime; $i = $i + 86400 ) {
-            // for ($y=0; $y < count($hariLibur); $y++) { 
-            //     if ($hariLibur[$y] != date( 'Y-m-d', $i )) {
-            //         $getDatatanggal[]['date'] = date( 'Y-m-d', $i );
-            //     } 
-            // }
-
-            // return in_array(date( 'Y-m-d', $i), $hariLibur); 
-
             if (in_array(date( 'Y-m-d', $i), $hariLibur) != 1) {
                 $getDatatanggal[]['date'] = date( 'Y-m-d', $i);   
             }  
@@ -71,13 +63,11 @@ class laporanRekapitulasiabsenController extends Controller
         $result = [];
         $rekapAbsen = [];
         $pegawai = pegawai::select('nama','nip','id_satuan_kerja')->where('id',Auth::user()->id_pegawai)->first();
-        // $getAbsen = DB::table('tb_absen')->where('id_pegawai',Auth::user()->id_pegawai)->get();
-        // $getDatatanggal = DB::table('tb_absen')->select(DB::raw('tanggal_absen as date'))->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
 
 
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
-            $getAbsen = DB::table('tb_absen')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$value['date'])->get();
+            $getAbsen = DB::table('tb_absen')->where('id_pegawai',Auth::user()->id_pegawai)->where('validation',1)->where('tanggal_absen',$value['date'])->get();
             
             foreach ($getAbsen as $i => $v) {
                 // return $v;
@@ -434,7 +424,7 @@ class laporanRekapitulasiabsenController extends Controller
         }
 
         foreach ($pegawaiBySatuanKerja as $key => $value) {
-            $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id','id_pegawai','waktu_absen','status','jenis')->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->groupBy('tb_absen.id')->get();
+            $getAbsenPegawai = absen::where('id_pegawai',$value->id)->select('id','id_pegawai','waktu_absen','status','jenis')->where('tanggal_absen','>=',$startDate)->where('tanggal_absen','<=',$endDate)->where('validation',1)->groupBy('tb_absen.id')->get();
 
                if (count($getAbsenPegawai) > 0) {
                    $pegawai_data[] = $getAbsenPegawai;
