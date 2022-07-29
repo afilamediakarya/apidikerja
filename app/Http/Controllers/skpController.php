@@ -25,9 +25,11 @@ class skpController extends Controller
         $type =  request('type');
         $result = array();
 
+        $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',Auth::user()->id_pegawai)->first();
+
         if ($type == 'tahunan') {
              if ($params == 'pegawai') {
-               $result = skp::with('aspek_skp')->where('tahun',$tahun)->where('id_pegawai',Auth::user()->id_pegawai)->orderBy('jenis','ASC')->get();
+               $result = skp::with('aspek_skp')->where('tahun',$tahun)->where('id_jabatan',$jabatanByPegawai->id)->orderBy('jenis','ASC')->get();
                foreach ($result as $key => $value) {
                 if (!is_null($value->id_skp_atasan)) {
                     $value->skp_atasan = DB::table('tb_skp')->where('id',$value->id_skp_atasan)->first()->rencana_kerja;
@@ -42,7 +44,7 @@ class skpController extends Controller
                    }
                }
             } else {
-               $result = skp::with('aspek_skp')->where('tahun',$tahun)->where('id_pegawai',Auth::user()->id_pegawai)->orderBy('jenis','ASC')->get();
+               $result = skp::with('aspek_skp')->where('tahun',$tahun)->where('id_jabatan',$jabatanByPegawai->id)->orderBy('jenis','ASC')->get();
                foreach ($result as $key => $value) {
                    if ($value->jenis == 'utama') {
                        $value->jenis_kinerja = 'A. Kinerja Utama';
@@ -52,8 +54,9 @@ class skpController extends Controller
                }
             } 
         }else{
-            $skp_filter =  DB::table('tb_skp')->select('tb_skp.id','tb_skp.id_skp_atasan')->join('tb_aspek_skp','tb_aspek_skp.id_skp','tb_skp.id')->join('tb_target_skp','tb_target_skp.id_aspek_skp','tb_aspek_skp.id')->groupBy('tb_skp.id')->where('tb_skp.tahun',$tahun)->where('id_pegawai',Auth::user()->id_pegawai)->where('tb_target_skp.bulan',request('bulan'))->get();
-
+            $skp_filter =  DB::table('tb_skp')->select('tb_skp.id','tb_skp.id_skp_atasan')->join('tb_aspek_skp','tb_aspek_skp.id_skp','tb_skp.id')->join('tb_target_skp','tb_target_skp.id_aspek_skp','tb_aspek_skp.id')->groupBy('tb_skp.id')->where('tb_skp.tahun',$tahun)->where('id_jabatan',$jabatanByPegawai->id)->where('tb_target_skp.bulan',request('bulan'))->get();
+         
+    
             if ($params == 'pegawai') {
                foreach($skp_filter as $index => $val){
                     $data = skp::with('aspek_skp')->where('id',$val->id)->orderBy('jenis','ASC')->first();
@@ -65,7 +68,6 @@ class skpController extends Controller
                     }
                    $result[$index] = $data; 
                }
-
             } else {
                 foreach($skp_filter as $index => $val){
                     $data = skp::with('aspek_skp')->where('id',$val->id)->orderBy('jenis','ASC')->first();
@@ -96,9 +98,6 @@ class skpController extends Controller
             ]);
         }
     }
-
-    
-
     public function list_skp_kepala(){
         $result =[];
         $skpUtama = skp::with('aspek_skp')->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
@@ -194,8 +193,10 @@ class skpController extends Controller
 
     public function store(Request $request){
         
+        $data =  DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',Auth::user()->id_pegawai)->first();
+
         $skp = new skp();
-        $skp->id_pegawai = Auth::user()->id_pegawai;
+        $skp->id_jabatan = $data->id;
         $skp->id_satuan_kerja = $request->id_satuan_kerja;
         $skp->id_skp_atasan = $request->id_skp_atasan;
         $skp->jenis = $request->jenis;
@@ -206,12 +207,14 @@ class skpController extends Controller
         $review = new review_skp();
         $review->id_skp = $skp->id;
         $review->kesesuaian = 'tidak';
+        $review->id_pegawai = $data->id_pegawai;
         $review->save();
 
             $review_realisasi_skp = new review_realisasi_skp();
             $review_realisasi_skp->id_skp = $skp->id;
             $review_realisasi_skp->kesesuaian = 'tidak';
             $review_realisasi_skp->bulan = '0';
+            $review_realisasi_skp->id_pegawai = $data->id_pegawai;
             $review_realisasi_skp->save();
         
 
@@ -227,12 +230,14 @@ class skpController extends Controller
                 $realisasi_skp->id_aspek_skp = $aspek->id;
                 $realisasi_skp->realisasi_bulanan = 0;
                 $realisasi_skp->bulan = '0';
+                $realisasi_skp->id_pegawai = $data->id_pegawai;
                 $realisasi_skp->save();
 
                $target = new target_skp();
                 $target->id_aspek_skp = $aspek->id;
                 $target->target = $value['target'];
                 $target->bulan = '0';
+                $target->id_pegawai = $data->id_pegawai;
                 $target->save();
         }
 
@@ -254,10 +259,13 @@ class skpController extends Controller
 
     public function store_bulanan(Request $request){
 
+        $data =  DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',Auth::user()->id_pegawai)->first();
+
             $review_realisasi_skp = new review_realisasi_skp();
             $review_realisasi_skp->id_skp = $request['rencana_kerja'];
             $review_realisasi_skp->kesesuaian = 'tidak';
             $review_realisasi_skp->bulan = $request['bulan'];
+            $review_realisasi_skp->id_pegawai = $data->id_pegawai;
             $review_realisasi_skp->save();
 
         foreach ($request['id_aspek'] as $key => $value) {
@@ -265,12 +273,14 @@ class skpController extends Controller
                 $target->id_aspek_skp = $value;
                 $target->target = $request['target'][$key];
                 $target->bulan = $request['bulan'];
+                $target->id_pegawai = $data->id_pegawai;
                 $target->save();
 
                 $realisasi_skp = new realisasi_skp();
                 $realisasi_skp->id_aspek_skp = $value;
                 $realisasi_skp->realisasi_bulanan = 0;
                 $realisasi_skp->bulan = $request['bulan'];
+                $realisasi_skp->id_pegawai = $data->id_pegawai;
                 $realisasi_skp->save();
         }
         if ($target) {
@@ -288,7 +298,8 @@ class skpController extends Controller
     }
 
     public function show($params){
-        $data = skp::with('aspek_skp')->where('id',$params)->first();
+        $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',Auth::user()->id_pegawai)->first();
+        $data = skp::with('aspek_skp')->where('id_jabatan',$jabatanByPegawai->id)->first();
         if ($data) {
             return response()->json([
                 'message' => 'Success',
@@ -305,8 +316,10 @@ class skpController extends Controller
 
 
     public function update($params,Request $request){
-        $skp = skp::where('id',$params)->first();
-            $skp->id_pegawai = Auth::user()->id_pegawai;
+        $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',Auth::user()->id_pegawai)->first();
+
+             $skp = skp::where('id',$params)->first();
+            $skp->id_jabatan = $jabatanByPegawai->id;
             $skp->id_satuan_kerja = $request->id_satuan_kerja;
             $skp->id_skp_atasan = $request->id_skp_atasan;
             $skp->jenis = $request->jenis;
@@ -631,9 +644,9 @@ class skpController extends Controller
 
     public function optionSkp(){
         $result = [];
-        // $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        $jabatanByPegawai = DB::table('tb_jabatan')->select('tb_jabatan.parent_id','tb_jenis_jabatan.level')->join('tb_jenis_jabatan','tb_jabatan.id_jenis_jabatan','=','tb_jenis_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        // return $jabatanByPegawai;
+        
+        $jabatanByPegawai = DB::table('tb_jabatan')->select('tb_jabatan.parent_id','tb_jenis_jabatan.level','tb_jabatan.id')->join('tb_jenis_jabatan','tb_jabatan.id_jenis_jabatan','=','tb_jenis_jabatan.id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+      
         $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
   
         if (isset($jabatanByPegawai)) {
@@ -643,10 +656,8 @@ class skpController extends Controller
                 if ($jabatanByPegawai->level !== 1) {
 
                     $atasan = DB::table('tb_jabatan')->where('id',$jabatanByPegawai->parent_id)->first();
-                    // return $atasan;
-                    
                     if (isset($atasan)) {
-                        $getSkp = skp::where('id_pegawai',$atasan->id_pegawai)->get();
+                        $getSkp = skp::where('id_jabatan',$atasan->id)->get();
                         foreach ($getSkp as $key => $value) {
                             $result[$key] = [
                                 'id' => $value->id,
@@ -655,9 +666,7 @@ class skpController extends Controller
                         }
                     }
 
-                   
-                
-                     return response()->json([
+                    return response()->json([
                         'message' => 'Success',
                         'status' => true,
                         'data' => $result

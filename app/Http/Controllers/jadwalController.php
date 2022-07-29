@@ -10,7 +10,6 @@ class jadwalController extends Controller
 {
     public function list(){
         $data = jadwal::latest()->get();
-
         if ($data) {
             return response()->json([
                 'message' => 'Success',
@@ -42,7 +41,7 @@ class jadwalController extends Controller
         $data->sub_tahapan = $request->sub_tahapan;
         $data->tanggal_awal = $request->tanggal_awal;
         $data->tanggal_akhir = $request->tanggal_akhir;
-        $data->tahun = date('Y');
+        $data->tahun = $request->tahun;
         $data->save();
 
 

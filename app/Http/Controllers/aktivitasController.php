@@ -245,10 +245,12 @@ class aktivitasController extends Controller
         $data = array();
         $tahun = request('tahun');
 
+        $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',Auth::user()->id_pegawai)->first();
+
         if (isset($tahun)) {
-                    $data = skp::where('id_pegawai',Auth::user()->id_pegawai)->latest()->where('tahun',$tahun)->get();
+            $data = skp::where('id_jabatan',$jabatanByPegawai->id)->latest()->where('tahun',$tahun)->get();
         }else{
-                    $data = skp::where('id_pegawai',Auth::user()->id_pegawai)->latest()->where('tahun',date('Y'))->get();
+            $data = skp::where('id_jabatan',$jabatanByPegawai->id)->latest()->where('tahun',date('Y'))->get();
         }
 
         foreach ($data as $key => $value) {

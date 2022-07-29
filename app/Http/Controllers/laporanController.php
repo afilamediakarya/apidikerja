@@ -73,7 +73,7 @@ class laporanController extends Controller
         $skpChild = '';
         $atasan = '';
         $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        
+   
         if (isset($jabatanByPegawai)) {
             $jabatan_atasan = DB::table('tb_jabatan')->where('id',$jabatanByPegawai->parent_id)->first();
         }
@@ -85,7 +85,7 @@ class laporanController extends Controller
 
         $current = DB::table('tb_jabatan')->select('tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai','tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja','tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id',Auth::user()->id_pegawai)->first();       
         // return $jabatanByPegawai;
-        $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('tb_skp.id_skp_atasan')->get();
+        $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_jabatan',$jabatan_atasan->id)->groupBy('tb_skp.id_skp_atasan')->get();
 
         $result['atasan'] = $atasan;
         $result['pegawai_dinilai'] = $current;
@@ -120,7 +120,7 @@ class laporanController extends Controller
            }
            
             if ($getRencanaKerjaAtasan != []) {
-                $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('id_pegawai',Auth::user()->id_pegawai)->where('jenis','utama')->get();
+                $skpChild = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('id_jabatan',$jabatanByPegawai->id)->where('jenis','utama')->get();
             }else{
                 $skpChild = [];
             }
@@ -132,7 +132,7 @@ class laporanController extends Controller
         
         }      
 
-          $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
+          $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_jabatan',$jabatanByPegawai->id)->get();
 
         if (count($skp_tambahan) > 0) {
            $result['skp']['tambahan'] = $skp_tambahan;

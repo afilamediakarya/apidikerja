@@ -50,7 +50,6 @@ class AuthController extends Controller
         $jabatan = jabatan::with('jenis_jabatan')->select('id','id_jenis_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->get();
         
         if (count($jabatan) > 0) {
-
             foreach ($jabatan as $key => $value) {
                 if (!is_null($value['jenis_jabatan'])) {
                     

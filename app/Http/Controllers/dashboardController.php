@@ -78,7 +78,8 @@ class dashboardController extends Controller
 
 	public function pegawai_dashboard(){
 		// return Auth::user()->id_pegawai;
-		$getSkp = skp::where('id_pegawai',Auth::user()->id_pegawai)->get()->count();
+		$getSkp = DB::table('tb_skp')->join('tb_jabatan','tb_skp.id_jabatan','tb_jabatan.id')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',Auth::user()->id_pegawai)->get()->count();
+		
 		$list_pegawai = [];
 		$result = [];
 		$temporary = [];
@@ -91,37 +92,42 @@ class dashboardController extends Controller
 		$getJabatanByCurrentParent = jabatan::where('parent_id',$getJabatanPegawai->id)->get();
 		}
 	
+		// return $getJabatanByCurrentParent;
 	
 		$countAktivitas = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->count();
 
 		if (count($getJabatanByCurrentParent) > 0) {
 			foreach ($getJabatanByCurrentParent as $key => $value) {
+				// return $value;
 		
-			$res = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_pegawai.id',$value->id_pegawai)->get();
+			$res = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_skp','tb_jabatan.id', '=', 'tb_skp.id_jabatan')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_jabatan.id',$value->id)->get();
+			
 
-			foreach ($res as $x => $y) {
-				$review_realisasi = review_realisasi_skp::where('id_skp',$y->id_skp)->get()->pluck('kesesuaian')->toArray();
-	
-				if ($y->kesesuaian == 'ya') {
-					$label_review = 'Selesai';
-				} else {
-					$label_review = 'Belum Review';
+			if (count($res) > 0) {
+				foreach ($res as $x => $y) {
+					$review_realisasi = review_realisasi_skp::where('id_skp',$y->id_skp)->get()->pluck('kesesuaian')->toArray();
+		
+					if ($y->kesesuaian == 'ya') {
+						$label_review = 'Selesai';
+					} else {
+						$label_review = 'Belum Review';
+					}
+		
+					if (in_array("tidak", $review_realisasi) == true && in_array("ya", $review_realisasi) == true){
+						$label_review_skp = 'Belum Sesuai';
+					}
+					else if(in_array("ya", $review_realisasi) == true && in_array("tidak", $review_realisasi) == false){
+						$label_review_skp = 'Selesai';
+					}else{
+						$label_review_skp = 'Belum Review';
+					}	
+					
+					$list_pegawai[$key] = [
+						'nama' => $y->nama,
+						'review_skp' => $label_review,
+						'review_realisasi' => $label_review_skp
+					];
 				}
-	
-				if (in_array("tidak", $review_realisasi) == true && in_array("ya", $review_realisasi) == true){
-					$label_review_skp = 'Belum Sesuai';
-				}
-				else if(in_array("ya", $review_realisasi) == true && in_array("tidak", $review_realisasi) == false){
-					$label_review_skp = 'Selesai';
-				}else{
-					$label_review_skp = 'Belum Review';
-				}	
-				
-				$list_pegawai[$key] = [
-					'nama' => $y->nama,
-					'review_skp' => $label_review,
-					'review_realisasi' => $label_review_skp
-				];
 			}
 		}
 		}
@@ -154,6 +160,8 @@ class dashboardController extends Controller
 				'Instansi' => $get_penilai['satuan_kerja']['nama_satuan_kerja']
 			];	
 		}
+
+	
 		
 		// 
 
@@ -167,38 +175,32 @@ class dashboardController extends Controller
 
 		// INFO TPP
 			$nilai_besaran_tpp = 0;
-			// $besaran_tpp = jabatan::where('id_pegawai',Auth::user()->id_pegawai)->first();
-			// if ($besaran_tpp) {
-			// 	$nilai_besaran_tpp = $besaran_tpp['kelas_jabatan']['besaran_tpp'];
-			// }
-			// Tunjangan Prestasi Kerja
-			// return $get_pegawai;
-			if (isset($get_pegawai)) {
-				if (!empty($get_pegawai['skp'])) {
-					// return $get_pegawai['skp'];
-					foreach ($get_pegawai['skp'] as $kk => $vv) {
-						$aspek = aspek_skp::where('id_skp',$vv['id'])->get();
-						$cek[$kk] = $aspek;
-						foreach($aspek as $index => $val){
-							foreach($val['realisasi_skp'] as $k => $kl){ 
-								$total_realisasi += $kl['realisasi_bulanan'];
-								$total_target += $val['target_skp'][$k]['target'];
-							}
-						}
-					}
 		
-					if ($total_realisasi > 0 && $total_target > 0) {
-						$total_kinerja = (($total_realisasi / $total_target) * 100) / $getSkp;
-						$hasil_total_kinerja = ($total_kinerja / 60) * 100;
-					}
-				}
-			}
+		
+			// if (isset($get_pegawai)) {
+			// 	return $get_pegawai;
+			// 	if (!empty($get_pegawai['skp'])) {
+					
+			// 		foreach ($get_pegawai['skp'] as $kk => $vv) {
+						
+			// 			$aspek = aspek_skp::where('id_skp',$vv['id'])->get();
+			// 			$cek[$kk] = $aspek;
+			// 			foreach($aspek as $index => $val){
+			// 				foreach($val['realisasi_skp'] as $k => $kl){ 
+			// 					$total_realisasi += $kl['realisasi_bulanan'];
+			// 					$total_target += $val['target_skp'][$k]['target'];
+			// 				}
+			// 			}
+			// 		}
+		
+			// 		if ($total_realisasi > 0 && $total_target > 0) {
+			// 			$total_kinerja = (($total_realisasi / $total_target) * 100) / $getSkp;
+			// 			$hasil_total_kinerja = ($total_kinerja / 60) * 100;
+			// 		}
+			// 	}
+			// }
 
-				// return $total_realisasi;
-			// 
-		// 
-
-
+		
 
 		if (count($list_pegawai) == 0) {
 			$list_pegawai = null;
@@ -233,20 +235,20 @@ class dashboardController extends Controller
 		$count_aktifitas = 0;
 		$count_skp = 0;
 		// return $pegawaiBySatuankerja;
-		foreach($pegawaiBySatuankerja as $k => $vv){
-			// Aktifitias
-			$aktivitas = aktivitas::where('id_pegawai',$vv['id'])->get()->count();
-			$skp = skp::where('id_pegawai',$vv['id'])->get()->count();
-			// return $aktivitas;
-			if ($aktivitas != []) {
-				$count_aktifitas += $aktivitas;
-			}
+		// foreach($pegawaiBySatuankerja as $k => $vv){
 
-			if ($skp != []) {
-				$count_skp += $skp;
-			}
-				// 
-		}
+		// 	$aktivitas = aktivitas::where('id_pegawai',$vv['id'])->get()->count();
+		// 	$skp = skp::where('id_pegawai',$vv['id'])->get()->count();
+		
+		// 	if ($aktivitas != []) {
+		// 		$count_aktifitas += $aktivitas;
+		// 	}
+
+		// 	if ($skp != []) {
+		// 		$count_skp += $skp;
+		// 	}
+				
+		// }
 
 		return $result = [
 			'jumlah_pegawai' => count($pegawaiBySatuankerja),

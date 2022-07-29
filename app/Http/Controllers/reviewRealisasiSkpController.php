@@ -20,17 +20,17 @@ class reviewRealisasiSkpController extends Controller
          $groupSkpPegawai = [];
         if (isset($jabatanPegawai)) {
             $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get(); 
+        
             $status = '';
             foreach ($getData as $key => $value) {
 
-                if (!is_null($value->id_pegawai)) {
-                   array_push($groupId,$value->id_pegawai);       
+                if (!is_null($value->id)) {
+                   array_push($groupId,$value->id);       
                 }  
              }
 
              foreach ($groupId as $x => $vv) {
-
-                $res = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_jabatan.nama_jabatan')->join('tb_skp','tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->where('tb_jabatan.id_pegawai',$vv)->get();
+                $res = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_skp','tb_jabatan.id', '=', 'tb_skp.id_jabatan')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_jabatan.id',$vv)->get();
 
                 if (count($res) > 0) {
                     array_push($groupSkpPegawai,$res);
