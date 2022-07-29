@@ -32,50 +32,52 @@ class absenController extends Controller
     public function list_filter_absen($satuan_kerja, $tanggal, $valid){
         // return $satuan_kerja.' / '.$tanggal.' / '.$valid;
         $pegawaiBySatuanKerja = array();
-        if ($satuan_kerja == 'semua') {
-            $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama')->join('tb_absen','tb_pegawai.id','=','tb_absen.id_pegawai')->where('tb_absen.tanggal_absen',$tanggal)->groupBy('tb_pegawai.id')->get();
-        }else{
-            $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$satuan_kerja)->get();
-        }
-
         $result = array();
         $absen = array();
-        foreach ($pegawaiBySatuanKerja as $key => $value) {
-           $data = array();
-            if ($valid == 'semua') {
-                $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->get();
-            }else{
-                $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->where('validation',$valid)->get();
-            }
+        if ($satuan_kerja !== 'semua') {
+            $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$satuan_kerja)->get();
+            // $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama')->join('tb_absen','tb_pegawai.id','=','tb_absen.id_pegawai')->where('tb_absen.tanggal_absen',$tanggal)->groupBy('tb_pegawai.id')->get();
 
-            
-            
-
-           if (count($absen) > 0) {
-            $data['id'] = $value->id;
-            $data['nama_pegawai'] = $value->nama;
-            $data['waktu_pulang'] = '-';
-            foreach ($absen as $k => $val) {
-               
-                if ($val->jenis == 'checkin') {
-                   $data['waktu_masuk'] = $val->waktu_absen; 
-                   $data['validation'] = $val->validation;
-                   $data['status'] = $val->status; 
-                   $data['tanggal_absen'] = $val->tanggal_absen; 
-                }else{
-                    $data['waktu_pulang'] = $val->waktu_absen;
+            foreach ($pegawaiBySatuanKerja as $key => $value) {
+                $data = array();
+                 if ($valid == 'semua') {
+                     $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->get();
+                 }else{
+                     $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->where('validation',$valid)->get();
+                 }
+     
+                 
+                 
+     
+                if (count($absen) > 0) {
+                 $data['id'] = $value->id;
+                 $data['nama_pegawai'] = $value->nama;
+                 $data['waktu_pulang'] = '-';
+                 foreach ($absen as $k => $val) {
+                    
+                     if ($val->jenis == 'checkin') {
+                        $data['waktu_masuk'] = $val->waktu_absen; 
+                        $data['validation'] = $val->validation;
+                        $data['status'] = $val->status; 
+                        $data['tanggal_absen'] = $val->tanggal_absen; 
+                     }else{
+                         $data['waktu_pulang'] = $val->waktu_absen;
+                     }
+                 }
+     
+                 // if (in_array("waktu_masuk", $data) == true) {
+                     $result[] = $data;
+                 // }
+              
+     
                 }
-            }
-
-            // if (in_array("waktu_masuk", $data) == true) {
-                $result[] = $data;
-            // }
-         
-
-           }
-          
+               
+     
+             }
 
         }
+      
+
 
          if ($result) {
             return response()->json([
