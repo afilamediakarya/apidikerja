@@ -29,22 +29,41 @@ class absenController extends Controller
         }
     }
 
-    public function list_filter_absen($satuan_kerja, $tanggal, $valid){
-        // return $satuan_kerja.' / '.$tanggal.' / '.$valid;
+    public function list_filter_absen(){
+        
+        $satuan_kerja = request('satuan_kerja');
+        $tanggal = request('tanggal');
+        $valid = request('valid');
+        $status = request('status');
+
         $pegawaiBySatuanKerja = array();
         $result = array();
         $absen = array();
+
+        $where = '';
+        if ($valid !== 'semua') {
+            $where .= "AND validation='$valid'";
+        }
+
+        if ($status !== 'semua') {
+            $where .= "AND status='$status'";
+        }
+        
+
         if ($satuan_kerja !== 'semua') {
             $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$satuan_kerja)->get();
-            // $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama')->join('tb_absen','tb_pegawai.id','=','tb_absen.id_pegawai')->where('tb_absen.tanggal_absen',$tanggal)->groupBy('tb_pegawai.id')->get();
 
             foreach ($pegawaiBySatuanKerja as $key => $value) {
                 $data = array();
-                 if ($valid == 'semua') {
-                     $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->get();
-                 }else{
-                     $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->where('validation',$valid)->get();
-                 }
+                
+
+                $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->whereRaw("tanggal_absen = '$tanggal' $where")->get();      
+    //   if ($valid == 'semua') {
+    //                 $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->get();
+    //              }else{
+    //                  $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->where('validation',$valid)->get();
+    //              }
+           
      
                  
                  
@@ -65,9 +84,10 @@ class absenController extends Controller
                      }
                  }
      
-                 // if (in_array("waktu_masuk", $data) == true) {
+                 
+                 if (array_key_exists('waktu_masuk', $data) == true) {
                      $result[] = $data;
-                 // }
+                 }
               
      
                 }
