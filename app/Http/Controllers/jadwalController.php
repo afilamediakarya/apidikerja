@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\jadwal;
 use DB;
 use Validator;
+use Illuminate\Validation\ValidationException;
 class jadwalController extends Controller
 {
     public function list(){
@@ -25,38 +26,37 @@ class jadwalController extends Controller
     }
 
     public function store(Request $request){
-        $validator = Validator::make($request->all(),[
-            'tahapan' => 'required|string',
-            'sub_tahapan' => 'required|string',
-            'tanggal_awal' => 'required|date',
-            'tanggal_akhir' => 'required|date',
-        ]);
+       
+        $jadwal_filter = jadwal::where('tahapan',$request->tahapan)->where('sub_tahapan',$request->sub_tahapan)->where('tahun',$request->tahun)->first();
 
-        if($validator->fails()){
-            return response()->json($validator->errors());       
-        }
-
-        $data = new jadwal();
-        $data->tahapan = $request->tahapan;
-        $data->sub_tahapan = $request->sub_tahapan;
-        $data->tanggal_awal = $request->tanggal_awal;
-        $data->tanggal_akhir = $request->tanggal_akhir;
-        $data->tahun = $request->tahun;
-        $data->save();
-
-
-        if ($data) {
-            return response()->json([
-                'message' => 'Success',
-                'status' => true,
-                'data' => $data
-            ]);
+        if (isset($jadwal_filter)) {
+            return response()->json(['Maaf, anda tidak bisa menambah jadwal'],400);
         }else{
-            return response()->json([
-                'message' => 'Failed',
-                'status' => false
-            ]);
+            $data = new jadwal();
+            $data->tahapan = $request->tahapan;
+            $data->sub_tahapan = $request->sub_tahapan;
+            $data->tanggal_awal = $request->tanggal_awal;
+            $data->tanggal_akhir = $request->tanggal_akhir;
+            $data->tahun = $request->tahun;
+            $data->save();
+    
+    
+            if ($data) {
+                return response()->json([
+                    'message' => 'Success',
+                    'status' => true,
+                    'data' => $data
+                ]);
+            }else{
+                return response()->json([
+                    'message' => 'Failed',
+                    'status' => false
+                ]);
+            }
         }
+       
+
+       
     }
 
     public function show($params){
@@ -77,23 +77,12 @@ class jadwalController extends Controller
     }
 
     public function update($params,Request $request){
-        $validator = Validator::make($request->all(),[
-            'tahapan' => 'required|string',
-            'sub_tahapan' => 'required|string',
-            'tanggal_awal' => 'required|date',
-            'tanggal_akhir' => 'required|date',
-        ]);
-
-        if($validator->fails()){
-            return response()->json($validator->errors());       
-        }
-
-        $data =  jadwal::where('id',$params)->first();
+        $data = jadwal::where('id',$params)->first();
         $data->tahapan = $request->tahapan;
         $data->sub_tahapan = $request->sub_tahapan;
         $data->tanggal_awal = $request->tanggal_awal;
         $data->tanggal_akhir = $request->tanggal_akhir;
-        $data->tahun = date('Y');
+        $data->tahun = $request->tahun;
         $data->save();
 
 
@@ -151,5 +140,16 @@ class jadwalController extends Controller
         }
 
         return response()->json($result);
+    }
+
+    public function check_jadwal(){
+        // if ($type == 'target') {
+        //     $tahapan = request('tahapan');
+        //     $sub_tahapan = request('sub_tahapan');
+        //     $tanggal_awal = request('tanggal_awal');
+        //     $tanggal_akhir = request('tanggal_akhir');
+        // }else{
+
+        // }
     }
 }

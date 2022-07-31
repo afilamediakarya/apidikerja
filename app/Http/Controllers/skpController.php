@@ -589,6 +589,7 @@ class skpController extends Controller
     }
 
     public function delete($params){
+        return request('type');
         $data = skp::where('id',$params)->first();
         $data->delete();
 
@@ -624,7 +625,14 @@ class skpController extends Controller
                 ]);
             } 
         }else{
-            
+           $aspek = DB::table('tb_aspek_skp')->where('id_skp',$params)->get();
+           foreach ($aspek as $key => $value) {
+              DB::table('tb_target_skp')->where('id_aspek_skp',$value->id)->where('bulan',request('bulan'))->delete();
+           }
+           return response()->json([
+            'message' => 'Success',
+            'status' => true,
+        ]);
         }
         
     }
