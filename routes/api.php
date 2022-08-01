@@ -142,7 +142,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('realisasi_skp')->group(function () {
-        Route::get('/list/{params}', [App\Http\Controllers\realisasiController::class, 'list']);  
+        Route::get('/list', [App\Http\Controllers\realisasiController::class, 'list']);  
         Route::post('/store', [App\Http\Controllers\realisasiController::class, 'store']);  
         Route::get('/show/{params}', [App\Http\Controllers\realisasiController::class, 'show']);
         Route::get('/realisasiKuantitas/{params}/{id_skp}', [App\Http\Controllers\realisasiController::class, 'realisasiKuantitas']);  
