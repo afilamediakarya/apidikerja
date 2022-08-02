@@ -58,11 +58,12 @@ class skpController extends Controller
             if ($params == 'pegawai') {
                foreach($skp_filter as $index => $val){
                     $data = skp::with('aspek_skp')->where('id',$val->id)->orderBy('jenis','ASC')->first();
-                    $data->skp_atasan = DB::table('tb_skp')->where('id',$val->id_skp_atasan)->first()->rencana_kerja;
                     if ($data->jenis == 'utama') {
                         $data->jenis_kinerja = 'A. Kinerja Utama';
+                        $data->skp_atasan = DB::table('tb_skp')->where('id',$val->id_skp_atasan)->first()->rencana_kerja;
                     } else {
                         $data->jenis_kinerja = 'B. Kinerja Tambahan';
+                        // $data->skp_atasan = DB::table('tb_skp')->where('id',$val->id_skp_atasan)->first()->rencana_kerja;
                     }
 
                    $result[$index] = $data; 

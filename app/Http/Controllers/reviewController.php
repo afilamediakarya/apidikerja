@@ -17,61 +17,75 @@ class reviewController extends Controller
 
     public function list(){
         $myArray = [];
-        $groupId = [];
-        $groupSkpPegawai = [];
+        $data = array();
         $jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-
         if (isset($jabatanPegawai)) {
-            $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get(); 
-            // return $getData;
-            $status = '';
-            foreach ($getData as $key => $value) {
+            $myArray = DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai','tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_pegawai.nip')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('parent_id',$jabatanPegawai->id)->get();  
 
-                if (!is_null($value->id_pegawai)) {
-                   array_push($groupId,$value->id_pegawai);       
-                }
+            // return $myArray;
 
-            }
-
-            foreach ($groupId as $x => $vv) {
-
-                $res = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_skp','tb_jabatan.id', '=', 'tb_skp.id_jabatan')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_jabatan.id',$vv)->get();
-
-                if (count($res) > 0) {
-                    array_push($groupSkpPegawai,$res);
-                }       
-            }  
-
-            // return $groupSkpPegawai;
-
-
-            foreach ($groupSkpPegawai as $bnb => $llo) {
-                $getDataStatus = [];
-                foreach ($llo as $vv => $bb) {
-                    foreach ($llo as $cc => $klp) {
-                        $getDataStatus[] = $klp->kesesuaian;  
-                    }
-                     
-                }
-
-                if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
+            foreach ($myArray as $key => $value) {
+                $skp = DB::table('tb_skp')->select('tb_review.kesesuaian')->join('tb_review','tb_review.id_skp','=','tb_skp.id')->where('tb_skp.id_jabatan',$value->id)->where('tb_skp.tahun',request('tahun'))->get()->toArray();
+                $filter_ = array_column($skp, 'kesesuaian');
+                if (in_array("tidak", $filter_) == true && in_array("ya", $filter_) == true){
                     $status = 'Belum Sesuai';
                 }
-                else if(in_array("ya", $getDataStatus) == true && in_array("tidak", $getDataStatus) == false){
+                else if(in_array("ya", $filter_) == true && in_array("tidak", $filter_) == false){
                     $status = 'Selesai';
                 }else{
                     $status = 'Belum Review';
                 }
+                $value->status = $status;
+            }
 
-                 $myArray[$bnb] = [
-                    'nama'=>$llo[0]->nama,
-                    'nip'=>$llo[0]->nip,
-                    'jabatan'=>$llo[0]->nama_jabatan,
-                    'id_pegawai'=>$llo[0]->id_pegawai_,
-                    'status' => $status
-                ];
+            // $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get(); 
+            // return $getData;
+            // foreach ($getData as $key => $value) {
+            //     $myArray = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_skp','tb_jabatan.id', '=', 'tb_skp.id_jabatan')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_jabatan.id',$vv)->get();
+            // }
+            // $status = '';
+            // foreach ($getData as $key => $value) {
+            //     if (!is_null($value->id_pegawai)) {
+            //        array_push($groupId,$value->id_pegawai);       
+            //     }
+            // }
 
-            }  
+            // foreach ($groupId as $x => $vv) {
+
+            //     $res = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_skp','tb_jabatan.id', '=', 'tb_skp.id_jabatan')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_jabatan.id',$vv)->get();
+
+            //     if (count($res) > 0) {
+            //         array_push($groupSkpPegawai,$res);
+            //     }       
+            // }  
+
+            // foreach ($groupSkpPegawai as $bnb => $llo) {
+            //     $getDataStatus = [];
+            //     foreach ($llo as $vv => $bb) {
+            //         foreach ($llo as $cc => $klp) {
+            //             $getDataStatus[] = $klp->kesesuaian;  
+            //         }
+                     
+            //     }
+
+            //     if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
+            //         $status = 'Belum Sesuai';
+            //     }
+            //     else if(in_array("ya", $getDataStatus) == true && in_array("tidak", $getDataStatus) == false){
+            //         $status = 'Selesai';
+            //     }else{
+            //         $status = 'Belum Review';
+            //     }
+
+            //      $myArray[$bnb] = [
+            //         'nama'=>$llo[0]->nama,
+            //         'nip'=>$llo[0]->nip,
+            //         'jabatan'=>$llo[0]->nama_jabatan,
+            //         'id_pegawai'=>$llo[0]->id_pegawai_,
+            //         'status' => $status
+            //     ];
+
+            // }  
 
         }
 
@@ -223,7 +237,7 @@ class reviewController extends Controller
     }
 
     public function store(Request $request){
-     
+        
         $validator = Validator::make($request->all(),[
             'id_skp' => 'required|array',
             'keterangan' => 'required|array',
@@ -257,32 +271,25 @@ class reviewController extends Controller
     }
 
     public function skpbyId($params){
-          $result = [];
-        $groupSkpAtasan = [];
+        $type = request('type');
+        $tahun = request('tahun');
 
-        $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_pegawai',$params)->groupBy('tb_skp.id_skp_atasan')->get();
+        $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',$params)->first();
 
-        // return $get_skp_atasan;
+        $result = skp::select('tb_skp.id','tb_skp.id_jabatan','tb_skp.id_skp_atasan','tb_skp.jenis','tb_skp.rencana_kerja','tb_skp.tahun','tb_review.keterangan','tb_review.kesesuaian')->with('aspek_skp')->join('tb_review','tb_review.id_skp','=','tb_skp.id')->where('tahun',$tahun)->where('id_jabatan',$jabatanByPegawai->id)->orderBy('jenis','ASC')->get();
+            foreach ($result as $key => $value) {
+             if (!is_null($value->id_skp_atasan)) {
+                 $value->skp_atasan = DB::table('tb_skp')->where('id',$value->id_skp_atasan)->first()->rencana_kerja;
+             }else{
+                 $value->skp_atasan = '-';
+             }
 
-        if (!is_null($get_skp_atasan)) {
-            foreach ($get_skp_atasan as $key => $value) {
-                $getSkpByAtasan = DB::table('tb_skp')->select('id','rencana_kerja','jenis')->where('id',$value->id_skp_atasan)->first();
-                if (!is_null($getSkpByAtasan)) {
-                    $skpChild = skp::with('aspek_skp','review_skp')->where('id_skp_atasan',$getSkpByAtasan->id)->where('id_pegawai',$params)->get();
-                    $result['utama'][$key]['atasan'] = $getSkpByAtasan;
-                    $result['utama'][$key]['skp_child'] = $skpChild;
+                if ($value->jenis == 'utama') {
+                    $value->jenis_kinerja = 'A. Kinerja Utama';
+                } else {
+                    $value->jenis_kinerja = 'B. Kinerja Tambahan';
                 }
-              
             }
-        }      
-
-         $skp_tambahan = skp::with('aspek_skp')->where('jenis','tambahan')->where('id_pegawai',$params)->get();
-
-        if (count($skp_tambahan) > 0) {
-            foreach ($skp_tambahan as $yy => $vals) {
-                $result['tambahan'] = $skp_tambahan;
-            }
-        }
 
 
         if ($result) {

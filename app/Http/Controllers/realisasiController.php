@@ -21,31 +21,6 @@ class realisasiController extends Controller
 
         $skp_filter =  DB::table('tb_skp')->select('tb_skp.id','tb_skp.id_skp_atasan')->join('tb_aspek_skp','tb_aspek_skp.id_skp','tb_skp.id')->join('tb_target_skp','tb_target_skp.id_aspek_skp','tb_aspek_skp.id')->groupBy('tb_skp.id')->where('tb_skp.tahun',$tahun)->where('id_jabatan',$jabatanByPegawai->id)->where('tb_target_skp.bulan',$bulan)->get();
 
-        // $skpUtama = skp::with('aspek_skp')->where('id_skp_atasan',$getRencanaKerjaAtasan['id'])->where('jenis','utama')->where('id_pegawai',Auth::user()->id_pegawai)->get();
-
-        // foreach ($skpUtama as $keys => $values) {
-        //     $getReview = $values['reviewRealisasiSkp']->pluck('kesesuaian')->toArray();
-                
-        //         if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
-        //             $status_review = 'Belum Sesuai';
-        //             $keterangan = 'Penilai tidak menyetujui, karena tidak sesuai dengan realisasi';
-        //             $color = 'warning';
-        //         }
-        //         else if(in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false){
-        //             $status_review = 'Selesai';
-        //             $keterangan = 'Penilai telah menyetujui';
-        //             $color = 'success';
-        //         }else{
-        //             $status_review = 'Belum Review';
-        //             $keterangan = 'Penilai belum melakukan review';
-        //             $color = 'danger';
-        //         }
-
-        //     $skpUtama[$keys]['status_review'] = $status_review;   
-        //     $skpUtama[$keys]['label'] = $keterangan; 
-        //     $skpUtama[$keys]['color'] = $color;    
-        // }
-
         if ($type == 'pegawai') {
            foreach($skp_filter as $index => $val){
                 $data = skp::with('aspek_skp')->where('id',$val->id)->orderBy('jenis','ASC')->first();

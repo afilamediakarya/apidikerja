@@ -259,5 +259,29 @@ class dashboardController extends Controller
 
 	}
 
+	public function pegawai_dinilai(){
+		$jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+			$myArray = [];
+			$groupId = [];
+			 $groupSkpPegawai = [];
+			if (isset($jabatanPegawai)) {
+				$myArray = DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai','tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_pegawai.nip')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('parent_id',$jabatanPegawai->id)->get();  
+			}
+	
+			if ($myArray) {
+				return response()->json([
+					'message' => 'Success',
+					'status' => true,
+					'data' => $myArray
+				]);
+			}else{
+				return response()->json([
+					'message' => 'Failed',
+					'status' => false,
+					'data' => $myArray
+				]);
+			}
+	}
+
 
 }

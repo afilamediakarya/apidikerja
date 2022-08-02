@@ -27,6 +27,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
     Route::post('/face_id', [App\Http\Controllers\AuthController::class, 'face_id']);
     Route::get('/dashboard/{type}', [App\Http\Controllers\dashboardController::class, 'get_data']);
+    Route::get('/dashboard/pegawai/level', [App\Http\Controllers\dashboardController::class, 'pegawai_dinilai']);
     Route::get('/current_user', [App\Http\Controllers\AuthController::class, 'current_user']);
 
     Route::prefix('admin')->group(function () {
