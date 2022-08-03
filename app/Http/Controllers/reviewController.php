@@ -36,56 +36,7 @@ class reviewController extends Controller
                     $status = 'Belum Review';
                 }
                 $value->status = $status;
-            }
-
-            // $getData = DB::table('tb_jabatan')->where('parent_id',$jabatanPegawai->id)->get(); 
-            // return $getData;
-            // foreach ($getData as $key => $value) {
-            //     $myArray = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_skp','tb_jabatan.id', '=', 'tb_skp.id_jabatan')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_jabatan.id',$vv)->get();
-            // }
-            // $status = '';
-            // foreach ($getData as $key => $value) {
-            //     if (!is_null($value->id_pegawai)) {
-            //        array_push($groupId,$value->id_pegawai);       
-            //     }
-            // }
-
-            // foreach ($groupId as $x => $vv) {
-
-            //     $res = DB::table('tb_pegawai')->select('tb_pegawai.id','tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai','tb_review.kesesuaian AS kesesuaian')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_skp','tb_jabatan.id', '=', 'tb_skp.id_jabatan')->join('tb_review','tb_skp.id','=','tb_review.id_skp')->where('tb_jabatan.id',$vv)->get();
-
-            //     if (count($res) > 0) {
-            //         array_push($groupSkpPegawai,$res);
-            //     }       
-            // }  
-
-            // foreach ($groupSkpPegawai as $bnb => $llo) {
-            //     $getDataStatus = [];
-            //     foreach ($llo as $vv => $bb) {
-            //         foreach ($llo as $cc => $klp) {
-            //             $getDataStatus[] = $klp->kesesuaian;  
-            //         }
-                     
-            //     }
-
-            //     if (in_array("tidak", $getDataStatus) == true && in_array("ya", $getDataStatus) == true){
-            //         $status = 'Belum Sesuai';
-            //     }
-            //     else if(in_array("ya", $getDataStatus) == true && in_array("tidak", $getDataStatus) == false){
-            //         $status = 'Selesai';
-            //     }else{
-            //         $status = 'Belum Review';
-            //     }
-
-            //      $myArray[$bnb] = [
-            //         'nama'=>$llo[0]->nama,
-            //         'nip'=>$llo[0]->nip,
-            //         'jabatan'=>$llo[0]->nama_jabatan,
-            //         'id_pegawai'=>$llo[0]->id_pegawai_,
-            //         'status' => $status
-            //     ];
-
-            // }  
+            } 
 
         }
 
