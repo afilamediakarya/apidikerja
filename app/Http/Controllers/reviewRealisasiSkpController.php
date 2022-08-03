@@ -19,6 +19,19 @@ class reviewRealisasiSkpController extends Controller
          $groupSkpPegawai = [];
         if (isset($jabatanPegawai)) {
             $myArray = DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai','tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_pegawai.nip')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('parent_id',$jabatanPegawai->id)->get();  
+            foreach ($myArray as $key => $value) {
+                $skp = DB::table('tb_skp')->select('tb_review_realisasi_skp.kesesuaian')->join('tb_review_realisasi_skp','tb_review_realisasi_skp.id_skp','=','tb_skp.id')->where('tb_skp.id_jabatan',$value->id)->where('tb_skp.tahun',request('tahun'))->get()->toArray();
+                $filter_ = array_column($skp, 'kesesuaian');
+                if (in_array("tidak", $filter_) == true && in_array("ya", $filter_) == true){
+                    $status = 'Belum Sesuai';
+                }
+                else if(in_array("ya", $filter_) == true && in_array("tidak", $filter_) == false){
+                    $status = 'Selesai';
+                }else{
+                    $status = 'Belum Review';
+                }
+                $value->status = $status;
+            }
         }
 
         if ($myArray) {
