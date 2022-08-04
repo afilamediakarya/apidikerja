@@ -24,7 +24,12 @@ class realisasiController extends Controller
         if ($type == 'pegawai') {
            foreach($skp_filter as $index => $val){
                 $data = skp::with('aspek_skp')->where('id',$val->id)->orderBy('jenis','ASC')->first();
-                $data->skp_atasan = DB::table('tb_skp')->where('id',$val->id_skp_atasan)->first()->rencana_kerja;
+                if (!is_null($val->id_skp_atasan)) {
+                    $val->skp_atasan = DB::table('tb_skp')->where('id',$val->id_skp_atasan)->first()->rencana_kerja;
+                }else{
+                    $val->skp_atasan = '-';
+                }
+                // $data->skp_atasan = DB::table('tb_skp')->where('id',$val->id_skp_atasan)->first()->rencana_kerja;
                 foreach ($data->reviewRealisasiSkp as $key => $value) {
                     $getReview = $value->pluck('kesesuaian')->toArray();
                         if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true){
