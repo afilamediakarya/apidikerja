@@ -31,7 +31,13 @@ class skpController extends Controller
 
         if ($type == 'tahunan') {
             if ($params == 'pegawai') {
-                $result = skp::with('aspek_skp')->where('tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->orderBy('jenis', 'ASC')->get();
+
+                // $result = skp::with('aspek_skp')->where('tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->orderBy('jenis', 'ASC')->get();
+
+                $result = DB::table('tb_skp')->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')->where('tb_skp.tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->groupBy('tb_aspek_skp.id')->orderBy('tb_skp.jenis', 'ASC')->get();
+
+                // return $result;
+
                 foreach ($result as $key => $value) {
                     if (!is_null($value->id_skp_atasan)) {
                         $value->skp_atasan = DB::table('tb_skp')->where('id', $value->id_skp_atasan)->first()->rencana_kerja;
@@ -46,7 +52,11 @@ class skpController extends Controller
                     }
                 }
             } else {
-                $result = skp::with('aspek_skp')->where('tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->orderBy('jenis', 'ASC')->get();
+
+                // $result = skp::with('aspek_skp')->where('tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->orderBy('jenis', 'ASC')->get();
+
+                $result = DB::table('tb_skp')->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')->where('tb_skp.tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->groupBy('tb_aspek_skp.id')->orderBy('tb_skp.jenis', 'ASC')->get();
+
                 foreach ($result as $key => $value) {
                     if ($value->jenis == 'utama') {
                         $value->jenis_kinerja = 'A. Kinerja Utama';
@@ -56,8 +66,10 @@ class skpController extends Controller
                 }
             }
         } else {
-            $skp_filter =  DB::table('tb_skp')->select('tb_skp.id', 'tb_skp.id_skp_atasan')->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')->groupBy('tb_skp.id')->where('tb_skp.tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->where('tb_target_skp.bulan', request('bulan'))->get();
-            // return $skp_filter;
+            $skp_filter =  DB::table('tb_skp')->select('tb_skp.id', 'tb_skp.id_skp_atasan')->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')->where('tb_skp.tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->where('tb_target_skp.bulan', request('bulan'))->orderBy('tb_skp.jenis', 'ASC')->get();
+
+            // $skp_filter =  DB::table('tb_skp')->select('tb_skp.id', 'tb_skp.id_skp_atasan')->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')->groupBy('tb_skp.id')->where('tb_skp.tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->where('tb_target_skp.bulan', request('bulan'))->get();
+
             if ($params == 'pegawai') {
                 foreach ($skp_filter as $index => $val) {
                     $data = skp::with('aspek_skp')->where('id', $val->id)->orderBy('jenis', 'ASC')->first();
@@ -73,7 +85,7 @@ class skpController extends Controller
                 }
             } else {
                 foreach ($skp_filter as $index => $val) {
-                    $data = skp::with('aspek_skp')->where('id', $val->id)->orderBy('jenis', 'ASC')->first();
+                    $data = skp::with('aspek_skp')->where('id', $val->id)->orderBy('id', 'DESC')->first();
                     if ($data->jenis == 'utama') {
                         $data->jenis_kinerja = 'A. Kinerja Utama';
                     } else {
@@ -83,6 +95,7 @@ class skpController extends Controller
                 }
             }
         }
+        // return $result;
 
 
 
@@ -207,14 +220,14 @@ class skpController extends Controller
         $review = new review_skp();
         $review->id_skp = $skp->id;
         $review->kesesuaian = 'tidak';
-        $review->id_pegawai = $data->id_pegawai;
+        // $review->id_pegawai = $data->id_pegawai;
         $review->save();
 
         $review_realisasi_skp = new review_realisasi_skp();
         $review_realisasi_skp->id_skp = $skp->id;
         $review_realisasi_skp->kesesuaian = 'tidak';
         $review_realisasi_skp->bulan = '0';
-        $review_realisasi_skp->id_pegawai = $data->id_pegawai;
+        // $review_realisasi_skp->id_pegawai = $data->id_pegawai;
         $review_realisasi_skp->save();
 
 
@@ -230,16 +243,17 @@ class skpController extends Controller
             $realisasi_skp->id_aspek_skp = $aspek->id;
             $realisasi_skp->realisasi_bulanan = 0;
             $realisasi_skp->bulan = '0';
-            $realisasi_skp->id_pegawai = $data->id_pegawai;
+            // $realisasi_skp->id_pegawai = $data->id_pegawai;
             $realisasi_skp->save();
 
             $target = new target_skp();
             $target->id_aspek_skp = $aspek->id;
             $target->target = $value['target'];
             $target->bulan = '0';
-            $target->id_pegawai = $data->id_pegawai;
+            // $target->id_pegawai = $data->id_pegawai;
             $target->save();
         }
+        return $aspek;
 
 
         if ($skp) {
@@ -261,11 +275,13 @@ class skpController extends Controller
 
         $data =  DB::table('tb_jabatan')->select('tb_jabatan.id', 'tb_jabatan.id_pegawai')->join('tb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')->where('tb_jabatan.id_pegawai', Auth::user()->id_pegawai)->first();
 
+        // return $data;
+
         $review_realisasi_skp = new review_realisasi_skp();
         $review_realisasi_skp->id_skp = $request['rencana_kerja'];
         $review_realisasi_skp->kesesuaian = 'tidak';
         $review_realisasi_skp->bulan = $request['bulan'];
-        $review_realisasi_skp->id_pegawai = $data->id_pegawai;
+        // $review_realisasi_skp->id_pegawai = $data->id_pegawai;
         $review_realisasi_skp->save();
 
         foreach ($request['id_aspek'] as $key => $value) {
@@ -273,14 +289,14 @@ class skpController extends Controller
             $target->id_aspek_skp = $value;
             $target->target = $request['target'][$key];
             $target->bulan = $request['bulan'];
-            $target->id_pegawai = $data->id_pegawai;
+            // $target->id_pegawai = $data->id_pegawai;
             $target->save();
 
             $realisasi_skp = new realisasi_skp();
             $realisasi_skp->id_aspek_skp = $value;
             $realisasi_skp->realisasi_bulanan = 0;
             $realisasi_skp->bulan = $request['bulan'];
-            $realisasi_skp->id_pegawai = $data->id_pegawai;
+            // $realisasi_skp->id_pegawai = $data->id_pegawai;
             $realisasi_skp->save();
         }
         if ($target) {
