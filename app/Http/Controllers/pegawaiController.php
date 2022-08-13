@@ -10,29 +10,29 @@ use Illuminate\Support\Facades\Hash;
 use Validator;
 use DB;
 use Auth;
+
 class pegawaiController extends Controller
 {
-    
-    public function list_tes(){
-        return $data = pegawai::select('id','nama','nip','golongan')->latest()->get();
+
+    public function list_tes()
+    {
+        return $data = pegawai::select('id', 'nama', 'nip', 'golongan')->latest()->get();
     }
 
-    public function list(){
+    public function list()
+    {
         $data = '';
-     
+
         if (Auth::user()->role == 'super_admin') {
             // $data = pegawai::latest()->get();
-            $data = pegawai::select('id','nama','nip','golongan')->latest()->get();
-        }else{
-            $pegawai = pegawai::where('id',Auth::user()->id_pegawai)->first();
+            $data = pegawai::select('id', 'nama', 'nip', 'golongan')->latest()->get();
+        } else {
+            $pegawai = pegawai::where('id', Auth::user()->id_pegawai)->first();
             if (isset($pegawai)) {
-                    $data = pegawai::select('id','nama','nip','golongan')->where('id_satuan_kerja',$pegawai->id_satuan_kerja)->latest()->get();
-            }else{
+                $data = pegawai::select('id', 'nama', 'nip', 'golongan')->where('id_satuan_kerja', $pegawai->id_satuan_kerja)->latest()->get();
+            } else {
                 $data = [];
             }
-
-
-           
         }
 
         // return $data;
@@ -43,7 +43,7 @@ class pegawaiController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -51,23 +51,25 @@ class pegawaiController extends Controller
         }
     }
 
-    public function pegawaiBySatuanKerja($params){
+    public function pegawaiBySatuanKerja($params)
+    {
         $result = [];
-        $data = pegawai::where('id_satuan_kerja',$params)->get();
+        $data = pegawai::where('id_satuan_kerja', $params)->get();
 
         foreach ($data as $key => $value) {
             $result[] = [
                 'id' => $value->id,
-                'value'=> $value->nama
-            ];    
+                'value' => $value->nama
+            ];
         }
 
-       return response()->json($result);
+        return response()->json($result);
     }
 
-    public function store(Request $request){
-        
-        $validator = Validator::make($request->all(),[
+    public function store(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
             'id_satuan_kerja' => 'required',
             'nama' => 'required|string',
             'tempat_lahir' => 'required',
@@ -87,8 +89,8 @@ class pegawaiController extends Controller
             'jurusan' => 'required',
         ]);
 
-        if($validator->fails()){
-            return response()->json($validator->errors());       
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
         }
 
 
@@ -129,7 +131,7 @@ class pegawaiController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -137,9 +139,10 @@ class pegawaiController extends Controller
         }
     }
 
-    public function show($params){
+    public function show($params)
+    {
 
-        $data = pegawai::where('id',$params)->first();
+        $data = pegawai::where('id', $params)->first();
 
         if ($data) {
             return response()->json([
@@ -147,7 +150,7 @@ class pegawaiController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -155,10 +158,11 @@ class pegawaiController extends Controller
         }
     }
 
-    public function update($params, Request $request){
+    public function update($params, Request $request)
+    {
 
         if ($request->type == 'pegawai') {
-            $validator = Validator::make($request->all(),[
+            $validator = Validator::make($request->all(), [
                 'id_satuan_kerja' => 'required',
                 'nama' => 'required|string',
                 'tempat_lahir' => 'required',
@@ -178,7 +182,7 @@ class pegawaiController extends Controller
                 'jurusan' => 'required',
             ]);
         } else {
-               $validator = Validator::make($request->all(),[
+            $validator = Validator::make($request->all(), [
                 'id_satuan_kerja' => 'required',
                 'nama' => 'required|string',
                 'tempat_lahir' => 'required',
@@ -197,15 +201,15 @@ class pegawaiController extends Controller
                 'jurusan' => 'required',
             ]);
         }
-        
 
-    
 
-        if($validator->fails()){
-            return response()->json($validator->errors());       
+
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
         }
 
-        $data =  pegawai::where('id',$params)->first();
+        $data =  pegawai::where('id', $params)->first();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->nama = $request->nama;
         $data->tempat_lahir = $request->tempat_lahir;
@@ -236,7 +240,7 @@ class pegawaiController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -244,8 +248,9 @@ class pegawaiController extends Controller
         }
     }
 
-    public function delete($params){
-        $data = pegawai::where('id',$params)->first();
+    public function delete($params)
+    {
+        $data = pegawai::where('id', $params)->first();
         $data->delete();
 
         if ($data) {
@@ -253,7 +258,7 @@ class pegawaiController extends Controller
                 'message' => 'Success',
                 'status' => true,
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -261,81 +266,88 @@ class pegawaiController extends Controller
         }
     }
 
-    public function optionAgama(){
+    public function optionAgama()
+    {
         $result = [];
         $data = DB::table('tb_agama')->orderBy('id', 'ASC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
-                'value'=> $value->nama_agama
+                'value' => $value->nama_agama
             ];
         }
         return response()->json($result);
     }
 
-    public function optionStatusKawin(){
+    public function optionStatusKawin()
+    {
         $result = [];
         $data = DB::table('tb_status_kawin')->orderBy('id', 'ASC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
-                'value'=> $value->nama_status_kawin
+                'value' => $value->nama_status_kawin
             ];
         }
         return response()->json($result);
     }
 
-    public function optionGolongan(){
+    public function optionGolongan()
+    {
         $result = [];
         $data = DB::table('tb_golongan')->orderBy('id', 'ASC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
-                'value'=> $value->nama_golongan
+                'value' => $value->nama_golongan
             ];
         }
         return response()->json($result);
     }
 
-    public function optionStatusPegawai(){
+    public function optionStatusPegawai()
+    {
         $result = [];
         $data = DB::table('tb_status_pegawai')->orderBy('id', 'ASC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
-                'value'=> $value->nama_status_pegawai
+                'value' => $value->nama_status_pegawai
             ];
         }
         return response()->json($result);
     }
 
-    public function pendidikanTerakhir(){
+    public function pendidikanTerakhir()
+    {
         $result = [];
         $data = DB::table('tb_pendidikan')->orderBy('id', 'DESC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
-                'value'=> $value->nama_pendidikan
+                'value' => $value->nama_pendidikan
             ];
         }
         return response()->json($result);
     }
 
-    public function optionEselon(){
+    public function optionEselon()
+    {
         $result = [];
         $data = DB::table('tb_eselon')->orderBy('id', 'ASC')->get();
         foreach ($data as $key => $value) {
             $result[$key] = [
-                'value'=> $value->nama_eselon
+                'value' => $value->nama_eselon
             ];
         }
         return response()->json($result);
     }
 
-    public function tesScheduling(){
-      
+    public function tesScheduling()
+    {
+
         $absen = '';
-        $data = DB::table('tb_pegawai')->whereNotExists(function($query){
-            $query->select(DB::raw(1))->from('tb_absen')->where('tanggal_absen',date('Y-m-d'))->whereColumn('tb_absen.id_pegawai','tb_pegawai.id');
+        $data = DB::table('tb_pegawai')->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))->from('tb_absen')->where('tanggal_absen', date('Y-m-d'))->whereColumn('tb_absen.id_pegawai', 'tb_pegawai.id');
         })->get();
 
         foreach ($data as $key => $value) {
-            for ($i=0; $i < 2; $i++) { 
+            for ($i = 0; $i < 2; $i++) {
                 $absen = new absen();
                 $absen->id_pegawai = $value->id;
                 $absen->tanggal_absen = date('Y-m-d');
@@ -343,20 +355,38 @@ class pegawaiController extends Controller
                 if ($i == 0) {
                     $absen->jenis = 'checkin';
                     $absen->waktu_absen = '08:00:00';
-                }else{
+                } else {
                     $absen->jenis = 'checkout';
                     $absen->waktu_absen = '17:00:00';
                 }
                 $absen->location_auth = 'valid';
                 $absen->face_auth = 'valid';
                 $absen->tahun = '2022';
-                $absen->save();   
+                $absen->save();
             }
         }
-
-    
-      
     }
 
+    public function reset_password(Request $request, $id)
+    {
+        $user = User::where('id', $id)->first();
 
+        $user->password = Hash::make('dikerja');
+        $user->save();
+
+        // return $user->password;
+
+        if ($user) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $user
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false,
+            ], 422);
+        }
+    }
 }
