@@ -9,36 +9,37 @@ use App\Models\atasan;
 use Auth;
 use DB;
 use Validator;
+
 class reviewRealisasiSkpController extends Controller
 {
 
-    public function list(){
-        $jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+    public function list()
+    {
+        $jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai', Auth::user()->id_pegawai)->first();
         $myArray = [];
         $groupId = [];
-         $groupSkpPegawai = [];
+        $groupSkpPegawai = [];
         if (isset($jabatanPegawai)) {
-            $myArray = DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai','tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_pegawai.nip')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('parent_id',$jabatanPegawai->id)->get();  
+            $myArray = DB::table('tb_jabatan')->select('tb_jabatan.id', 'tb_jabatan.id_pegawai', 'tb_jabatan.nama_jabatan', 'tb_pegawai.nama', 'tb_pegawai.nip')->join('tb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')->where('parent_id', $jabatanPegawai->id)->get();
             foreach ($myArray as $key => $value) {
-                $skp = skp::select('id')->where('tb_skp.id_jabatan',$value->id)->where('tahun',request('tahun'))->get();
+                $skp = skp::select('id')->where('tb_skp.id_jabatan', $value->id)->where('tahun', request('tahun'))->get();
                 $filter_ = array();
                 foreach ($skp as $a => $b) {
                     foreach ($b['reviewRealisasiSkp'] as $x => $y) {
-                        array_push($filter_,$y->kesesuaian);
+                        array_push($filter_, $y->kesesuaian);
                     }
                 }
 
                 // return $label;
-            
-                if (in_array("tidak", $filter_) == true && in_array("ya", $filter_) == true){
+
+                if (in_array("tidak", $filter_) == true && in_array("ya", $filter_) == true) {
                     $status = 'Belum Sesuai';
-                }
-                else if(in_array("ya", $filter_) == true && in_array("tidak", $filter_) == false){
+                } else if (in_array("ya", $filter_) == true && in_array("tidak", $filter_) == false) {
                     $status = 'Selesai';
-                }else{
+                } else {
                     $status = 'Belum Review';
                 }
-                $value->status = $status; 
+                $value->status = $status;
             }
         }
 
@@ -48,7 +49,7 @@ class reviewRealisasiSkpController extends Controller
                 'status' => true,
                 'data' => $myArray
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false,
@@ -57,27 +58,44 @@ class reviewRealisasiSkpController extends Controller
         }
     }
 
-    public function skpbyId($params){
+    public function skpbyId($params)
+    {
         $type = request('type');
         $tahun = request('tahun');
         $bulan = request('bulan');
 
-        $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',$params)->first();
+        $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id', 'tb_jabatan.id_pegawai')->join('tb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')->where('tb_jabatan.id_pegawai', $params)->first();
 
-        $result = skp::select('tb_skp.id','tb_skp.id_jabatan','tb_skp.id_skp_atasan','tb_skp.jenis','tb_skp.rencana_kerja','tb_skp.tahun')->with('aspek_skp','reviewRealisasiSkp')->where('tahun',$tahun)->where('id_jabatan',$jabatanByPegawai->id)->orderBy('jenis','ASC')->get();
-            foreach ($result as $key => $value) {
-             if (!is_null($value->id_skp_atasan)) {
-                 $value->skp_atasan = DB::table('tb_skp')->where('id',$value->id_skp_atasan)->first()->rencana_kerja;
-             }else{
-                 $value->skp_atasan = '-';
-             }
+        // $result = skp::select('tb_skp.id', 'tb_skp.id_jabatan', 'tb_skp.id_skp_atasan', 'tb_skp.jenis', 'tb_skp.rencana_kerja', 'tb_skp.tahun')->with('aspek_skp', 'reviewRealisasiSkp')->where('tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->orderBy('jenis', 'ASC')->get();
 
-                if ($value->jenis == 'utama') {
-                    $value->jenis_kinerja = 'A. Kinerja Utama';
-                } else {
-                    $value->jenis_kinerja = 'B. Kinerja Tambahan';
-                }
+        $result = DB::table('tb_skp')
+            ->select('tb_skp.*', 'tb_aspek_skp.iki', 'tb_aspek_skp.aspek_skp', 'tb_aspek_skp.satuan', 'tb_target_skp.target', 'tb_realisasi_skp.realisasi_bulanan', 'tb_review_realisasi_skp.kesesuaian', 'tb_review_realisasi_skp.keterangan')
+            ->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')
+            ->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')
+            ->join('tb_realisasi_skp', 'tb_realisasi_skp.id_aspek_skp', 'tb_aspek_skp.id')
+            ->join('tb_review_realisasi_skp', 'tb_review_realisasi_skp.id_skp', 'tb_skp.id')
+            ->where('tb_skp.tahun', $tahun)
+            ->where('id_jabatan', $jabatanByPegawai->id)
+            ->where('tb_realisasi_skp.bulan', $bulan)
+            ->where('tb_review_realisasi_skp.bulan', '' . $bulan . '')
+            ->where('tb_target_skp.bulan', $bulan)
+            ->groupBy('tb_aspek_skp.id')
+            ->orderBy('tb_skp.jenis', 'ASC')
+            ->get();
+
+        foreach ($result as $key => $value) {
+            if (!is_null($value->id_skp_atasan)) {
+                $value->skp_atasan = DB::table('tb_skp')->where('id', $value->id_skp_atasan)->first()->rencana_kerja;
+            } else {
+                $value->skp_atasan = '-';
             }
+
+            if ($value->jenis == 'utama') {
+                $value->jenis_kinerja = 'A. Kinerja Utama';
+            } else {
+                $value->jenis_kinerja = 'B. Kinerja Tambahan';
+            }
+        }
 
 
         if ($result) {
@@ -86,11 +104,11 @@ class reviewRealisasiSkpController extends Controller
                 'status' => true,
                 'data' => $result
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'empty data',
                 'status' => false,
-                 'data' => $result
+                'data' => $result
             ]);
         }
         //       $result = [];
@@ -113,7 +131,7 @@ class reviewRealisasiSkpController extends Controller
         //                 }
         //             }
 
-              
+
         //         }  
         // }    
 
@@ -143,9 +161,10 @@ class reviewRealisasiSkpController extends Controller
         // }
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         // return $request->all();
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'id_skp' => 'required|array',
             'keterangan' => 'required|array',
             'kesesuaian' => 'required|array',
@@ -154,15 +173,28 @@ class reviewRealisasiSkpController extends Controller
 
 
 
-        if($validator->fails()){
-            return response()->json($validator->errors());       
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
         }
 
-        for ($i=0; $i < count($request->id_skp); $i++) { 
-            $data = review_realisasi_skp::where('id_skp',$request->id_skp[$i])->where('bulan',$request->bulan[$i])->first();
-            $data->keterangan = $request->keterangan[$i];
-            $data->kesesuaian = $request->kesesuaian[$i];
-            $data->save();
+        // for ($i = 0; $i < count($request->id_skp); $i++) {
+        //     $data = review_realisasi_skp::where('id_skp', $request->id_skp[$i])->where('bulan', $request->bulan[$i])->first();
+        //     $data->keterangan = $request->keterangan[$i];
+        //     $data->kesesuaian = $request->kesesuaian[$i];
+        //     $data->save();
+        // }
+
+        $id = '';
+        for ($i = 0; $i < count($request->id_skp); $i++) {
+            $data = review_realisasi_skp::where('id_skp', $request->id_skp[$i])->where('bulan', $request->bulan[$i])->first();
+
+            if ($id != $data->id_skp) {
+                $id = $data->id_skp;
+                $data->keterangan = $request['keterangan'][$i];
+                $data->kesesuaian = $request['kesesuaian'][$i];
+                // return $data;
+                $data->save();
+            }
         }
 
         // return $cek;
@@ -174,7 +206,7 @@ class reviewRealisasiSkpController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
