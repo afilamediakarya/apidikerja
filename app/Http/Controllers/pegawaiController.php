@@ -53,6 +53,7 @@ class pegawaiController extends Controller
 
     public function pegawaiBySatuanKerja($params)
     {
+        // return "ok";
         $result = [];
         $data = pegawai::where('id_satuan_kerja', $params)->get();
 
@@ -64,6 +65,27 @@ class pegawaiController extends Controller
         }
 
         return response()->json($result);
+    }
+
+    public function listPegawaiBySatuanKerja($params)
+    {
+        $data = '';
+        $data = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_jabatan.nama_jabatan')
+            ->leftJoin('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
+            ->where('tb_pegawai.id_satuan_kerja', $params)->get();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
     }
 
     public function store(Request $request)
@@ -253,10 +275,14 @@ class pegawaiController extends Controller
         $data = pegawai::where('id', $params)->first();
         $data->delete();
 
+        $user = User::where('id_pegawai', $params)->first();
+        $user->delete();
+
         if ($data) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
+                'data' => $data,
             ]);
         } else {
             return response()->json([
