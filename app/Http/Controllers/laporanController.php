@@ -20,16 +20,16 @@ use Auth;
 
 class laporanController extends Controller
 {
-    public function laporanSkp($params)
+    public function laporanSkp($params, $bulan)
     {
         if ($params == 'kepala') {
-            return $this->laporanSkpKepala();
+            return $this->laporanSkpKepala($bulan);
         } else {
-            return $this->laporanSkpPegawai();
+            return $this->laporanSkpPegawai($bulan);
         }
     }
 
-    public function laporanSkpKepala()
+    public function laporanSkpKepala($bulan)
     {
         $result = [];
         $skp = [];
@@ -45,9 +45,27 @@ class laporanController extends Controller
         $current = DB::table('tb_jabatan')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.nama_jabatan', 'tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja', 'tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id', Auth::user()->id_pegawai)->first();
 
         // $skp = skp::with('aspek_skp')->where('id_pegawai',Auth::user()->id_pegawai)->get();
-        $skpUtama = skp::with('aspek_skp')->where('jenis', 'utama')->where('id_jabatan', $jabatanByPegawai->id)->get();
-        $skpTambahan = skp::with('aspek_skp')->where('jenis', 'tambahan')->where('id_jabatan', $jabatanByPegawai->id)->get();
-
+        // $skpUtama = skp::with('aspek_skp')->where('jenis', 'utama')->where('id_jabatan', $jabatanByPegawai->id)->get();
+        // $skpTambahan = skp::with('aspek_skp')->where('jenis', 'tambahan')->where('id_jabatan', $jabatanByPegawai->id)->get();
+        $skpUtama = skp::with('aspek_skp')
+            ->where('jenis', 'utama')
+            ->where('id_jabatan', $jabatanByPegawai->id)
+            ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                $query->whereHas('target_skp', function ($query) use ($bulan) {
+                    $query->where('bulan', '' . $bulan . '');
+                });
+            })
+            ->get();
+        $skpTambahan =
+            skp::with('aspek_skp')
+            ->where('jenis', 'tambahan')
+            ->where('id_jabatan', $jabatanByPegawai->id)
+            ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                $query->whereHas('target_skp', function ($query) use ($bulan) {
+                    $query->where('bulan', '' . $bulan . '');
+                });
+            })
+            ->get();
 
         $result['atasan'] = $atasan;
         $result['pegawai_dinilai'] = $current;
@@ -69,7 +87,7 @@ class laporanController extends Controller
         }
     }
 
-    public function laporanSkpPegawai()
+    public function laporanSkpPegawai($bulan)
     {
         $result = [];
         $groupSkpAtasan = [];
@@ -122,7 +140,17 @@ class laporanController extends Controller
             }
 
             if ($getRencanaKerjaAtasan != []) {
-                $skpChild = skp::with('aspek_skp')->where('id_skp_atasan', $getRencanaKerjaAtasan['id'])->where('id_jabatan', $jabatanByPegawai->id)->where('jenis', 'utama')->get();
+                // $skpChild = skp::with('aspek_skp')->where('id_skp_atasan', $getRencanaKerjaAtasan['id'])->where('id_jabatan', $jabatanByPegawai->id)->where('jenis', 'utama')->get();
+                $skpChild = skp::with('aspek_skp')
+                    ->where('id_skp_atasan', $getRencanaKerjaAtasan['id'])
+                    ->where('jenis', 'utama')
+                    ->where('id_jabatan', $jabatanByPegawai->id)
+                    ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                        $query->whereHas('target_skp', function ($query) use ($bulan) {
+                            $query->where('bulan', '' . $bulan . '');
+                        });
+                    })
+                    ->get();
             } else {
                 $skpChild = [];
             }
@@ -133,8 +161,18 @@ class laporanController extends Controller
             }
         }
 
-        $skp_tambahan = skp::with('aspek_skp')->where('jenis', 'tambahan')->where('id_jabatan', $jabatanByPegawai->id)->get();
+        // $skp_tambahan = skp::with('aspek_skp')->where('jenis', 'tambahan')->where('id_jabatan', $jabatanByPegawai->id)->get();
 
+        $skp_tambahan =
+            skp::with('aspek_skp')
+            ->where('jenis', 'tambahan')
+            ->where('id_jabatan', $jabatanByPegawai->id)
+            ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                $query->whereHas('target_skp', function ($query) use ($bulan) {
+                    $query->where('bulan', '' . $bulan . '');
+                });
+            })
+            ->get();
         if (count($skp_tambahan) > 0) {
             $result['skp']['tambahan'] = $skp_tambahan;
         }
