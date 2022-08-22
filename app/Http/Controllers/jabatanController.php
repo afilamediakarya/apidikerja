@@ -10,18 +10,56 @@ use App\Models\jenis_jabatan;
 use Auth;
 use DB;
 use Illuminate\Validation\Rule;
+
 class jabatanController extends Controller
 {
-    public function list(){
+    public function list(Request $request)
+    {
         $data = '';
         if (Auth::user()->role == 'super_admin') {
-           $data = DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_jenis_jabatan.level','tb_satuan_kerja.nama_satuan_kerja','tb_jabatan.id_satuan_kerja')->join('tb_satuan_kerja','tb_jabatan.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')->orderBy('tb_jenis_jabatan.level', 'ASC')->get();
-        }else{
-            $pegawai = pegawai::select('id_satuan_kerja')->where('id',Auth::user()->id_pegawai)->first();
+            // return request('dinas');
+            // $data = DB::table('tb_jabatan')
+            //     ->select('tb_jabatan.id', 'tb_jabatan.nama_jabatan', 'tb_jabatan.parent_id', 'tb_pegawai.nama', 'tb_jenis_jabatan.level', 'tb_satuan_kerja.nama_satuan_kerja', 'tb_jabatan.id_satuan_kerja')
+            //     ->join('tb_satuan_kerja', 'tb_jabatan.id_satuan_kerja', '=', 'tb_satuan_kerja.id')
+            //     ->join('tb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')
+            //     ->join('tb_jenis_jabatan', 'tb_jenis_jabatan.id', '=', 'tb_jabatan.id_jenis_jabatan')
+            //     ->where('tb_jabatan.id_satuan_kerja', request('dinas'))
+            //     ->orderBy('tb_jenis_jabatan.level', 'ASC')
+            //     ->get();
+            $data = DB::table('tb_pegawai')
+                ->select('tb_jabatan.id', 'tb_jabatan.nama_jabatan', 'tb_jabatan.parent_id', 'tb_pegawai.nama', 'tb_jenis_jabatan.level', 'tb_satuan_kerja.nama_satuan_kerja', 'tb_jabatan.id_satuan_kerja')
+                ->rightJoin('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
+                ->join('tb_satuan_kerja', 'tb_jabatan.id_satuan_kerja', '=', 'tb_satuan_kerja.id')
+                ->join('tb_jenis_jabatan', 'tb_jenis_jabatan.id', '=', 'tb_jabatan.id_jenis_jabatan')
+                ->where('tb_jabatan.id_satuan_kerja', request('dinas'))
+                ->orderBy('tb_jenis_jabatan.level', 'ASC')
+                ->get();
+        } else {
+            $pegawai = pegawai::select('id_satuan_kerja')->where('id', Auth::user()->id_pegawai)->first();
             // $data = jabatan::where('id_satuan_kerja',$pegawai->id_satuan_kerja)->latest()->get();
-            $data = DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_jenis_jabatan.level','tb_satuan_kerja.nama_satuan_kerja','tb_jabatan.id_satuan_kerja')->join('tb_satuan_kerja','tb_jabatan.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')->where('tb_jabatan.id_satuan_kerja',$pegawai->id_satuan_kerja)->orderBy('tb_jenis_jabatan.level', 'ASC')->get();
+            // $data = DB::table('tb_jabatan')->select('tb_jabatan.id', 'tb_jabatan.nama_jabatan', 'tb_jabatan.parent_id', 'tb_pegawai.nama', 'tb_jenis_jabatan.level', 'tb_satuan_kerja.nama_satuan_kerja', 'tb_jabatan.id_satuan_kerja')->join('tb_satuan_kerja', 'tb_jabatan.id_satuan_kerja', '=', 'tb_satuan_kerja.id')->rightJoin('tbb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')->join('tb_jenis_jabatan', 'tb_jenis_jabatan.id', '=', 'tb_jabatan.id_jenis_jabatan')->where('tb_jabatan.id_satuan_kerja', $pegawai->id_satuan_kerja)->orderBy('tb_jenis_jabatan.level', 'ASC')->get();
+
+            $data = DB::table('tb_pegawai')
+                ->select('tb_jabatan.id', 'tb_jabatan.nama_jabatan', 'tb_jabatan.parent_id', 'tb_pegawai.nama', 'tb_jenis_jabatan.level', 'tb_satuan_kerja.nama_satuan_kerja', 'tb_jabatan.id_satuan_kerja')
+                ->rightJoin('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
+                ->join('tb_satuan_kerja', 'tb_jabatan.id_satuan_kerja', '=', 'tb_satuan_kerja.id')
+                ->join('tb_jenis_jabatan', 'tb_jenis_jabatan.id', '=', 'tb_jabatan.id_jenis_jabatan')
+                ->where('tb_jabatan.id_satuan_kerja', $pegawai->id_satuan_kerja)
+                ->orderBy('tb_jenis_jabatan.level', 'ASC')->get();
         }
-        
+
+        foreach ($data as $key => $value) {
+            $getAtasan = DB::table('tb_jabatan')
+                ->select('tb_jabatan.id', 'tb_jabatan.nama_jabatan', 'tb_pegawai.nama', 'tb_satuan_kerja.nama_satuan_kerja', 'tb_jabatan.id_satuan_kerja')
+                ->join('tb_satuan_kerja', 'tb_jabatan.id_satuan_kerja', '=', 'tb_satuan_kerja.id')
+                ->rightJoin('tb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')
+                ->where('tb_jabatan.id', $value->parent_id)
+                ->get();
+
+            $value->atasan_langsung = $getAtasan;
+        }
+        // return $data;
+
 
         if ($data) {
             return response()->json([
@@ -29,34 +67,36 @@ class jabatanController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
-                'status' => false
+                'status' => false,
+                'data' => $data
             ]);
         }
     }
 
-    public function store(Request $request){
-       
-        $validator = Validator::make($request->all(),[
+    public function store(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
             'id_satuan_kerja' => 'required|numeric',
             'id_jenis_jabatan' => 'required|numeric',
             'parent_id' => Rule::requiredIf($request->level > 1),
             'pembayaran_tpp' => 'required',
             'nama_jabatan' => 'required',
             'status_jabatan' => 'required',
-             'id_lokasi' => 'required'
+            'id_lokasi' => 'required'
         ]);
 
-        if($validator->fails()){
-            return response()->json($validator->errors());       
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
         }
 
         if ($request->hasFile('gambar')) {
             $file = $request->file('gambar');
-            $filename = time().'.'.$file->getClientOriginalExtension();
-            $file->storeAs('public/image',$filename);
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/image', $filename);
         }
 
         $data = new jabatan();
@@ -68,7 +108,7 @@ class jabatanController extends Controller
         $data->status_jabatan = $request->status_jabatan;
         $data->pembayaran_tpp = $request->pembayaran_tpp;
         $data->id_lokasi = $request->id_lokasi;
-        $data->nilai_jabatan = str_replace(',','',$request->nilai_jabatan);
+        $data->nilai_jabatan = str_replace(',', '', $request->nilai_jabatan);
         $data->save();
 
         if ($data) {
@@ -77,7 +117,7 @@ class jabatanController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -85,15 +125,16 @@ class jabatanController extends Controller
         }
     }
 
-    public function show($params){
+    public function show($params)
+    {
         $result = [];
         $parent_ = '';
-        $data = jabatan::where('id',$params)->first();
-        $parent = jabatan::where('id',$data->parent_id)->first();
+        $data = jabatan::where('id', $params)->first();
+        $parent = jabatan::where('id', $data->parent_id)->first();
 
         if (isset($parent)) {
             $parent_ = $parent->id;
-        }else{
+        } else {
             $parent_ = $parent;
         }
 
@@ -111,7 +152,7 @@ class jabatanController extends Controller
                 'parent_id' => $parent_,
                 'jenis_jabatan' => $data->id_jenis_jabatan,
             ],
-            
+
         ];
 
 
@@ -121,7 +162,7 @@ class jabatanController extends Controller
                 'status' => true,
                 'data' => $result
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -129,8 +170,9 @@ class jabatanController extends Controller
         }
     }
 
-    public function update($params,Request $request){
-        $validator = Validator::make($request->all(),[
+    public function update($params, Request $request)
+    {
+        $validator = Validator::make($request->all(), [
             'id_satuan_kerja' => 'required|numeric',
             'id_jenis_jabatan' => 'required|numeric',
             'parent_id' => Rule::requiredIf($request->level > 1),
@@ -140,20 +182,20 @@ class jabatanController extends Controller
             'id_lokasi' => 'required'
         ]);
 
-        if($validator->fails()){
-            return response()->json($validator->errors());       
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
         }
 
-        $data = jabatan::where('id',$params)->first();
+        $data = jabatan::where('id', $params)->first();
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->id_jenis_jabatan = $request->id_jenis_jabatan;
         $data->id_pegawai = $request->id_pegawai;
-         $data->parent_id = $request->parent_id;
+        $data->parent_id = $request->parent_id;
         $data->nama_jabatan = $request->nama_jabatan;
         $data->status_jabatan = $request->status_jabatan;
         $data->pembayaran_tpp = $request->pembayaran_tpp;
         $data->id_lokasi = $request->id_lokasi;
-        $data->nilai_jabatan = str_replace(',','',$request->nilai_jabatan);
+        $data->nilai_jabatan = str_replace(',', '', $request->nilai_jabatan);
         $data->save();
 
         if ($data) {
@@ -162,7 +204,7 @@ class jabatanController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -170,16 +212,18 @@ class jabatanController extends Controller
         }
     }
 
-    public function delete($params){
-        $data = jabatan::where('id',$params)->first();
+    public function delete($params)
+    {
+        $data = jabatan::where('id', $params)->first();
         $data->delete();
 
         if ($data) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
+                'data' => $data,
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -187,78 +231,80 @@ class jabatanController extends Controller
         }
     }
 
-    public function jabatanAtasan($level,$id_satuan_kerja){
-        $current_user = pegawai::where('id',Auth::user()->id_pegawai)->first();
+    public function jabatanAtasan($level, $id_satuan_kerja)
+    {
+        $current_user = pegawai::where('id', Auth::user()->id_pegawai)->first();
         $result = [];
         // return $current_user['id_satuan_kerja'];
-        $data = jabatan::where('id_satuan_kerja',$id_satuan_kerja)->where('level',$level-1)->get();
+        $data = jabatan::where('id_satuan_kerja', $id_satuan_kerja)->where('level', $level - 1)->get();
 
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'id' => $value->id,
-                'value'=> $value->nama_jabatan
+                'value' => $value->nama_jabatan
             ];
         }
 
         return response()->json($result);
     }
 
-    public function getPegawaiBySatuanKerja(){
-        $current_user = pegawai::where('id',Auth::user()->id_pegawai)->first();
+    public function getPegawaiBySatuanKerja()
+    {
+        $current_user = pegawai::where('id', Auth::user()->id_pegawai)->first();
         // return $current_user;
 
-        $data = pegawai::where('id_satuan_kerja',$current_user['id_satuan_kerja'])->get();
+        $data = pegawai::where('id_satuan_kerja', $current_user['id_satuan_kerja'])->get();
 
         foreach ($data as $key => $value) {
             $result[] = [
                 'id' => $value->id,
-                'value'=> $value->nama
-            ];            
+                'value' => $value->nama
+            ];
         }
 
         return response()->json($result);
-
     }
 
-    public function getOptionJenisJabatan(){
+    public function getOptionJenisJabatan()
+    {
         $data = jenis_jabatan::orderBy('id', 'DESC')->get();
 
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'id' => $value->id,
-                'value'=> $value->jenis_jabatan
+                'value' => $value->jenis_jabatan
             ];
         }
 
         return response()->json($result);
     }
 
-    public function getParent($params){
+    public function getParent($params)
+    {
         $result = [];
         $getParent = '';
-        $current_jenis_jabatan = jenis_jabatan::where('id',$params)->first();
-        
-        $current_user = pegawai::where('id',Auth::user()->id_pegawai)->first();
-      
-       if ($params == 2 || $params == 3) {
-            $getParent = DB::table('tb_jabatan')->select('tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_jabatan.id_pegawai','tb_jabatan.id')->join('tb_pegawai','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')->where('tb_jenis_jabatan.level','=',1)->get();
-       } else {
-            $getParent = DB::table('tb_jabatan')->select('tb_jabatan.nama_jabatan','tb_pegawai.nama','tb_jabatan.id_pegawai','tb_jabatan.id')->join('tb_pegawai','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')->where('tb_jenis_jabatan.level','<',$current_jenis_jabatan['level'])->where('tb_jabatan.id_satuan_kerja',$current_user['id_satuan_kerja'])->get();
-       }
-       
-     
+        $current_jenis_jabatan = jenis_jabatan::where('id', $params)->first();
+
+        $current_user = pegawai::where('id', Auth::user()->id_pegawai)->first();
+
+        if ($params == 2 || $params == 3) {
+            $getParent = DB::table('tb_jabatan')->select('tb_jabatan.nama_jabatan', 'tb_pegawai.nama', 'tb_jabatan.id_pegawai', 'tb_jabatan.id')->join('tb_pegawai', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_jenis_jabatan', 'tb_jenis_jabatan.id', '=', 'tb_jabatan.id_jenis_jabatan')->where('tb_jenis_jabatan.level', '=', 1)->get();
+        } else {
+            $getParent = DB::table('tb_jabatan')->select('tb_jabatan.nama_jabatan', 'tb_pegawai.nama', 'tb_jabatan.id_pegawai', 'tb_jabatan.id')->join('tb_pegawai', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_jenis_jabatan', 'tb_jenis_jabatan.id', '=', 'tb_jabatan.id_jenis_jabatan')->where('tb_jenis_jabatan.level', '<', $current_jenis_jabatan['level'])->where('tb_jabatan.id_satuan_kerja', $current_user['id_satuan_kerja'])->get();
+        }
+
+
         // return $getParent;
-        
+
         foreach ($getParent as $key => $value) {
             // if ($value->id_pegawai != $current_user->id) {
-                $result[] = [
-                    'id' => $value->id,
-                    'value'=> $value->nama.' - '.$value->nama_jabatan
-                ];    
+            $result[] = [
+                'id' => $value->id,
+                'value' => $value->nama . ' - ' . $value->nama_jabatan
+            ];
             // }   
         }
 
         return response()->json($result);
-
     }
 }

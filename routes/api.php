@@ -233,7 +233,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('laporan')->group(function () {
         // Route::get('/skp/{level}', [App\Http\Controllers\laporanController::class, 'laporanSkp']);
-        Route::get('/skp/{level}/{bulan}', [App\Http\Controllers\laporanController::class, 'laporanSkp']);
+        Route::get('/skp/cekLevel/{id_pegawai}', [App\Http\Controllers\laporanController::class, 'cekLevel']);
+        Route::get('/skp/{level}/{bulan}/{id_pegawai}', [App\Http\Controllers\laporanController::class, 'laporanSkp']);
     });
 
     Route::prefix('bankom')->group(function () {
