@@ -20,21 +20,56 @@ use Auth;
 
 class laporanController extends Controller
 {
-    public function laporanSkp($params, $bulan)
+    public function cekLevel($id_pegawai)
+    {
+        $jabatan = jabatan::with('jenis_jabatan')->select('id', 'id_jenis_jabatan')->where('id_pegawai', $id_pegawai)->get();
+
+        if (count($jabatan) > 0) {
+            foreach ($jabatan as $key => $value) {
+                if (!is_null($value['jenis_jabatan'])) {
+
+                    $level_[] = $value['jenis_jabatan']['level'];
+                } else {
+
+                    $status_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
+                }
+            }
+        } else {
+            $status_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
+        }
+
+        if (count($level_) > 0) {
+            $level = max($level_);
+        } else {
+            $level = 0;
+        }
+
+        if ($level !== '') {
+            return response()->json([
+                'level_jabatan' => $level,
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Gagal Login',
+                'messages_' => $status_fails
+            ], 422);
+        }
+    }
+    public function laporanSkp($params, $bulan, $id_pegawai)
     {
         if ($params == 'kepala') {
-            return $this->laporanSkpKepala($bulan);
+            return $this->laporanSkpKepala($bulan, $id_pegawai);
         } else {
-            return $this->laporanSkpPegawai($bulan);
+            return $this->laporanSkpPegawai($bulan, $id_pegawai);
         }
     }
 
-    public function laporanSkpKepala($bulan)
+    public function laporanSkpKepala($bulan, $id_pegawai)
     {
         $result = [];
         $skp = [];
         $atasan = '';
-        $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai', Auth::user()->id_pegawai)->first();
+        $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai', $id_pegawai)->first();
 
         $jabatan_atasan = DB::table('tb_jabatan')->where('id', $jabatanByPegawai->parent_id)->first();
 
@@ -42,7 +77,7 @@ class laporanController extends Controller
             $atasan = DB::table('tb_jabatan')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.nama_jabatan', 'tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja', 'tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id', $jabatan_atasan->id_pegawai)->first();
         }
 
-        $current = DB::table('tb_jabatan')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.nama_jabatan', 'tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja', 'tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id', Auth::user()->id_pegawai)->first();
+        $current = DB::table('tb_jabatan')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.nama_jabatan', 'tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja', 'tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id', $id_pegawai)->first();
 
         // $skp = skp::with('aspek_skp')->where('id_pegawai',Auth::user()->id_pegawai)->get();
         // $skpUtama = skp::with('aspek_skp')->where('jenis', 'utama')->where('id_jabatan', $jabatanByPegawai->id)->get();
@@ -87,13 +122,13 @@ class laporanController extends Controller
         }
     }
 
-    public function laporanSkpPegawai($bulan)
+    public function laporanSkpPegawai($bulan, $id_pegawai)
     {
         $result = [];
         $groupSkpAtasan = [];
         $skpChild = '';
         $atasan = '';
-        $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai', Auth::user()->id_pegawai)->first();
+        $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai', $id_pegawai)->first();
 
         if (isset($jabatanByPegawai)) {
             $jabatan_atasan = DB::table('tb_jabatan')->where('id', $jabatanByPegawai->parent_id)->first();
@@ -104,7 +139,7 @@ class laporanController extends Controller
             $atasan = DB::table('tb_jabatan')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.nama_jabatan', 'tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja', 'tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id', $jabatan_atasan->id_pegawai)->first();
         }
 
-        $current = DB::table('tb_jabatan')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.nama_jabatan', 'tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja', 'tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id', Auth::user()->id_pegawai)->first();
+        $current = DB::table('tb_jabatan')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.nama_jabatan', 'tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')->join('tb_satuan_kerja', 'tb_satuan_kerja.id', '=', 'tb_pegawai.id_satuan_kerja')->where('tb_pegawai.id', $id_pegawai)->first();
 
         $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_jabatan', $jabatanByPegawai->id)->groupBy('tb_skp.id_skp_atasan')->get();
 
