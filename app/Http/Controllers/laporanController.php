@@ -55,6 +55,64 @@ class laporanController extends Controller
             ], 422);
         }
     }
+    public function laporanRekapitulasiSkp($bulan)
+    {
+        $result = [];
+        $adminOpd = DB::table('tb_pegawai')->where('id', Auth::user()->id_pegawai)->first();
+        $satuanKerja = DB::table('tb_satuan_kerja')
+            ->select('nama_satuan_kerja')
+            ->where('id', $adminOpd->id_satuan_kerja)
+            ->first();
+
+        $listPegawai = DB::table('tb_pegawai')
+            ->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.id as id_jabatan', 'tb_jabatan.nama_jabatan')
+            ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
+            ->where('tb_pegawai.id_satuan_kerja', $adminOpd->id_satuan_kerja)
+            ->get();
+
+        foreach ($listPegawai as $key => $value) {
+            $skpUtama = skp::with('aspek_skp')
+                ->where('jenis', 'utama')
+                ->where('id_jabatan', $value->id_jabatan)
+                ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                    $query->whereHas('target_skp', function ($query) use ($bulan) {
+                        $query->where('bulan', '' . $bulan . '');
+                    });
+                })
+                ->get();
+            // return $skpUtama;
+            $skpTambahan =
+                skp::with('aspek_skp')
+                ->where('jenis', 'tambahan')
+                ->where('id_jabatan', $value->id_jabatan)
+                ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                    $query->whereHas('target_skp', function ($query) use ($bulan) {
+                        $query->where('bulan', '' . $bulan . '');
+                    });
+                })
+                ->get();
+
+            $value->skp_utama = $skpUtama;
+            $value->skp_tambahan = $skpTambahan;
+        }
+
+        $result['satuan_kerja'] = $satuanKerja;
+        $result['list_pegawai'] = $listPegawai;
+
+        if ($result) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $result
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'empty data',
+                'status' => false,
+                'data' => $result
+            ]);
+        }
+    }
     public function laporanSkp($params, $bulan, $id_pegawai)
     {
         if ($params == 'kepala') {
