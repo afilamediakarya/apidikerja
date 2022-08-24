@@ -248,6 +248,8 @@ class laporanController extends Controller
                 $skpChild = [];
             }
 
+            // return $getRencanaKerjaAtasan;
+
             if (count($getRencanaKerjaAtasan) > 0 && count($skpChild) > 0) {
                 $result['skp']['utama'][$key]['atasan'] = $getRencanaKerjaAtasan;
                 $result['skp']['utama'][$key]['skp_child'] = $skpChild;

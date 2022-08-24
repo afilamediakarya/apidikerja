@@ -56,6 +56,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('satuan_kerja')->group(function () {
         Route::get('/list', [App\Http\Controllers\satuanKerjaController::class, 'list']);
+        Route::get('/byAdminOpd', [App\Http\Controllers\satuanKerjaController::class, 'listByAdminOpd']);
         Route::post('/store', [App\Http\Controllers\satuanKerjaController::class, 'store']);
         Route::get('/show/{params}', [App\Http\Controllers\satuanKerjaController::class, 'show']);
         Route::post('/update/{params}', [App\Http\Controllers\satuanKerjaController::class, 'update']);
