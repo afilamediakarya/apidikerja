@@ -432,6 +432,34 @@ class skpController extends Controller
         return count($data);
     }
 
+    public function checkSkpBulanan($params)
+    {
+        $data = DB::table('tb_aspek_skp')->where('id_skp', $params)->get();
+        $result = [];
+
+        foreach ($data as $key => $value) {
+            $target_skp = DB::table('tb_target_skp')
+                ->where([
+                    ['id_aspek_skp', $value->id],
+                    ['bulan', '!=', '0']
+                ])->first();
+            if ($target_skp != null) {
+                $result['target'][$key] = $target_skp;
+            }
+
+            $realisasi_skp = DB::table('tb_realisasi_skp')
+                ->where([
+                    ['id_aspek_skp', $value->id],
+                    ['bulan', '!=', '0']
+                ])->first();
+            if ($realisasi_skp != null) {
+                $result['realisasi'][$key] = $realisasi_skp;
+            }
+        }
+
+        return count($result);
+    }
+
     public function update_skp_kepala($params, $request)
     {
 
@@ -631,7 +659,9 @@ class skpController extends Controller
         $type = request('type');
         if ($type == 'tahunan') {
             $check = $this->checkSkpAtasan($params);
-            if ($check > 0) {
+            $checkSkpBulanan = $this->checkSkpBulanan($params);
+            // return $checkSkpBulanan;
+            if ($check > 0 || $checkSkpBulanan > 0) {
                 return response()->json([
                     'message' => 'failed',
                     'status' => false,
@@ -646,9 +676,11 @@ class skpController extends Controller
                 ]);
             }
         } else {
+            DB::table('tb_review_realisasi_skp')->where('id_skp', $params)->where('bulan', request('bulan'))->delete();
             $aspek = DB::table('tb_aspek_skp')->where('id_skp', $params)->get();
             foreach ($aspek as $key => $value) {
                 DB::table('tb_target_skp')->where('id_aspek_skp', $value->id)->where('bulan', request('bulan'))->delete();
+                DB::table('tb_realisasi_skp')->where('id_aspek_skp', $value->id)->where('bulan', request('bulan'))->delete();
             }
             return response()->json([
                 'message' => 'Success',
