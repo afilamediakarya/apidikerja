@@ -91,25 +91,30 @@ class pegawaiController extends Controller
     public function store(Request $request)
     {
 
-        $validator = Validator::make($request->all(), [
-            'id_satuan_kerja' => 'required',
-            'nama' => 'required|string',
-            'tempat_lahir' => 'required',
-            'tanggal_lahir' => 'required|date',
-            'nip' => 'required|numeric|unique:tb_pegawai',
-            'golongan' => 'required',
-            'tmt_golongan' => 'required|date',
-            // 'eselon' => 'required',
-            // 'tmt_pegawai' => 'required|date',
-            'jenis_kelamin' => 'required',
-            'agama' => 'required',
-            'status_perkawinan' => 'required',
-            'pendidikan' => 'required',
-            'lulus_pendidikan' => 'required',
-            // 'pendidikan_struktural' => 'required',
-            // 'lulus_pendidikan_struktural' => 'required',
-            'jurusan' => 'required',
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'id_satuan_kerja' => 'required',
+                'nama' => 'required|string',
+                'tempat_lahir' => 'required',
+                'tanggal_lahir' => 'required|date',
+                // 'nip' => 'required|numeric|unique:tb_pegawai',
+                'nip' => 'required|numeric|unique:tb_pegawai|unique:users,username',
+                'golongan' => 'required',
+                'tmt_golongan' => 'required|date',
+                // 'eselon' => 'required',
+                // 'tmt_pegawai' => 'required|date',
+                'jenis_kelamin' => 'required',
+                'agama' => 'required',
+                'status_perkawinan' => 'required',
+                'pendidikan' => 'required',
+                'lulus_pendidikan' => 'required',
+                // 'pendidikan_struktural' => 'required',
+                // 'lulus_pendidikan_struktural' => 'required',
+                'jurusan' => 'required',
+            ],
+            ['nip.unique' => 'NIP/Username sudah digunakan. Cek data pegawai/user']
+        );
 
         if ($validator->fails()) {
             return response()->json($validator->errors());
