@@ -34,22 +34,45 @@ class realisasiController extends Controller
                     $val->skp_atasan = '-';
                 }
                 // $data->skp_atasan = DB::table('tb_skp')->where('id',$val->id_skp_atasan)->first()->rencana_kerja;
+                // return $data->reviewRealisasiSkp;
+                $getReview = array();
                 foreach ($data->reviewRealisasiSkp as $key => $value) {
-                    $getReview = $value->pluck('kesesuaian')->toArray();
-                    if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true) {
-                        $data->status_review = 'Belum Sesuai';
-                        $data->keterangan = 'Penilai tidak menyetujui, karena tidak sesuai dengan realisasi';
-                        $data->color = 'warning';
-                    } else if (in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false) {
+                    if ($value->bulan == $bulan) {
+                        array_push($getReview, $value->kesesuaian);
+                        // $getReview = $value->pluck('kesesuaian')->toArray();
+                        // $getReview = $value->kesesuaian;
 
-                        $data->status_review = 'Selesai';
-                        $data->keterangan = 'Penilai telah menyetujui';
-                        $data->color = 'success';
-                    } else {
-                        $data->status_review = 'Belum Review';
-                        $data->keterangan =  'Penilai belum melakukan review';
-                        $data->color = 'danger';
+                        // if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true) {
+                        //     $data->status_review = 'Belum Sesuai';
+                        //     $data->keterangan = 'Penilai tidak menyetujui, karena tidak sesuai dengan realisasi';
+                        //     $data->color = 'warning';
+                        // } else if (in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false) {
+
+                        //     $data->status_review = 'Selesai';
+                        //     $data->keterangan = 'Penilai telah menyetujui';
+                        //     $data->color = 'success';
+                        // } else {
+                        //     $data->status_review = 'Belum Review';
+                        //     $data->keterangan =  'Penilai belum melakukan review';
+                        //     $data->color = 'danger';
+                        // }
                     }
+                }
+                // return $getReview;
+
+                if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == false) {
+                    $data->status_review = 'Belum Sesuai';
+                    $data->keterangan = 'Penilai tidak menyetujui, karena tidak sesuai dengan realisasi';
+                    $data->color = 'warning';
+                } else if (in_array("ya", $getReview) == true && in_array("tidak", $getReview) == false) {
+
+                    $data->status_review = 'Selesai';
+                    $data->keterangan = 'Penilai telah menyetujui';
+                    $data->color = 'success';
+                } else {
+                    $data->status_review = 'Belum Review';
+                    $data->keterangan =  'Penilai belum melakukan review';
+                    $data->color = 'danger';
                 }
 
                 if ($data->jenis == 'utama') {
@@ -291,7 +314,7 @@ class realisasiController extends Controller
             }
         }
 
-        // return $tes;       
+        // return $data;
 
         if ($data) {
             return response()->json([

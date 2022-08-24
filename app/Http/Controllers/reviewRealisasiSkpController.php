@@ -26,11 +26,13 @@ class reviewRealisasiSkpController extends Controller
                 $filter_ = array();
                 foreach ($skp as $a => $b) {
                     foreach ($b['reviewRealisasiSkp'] as $x => $y) {
-                        array_push($filter_, $y->kesesuaian);
+                        if ($y->bulan == request('bulan')) {
+                            array_push($filter_, $y->kesesuaian);
+                        }
                     }
                 }
+                // return $skp;
 
-                // return $label;
 
                 if (in_array("tidak", $filter_) == true && in_array("ya", $filter_) == true) {
                     $status = 'Belum Sesuai';
