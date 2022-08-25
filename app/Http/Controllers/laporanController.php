@@ -182,6 +182,7 @@ class laporanController extends Controller
 
     public function laporanSkpPegawai($bulan, $id_pegawai)
     {
+
         $result = [];
         $groupSkpAtasan = [];
         $skpChild = '';
