@@ -88,9 +88,19 @@ class realisasiController extends Controller
         } else {
             foreach ($skp_filter as $index => $val) {
                 $data = skp::with('aspek_skp')->where('id', $val->id)->orderBy('jenis', 'ASC')->first();
+
+                $getReview = array();
+
                 foreach ($data->reviewRealisasiSkp as $key => $value) {
-                    $getReview = $value->pluck('kesesuaian')->toArray();
-                    if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == true) {
+                    $getReview = array();
+                    foreach ($data->reviewRealisasiSkp as $key => $value) {
+                        if ($value->bulan == $bulan) {
+                            array_push($getReview, $value->kesesuaian);
+                        }
+                    }
+                    // return $getReview;
+
+                    if (in_array("tidak", $getReview) == true && in_array("ya", $getReview) == false) {
                         $data->status_review = 'Belum Sesuai';
                         $data->keterangan = 'Penilai tidak menyetujui, karena tidak sesuai dengan realisasi';
                         $data->color = 'warning';

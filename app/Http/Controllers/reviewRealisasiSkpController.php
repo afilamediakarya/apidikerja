@@ -31,9 +31,9 @@ class reviewRealisasiSkpController extends Controller
                         }
                     }
                 }
+
+
                 // return $skp;
-
-
                 if (in_array("tidak", $filter_) == true && in_array("ya", $filter_) == true) {
                     $status = 'Belum Sesuai';
                 } else if (in_array("ya", $filter_) == true && in_array("tidak", $filter_) == false) {
