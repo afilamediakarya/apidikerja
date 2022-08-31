@@ -34,7 +34,15 @@ class skpController extends Controller
 
                 // $result = skp::with('aspek_skp')->where('tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->orderBy('jenis', 'ASC')->get();
 
-                $result = DB::table('tb_skp')->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')->where('tb_skp.tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->groupBy('tb_aspek_skp.id')->orderBy('tb_skp.jenis', 'ASC')->get();
+                $result = DB::table('tb_skp')
+                    ->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')
+                    ->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')
+                    ->where('tb_skp.tahun', $tahun)
+                    ->where('id_jabatan', $jabatanByPegawai->id)
+                    ->groupBy('tb_aspek_skp.id')
+                    ->orderBy('tb_skp.jenis', 'ASC')
+                    ->orderBy('tb_skp.id', 'ASC')
+                    ->get();
 
                 // return $result;
 
@@ -66,10 +74,20 @@ class skpController extends Controller
                 }
             }
         } else {
-            $skp_filter =  DB::table('tb_skp')->select('tb_skp.id', 'tb_skp.id_skp_atasan')->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')->where('tb_skp.tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->where('tb_target_skp.bulan', request('bulan'))->orderBy('tb_skp.jenis', 'ASC')->get();
+            $skp_filter =  DB::table('tb_skp')
+                ->select('tb_skp.id', 'tb_skp.id_skp_atasan')
+                ->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')
+                ->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')
+                ->where('tb_skp.tahun', $tahun)
+                ->where('id_jabatan', $jabatanByPegawai->id)
+                ->where('tb_target_skp.bulan', request('bulan'))
+                ->orderBy('tb_skp.jenis', 'ASC')
+                ->orderBy('tb_skp.id', 'ASC')
+                ->get();
 
             // $skp_filter =  DB::table('tb_skp')->select('tb_skp.id', 'tb_skp.id_skp_atasan')->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')->groupBy('tb_skp.id')->where('tb_skp.tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->where('tb_target_skp.bulan', request('bulan'))->get();
 
+            // return $skp_filter;
             if ($params == 'pegawai') {
                 foreach ($skp_filter as $index => $val) {
                     $data = skp::with('aspek_skp')->where('id', $val->id)->orderBy('jenis', 'ASC')->first();
