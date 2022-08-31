@@ -695,6 +695,7 @@ class skpController extends Controller
             }
         } else {
             DB::table('tb_review_realisasi_skp')->where('id_skp', $params)->where('bulan', request('bulan'))->delete();
+            DB::table('tb_review')->where('id_skp', $params)->where('bulan', request('bulan'))->delete();
             $aspek = DB::table('tb_aspek_skp')->where('id_skp', $params)->get();
             foreach ($aspek as $key => $value) {
                 DB::table('tb_target_skp')->where('id_aspek_skp', $value->id)->where('bulan', request('bulan'))->delete();
