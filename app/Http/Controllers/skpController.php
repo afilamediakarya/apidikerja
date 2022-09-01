@@ -334,8 +334,20 @@ class skpController extends Controller
     public function show($params)
     {
         // $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',Auth::user()->id_pegawai)->first();
+        $bulan = request('bulan');
         $data = skp::with('aspek_skp')->where('id', $params)->first();
-        if ($data) {
+
+        // cek if skp used in current month
+        $cek_skp = skp::with('aspek_skp')
+            ->where('id', $params)
+            ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                $query->whereHas('target_skp', function ($query) use ($bulan) {
+                    $query->where('bulan', '' . $bulan . '');
+                });
+            })
+            ->first();
+
+        if (!isset($cek_skp)) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
