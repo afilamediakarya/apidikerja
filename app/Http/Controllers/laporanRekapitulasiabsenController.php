@@ -287,6 +287,20 @@ class laporanRekapitulasiabsenController extends Controller
                 ];
             }
 
+            if (count($dataAbsen) == 1) {
+
+                if ($dataAbsen[0]['status_absen'] == 'hadir' || $dataAbsen[0]['status_absen'] == 'dinas luar') {
+                    $jml_kehadiran[] = 'checkout';
+                }
+                $dataAbsen[1] = [
+                    'jenis' => 'checkout',
+                    'status_absen' => 'hadir',
+                    'waktu_absen' => '14:00:00',
+                    'keterangan' => 'cepat 90 menit'
+                ];
+                $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
+            }
+
             if ($value['date'] > date('Y-m-d')) {
                 $rekapAbsen[$key] = [
                     'tanggal' => $value['date'],
