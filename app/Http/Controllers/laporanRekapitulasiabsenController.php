@@ -67,13 +67,11 @@ class laporanRekapitulasiabsenController extends Controller
         $rekapAbsen = [];
         $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', Auth::user()->id_pegawai)->first();
 
-
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
             $getAbsen = DB::table('tb_absen')->where('id_pegawai', Auth::user()->id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->get();
 
             foreach ($getAbsen as $i => $v) {
-                // return $v;
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
 
@@ -97,6 +95,7 @@ class laporanRekapitulasiabsenController extends Controller
                 } else {
 
                     $jml_kehadiran[] = $v->jenis;
+
                     $selisih_waktu = $this->konvertWaktu('checkout', $v->waktu_absen);
 
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
@@ -125,9 +124,9 @@ class laporanRekapitulasiabsenController extends Controller
                 ];
             }
 
-
             if (count($dataAbsen) == 1) {
-                if ($dataAbsen[0]['status_absen'] == 'hadir') {
+
+                if ($dataAbsen[0]['status_absen'] == 'hadir' || $dataAbsen[0]['status_absen'] == 'dinas luar') {
                     $jml_kehadiran[] = 'checkout';
                 }
                 $dataAbsen[1] = [
@@ -170,12 +169,12 @@ class laporanRekapitulasiabsenController extends Controller
         }
 
         // return $temps_absensi;
+        // return $jml_kehadiran;
 
 
         $jml_potongan_kehadiran = (count($temps_absensi['alpa']) * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
 
         $persentase_pemotongan_tunjangan = $jml_potongan_kehadiran * 0.4;
-
 
         $result['jml_hari_kerja'] = count($rekapAbsen);
         $result['kehadiran'] = count($jml_kehadiran);
@@ -184,6 +183,7 @@ class laporanRekapitulasiabsenController extends Controller
         $result['pegawai'] = $pegawai;
         $result['tanpa_keterangan'] = count($temps_absensi['alpa']);
         $result['data_absen'] = $rekapAbsen;
+
 
         if ($result) {
             return response()->json([
