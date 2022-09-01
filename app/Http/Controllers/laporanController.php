@@ -23,18 +23,18 @@ class laporanController extends Controller
     public function cekLevel($id_pegawai)
     {
         $jabatan = jabatan::with('jenis_jabatan')->select('id', 'id_jenis_jabatan')->where('id_pegawai', $id_pegawai)->get();
-
         if (count($jabatan) > 0) {
             foreach ($jabatan as $key => $value) {
                 if (!is_null($value['jenis_jabatan'])) {
 
                     $level_[] = $value['jenis_jabatan']['level'];
                 } else {
-
+                    // $level_[] = 0;
                     $status_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
                 }
             }
         } else {
+            // $level_[] = 0;
             $status_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
         }
 
@@ -65,35 +65,102 @@ class laporanController extends Controller
             ->first();
 
         $listPegawai = DB::table('tb_pegawai')
-            ->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.id as id_jabatan', 'tb_jabatan.nama_jabatan')
+            ->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.id as id_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.parent_id')
             ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
             ->where('tb_pegawai.id_satuan_kerja', $adminOpd->id_satuan_kerja)
+            // ->where('tb_pegawai.id', 32)
             ->get();
 
-        foreach ($listPegawai as $key => $value) {
-            $skpUtama = skp::with('aspek_skp')
-                ->where('jenis', 'utama')
-                ->where('id_jabatan', $value->id_jabatan)
-                ->whereHas('aspek_skp', function ($query) use ($bulan) {
-                    $query->whereHas('target_skp', function ($query) use ($bulan) {
-                        $query->where('bulan', '' . $bulan . '');
-                    });
-                })
-                ->get();
-            // return $skpUtama;
-            $skpTambahan =
-                skp::with('aspek_skp')
-                ->where('jenis', 'tambahan')
-                ->where('id_jabatan', $value->id_jabatan)
-                ->whereHas('aspek_skp', function ($query) use ($bulan) {
-                    $query->whereHas('target_skp', function ($query) use ($bulan) {
-                        $query->where('bulan', '' . $bulan . '');
-                    });
-                })
-                ->get();
+        // return $listPegawai;
 
-            $value->skp_utama = $skpUtama;
-            $value->skp_tambahan = $skpTambahan;
+        foreach ($listPegawai as $key => $value) {
+            $jabatan = jabatan::with('jenis_jabatan')->select('id', 'id_jenis_jabatan')->where('id_pegawai', $value->id)->first();
+
+            if ($jabatan['jenis_jabatan']['level'] == 1 || $jabatan['jenis_jabatan']['level'] == 2) {
+                $result = [];
+                $skp = [];
+                $atasan = '';
+                $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai', $value->id)->first();
+
+                $jabatan_atasan = DB::table('tb_jabatan')->where('id', $value->parent_id)->first();
+
+                $skp_utama = skp::with('aspek_skp')
+                    ->where('jenis', 'utama')
+                    ->where('id_jabatan', $jabatanByPegawai->id)
+                    ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                        $query->whereHas('target_skp', function ($query) use ($bulan) {
+                            $query->where('bulan', '' . $bulan . '');
+                        });
+                    })
+                    ->get();
+
+                $skp_tambahan =
+                    skp::with('aspek_skp')
+                    ->where('jenis', 'tambahan')
+                    ->where('id_jabatan', $jabatanByPegawai->id)
+                    ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                        $query->whereHas('target_skp', function ($query) use ($bulan) {
+                            $query->where('bulan', '' . $bulan . '');
+                        });
+                    })
+                    ->get();
+
+                $value->skp_utama = $skp_utama;
+                $value->skp_tambahan = $skp_tambahan;
+            } else {
+                $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_jabatan', $value->id_jabatan)->groupBy('tb_skp.id_skp_atasan')->get();
+
+                $skp_utama = [];
+                $skp_tambahan = [];
+                foreach ($get_skp_atasan as $k => $v) {
+                    if (!is_null($value->parent_id)) {
+
+                        if (!is_null($v->id_skp_atasan)) {
+                            $getSkpAtasan = DB::table('tb_skp')->select('id', 'rencana_kerja', 'jenis')->where('id', $v->id_skp_atasan)->first();
+                            if (isset($getSkpAtasan)) {
+
+                                $data_skp_utama = skp::with('aspek_skp')
+                                    ->where('id_skp_atasan', $getSkpAtasan->id)
+                                    ->where('jenis', 'utama')
+                                    ->where('id_jabatan', $value->id_jabatan)
+                                    ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                                        $query->whereHas('target_skp', function ($query) use ($bulan) {
+                                            $query->where('bulan', '' . $bulan . '');
+                                        });
+                                    })
+                                    ->first();
+                                if ($data_skp_utama != []) {
+                                    $skpChild = $data_skp_utama;
+                                } else {
+                                    $skpChild = [];
+                                }
+
+                                $skp_utama[$k] = [
+                                    'id_skp_atasan' => $getSkpAtasan->id,
+                                    'rencana_kerja_atasan' => $getSkpAtasan->rencana_kerja,
+                                    'skp_child' => $skpChild,
+                                ];
+                            } else {
+                                $skp_utama = [];
+                            }
+                        }
+                    }
+                }
+
+                $data_skp_tambahan =
+                    skp::with('aspek_skp')
+                    ->where('jenis', 'tambahan')
+                    ->where('id_jabatan', $value->id)
+                    ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                        $query->whereHas('target_skp', function ($query) use ($bulan) {
+                            $query->where('bulan', '' . $bulan . '');
+                        });
+                    })
+                    ->get();
+
+                $value->skp_utama = $skp_utama;
+                $value->skp_tambahan = $skp_tambahan;
+            }
         }
 
         $result['satuan_kerja'] = $satuanKerja;
@@ -203,6 +270,7 @@ class laporanController extends Controller
         $get_skp_atasan = DB::table('tb_skp')->select('id_skp_atasan')->where('id_jabatan', $jabatanByPegawai->id)->groupBy('tb_skp.id_skp_atasan')->get();
 
 
+
         $result['atasan'] = $atasan;
         $result['pegawai_dinilai'] = $current;
 
@@ -244,12 +312,17 @@ class laporanController extends Controller
                             $query->where('bulan', '' . $bulan . '');
                         });
                     })
+                    // ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                    //     $query->whereHas('realisasi_skp', function ($query) use ($bulan) {
+                    //         $query->where('bulan', '' . $bulan . '');
+                    //     });
+                    // })
                     ->get();
             } else {
                 $skpChild = [];
             }
 
-            // return $getRencanaKerjaAtasan;
+            // return $skpChild;
 
             if (count($getRencanaKerjaAtasan) > 0 && count($skpChild) > 0) {
                 $result['skp']['utama'][$key]['atasan'] = $getRencanaKerjaAtasan;
