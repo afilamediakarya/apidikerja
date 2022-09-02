@@ -99,7 +99,6 @@ class skpController extends Controller
                         } else {
                             $data->skp_atasan = '-';
                         }
-                        // return $data->skp_atasan;
                     } else {
                         $data->jenis_kinerja = 'B. Kinerja Tambahan';
                         $data->skp_atasan = '-';
