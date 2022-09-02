@@ -93,7 +93,13 @@ class skpController extends Controller
                     $data = skp::with('aspek_skp')->where('id', $val->id)->orderBy('jenis', 'ASC')->first();
                     if ($data->jenis == 'utama') {
                         $data->jenis_kinerja = 'A. Kinerja Utama';
-                        $data->skp_atasan = DB::table('tb_skp')->where('id', $val->id_skp_atasan)->first()->rencana_kerja;
+
+                        if (!is_null($val->id_skp_atasan)) {
+                            $data->skp_atasan = DB::table('tb_skp')->where('id', $val->id_skp_atasan)->first()->rencana_kerja;
+                        } else {
+                            $data->skp_atasan = '-';
+                        }
+                        // return $data->skp_atasan;
                     } else {
                         $data->jenis_kinerja = 'B. Kinerja Tambahan';
                         $data->skp_atasan = '-';
