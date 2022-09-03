@@ -65,10 +65,12 @@ class laporanController extends Controller
             ->first();
 
         $listPegawai = DB::table('tb_pegawai')
-            ->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.id as id_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.parent_id')
+            ->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.id as id_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_jabatan.parent_id', 'tb_jenis_jabatan.level')
             ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
+            ->join('tb_jenis_jabatan', 'tb_jabatan.id_jenis_jabatan', '=', 'tb_jenis_jabatan.id')
             ->where('tb_pegawai.id_satuan_kerja', $adminOpd->id_satuan_kerja)
-            // ->where('tb_pegawai.id', 32)
+            // ->where('tb_pegawai.id', 2691)
+            // ->orWhere('tb_pegawai.id', 2696)
             ->get();
 
         // return $listPegawai;
