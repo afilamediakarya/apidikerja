@@ -454,7 +454,9 @@ class laporanController extends Controller
 
 
         foreach ($get_skp_atasan as $key => $value) {
+
             $getRencanaKerjaAtasan = [];
+
             if (!is_null($jabatanByPegawai->parent_id)) {
 
                 if (!is_null($value->id_skp_atasan)) {
@@ -465,6 +467,11 @@ class laporanController extends Controller
                             'rencana_kerja' => $getSkpAtasan->rencana_kerja
                         ];
                     }
+                } else {
+                    $getRencanaKerjaAtasan = [
+                        'id' => null,
+                        'rencana_kerja' => "-",
+                    ];
                 }
             } else {
                 // $getKegiatan= DB::table('tb_kegiatan')->select('id','nama_kegiatan','kode_kegiatan')->where('id',$value->id_skp_atasan)->first();
@@ -501,7 +508,23 @@ class laporanController extends Controller
                     ->get();
                 // return $skpChild;
             } else {
-                $skpChild = [];
+                $skpChild =
+                    skp::with(['aspek_skp' => function ($query) use ($bulan) {
+                        $query->with(['target_skp' => function ($select) use ($bulan) {
+                            $select->where('bulan', "{$bulan}");
+                        }])
+                            ->with(['realisasi_skp' => function ($select) use ($bulan) {
+                                $select->where('bulan', "{$bulan}");
+                            }]);
+                    }])
+                    ->whereHas('aspek_skp', function ($query) use ($bulan) {
+                        $query->whereHas('target_skp', function ($query) use ($bulan) {
+                            $query->where('bulan', "{$bulan}");
+                        });
+                    })
+                    ->where('jenis', 'utama')
+                    ->where('id_jabatan', $jabatanByPegawai->id)
+                    ->get();
             }
 
 
