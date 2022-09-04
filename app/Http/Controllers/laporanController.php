@@ -527,7 +527,7 @@ class laporanController extends Controller
                     $query->where('bulan', "{$bulan}");
                 });
             })
-            ->where('id_skp_atasan', $getRencanaKerjaAtasan['id'])
+            // ->where('id_skp_atasan', $getRencanaKerjaAtasan['id'])
             ->where('jenis', 'tambahan')
             ->where('id_jabatan', $jabatanByPegawai->id)
             ->get();
