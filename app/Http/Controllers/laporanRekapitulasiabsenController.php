@@ -129,12 +129,18 @@ class laporanRekapitulasiabsenController extends Controller
                 if ($dataAbsen[0]['status_absen'] == 'hadir' || $dataAbsen[0]['status_absen'] == 'dinas luar') {
                     $jml_kehadiran[] = 'checkout';
                 }
-                $dataAbsen[1] = [
-                    'jenis' => 'checkout',
-                    'status_absen' => 'hadir',
-                    'waktu_absen' => '14:00:00',
-                    'keterangan' => 'cepat 90 menit'
-                ];
+
+                // cek if val date > date now, set checkout cepat 90 menit
+                if ($value['date'] > date('Y-m-d')) {
+
+                    $dataAbsen[1] = [
+                        'jenis' => 'checkout',
+                        'status_absen' => 'hadir',
+                        'waktu_absen' => '14:00:00',
+                        'keterangan' => 'cepat 90 menit'
+                    ];
+                }
+
                 $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
             }
 
