@@ -237,8 +237,8 @@ class reviewController extends Controller
             ->join('tb_review', 'tb_review.id_skp', '=', 'tb_skp.id')
             ->where('tb_skp.tahun', $tahun)
             ->where('id_jabatan', $jabatanByPegawai->id)
-            ->groupBy('tb_aspek_skp.id')
             ->orderBy('tb_skp.jenis', 'ASC')
+            ->orderBy('tb_skp.id', 'ASC')
             ->get();
 
         foreach ($result as $key => $value) {
