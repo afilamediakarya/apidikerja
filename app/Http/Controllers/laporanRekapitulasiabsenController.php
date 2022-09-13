@@ -94,7 +94,7 @@ class laporanRekapitulasiabsenController extends Controller
                     }
                 } else {
 
-                    $jml_kehadiran[] = $v->jenis;
+                    $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
 
                     $selisih_waktu = $this->konvertWaktu('checkout', $v->waktu_absen);
 
@@ -119,6 +119,7 @@ class laporanRekapitulasiabsenController extends Controller
                 $dataAbsen[$i] = [
                     'jenis' => $v->jenis,
                     'status_absen' => $v->status,
+                    'tanggal_absen' => $v->tanggal_absen,
                     'waktu_absen' => $v->waktu_absen,
                     'keterangan' => $keterangan
                 ];
@@ -127,11 +128,11 @@ class laporanRekapitulasiabsenController extends Controller
             if (count($dataAbsen) == 1) {
 
                 if ($dataAbsen[0]['status_absen'] == 'hadir' || $dataAbsen[0]['status_absen'] == 'dinas luar') {
-                    $jml_kehadiran[] = 'checkout';
+                    // $jml_kehadiran[] = 'checkout';
                 }
 
                 // cek if val date > date now, set checkout cepat 90 menit
-                if ($value['date'] > date('Y-m-d')) {
+                if ($value['date'] < date('Y-m-d')) {
 
                     $dataAbsen[1] = [
                         'jenis' => 'checkout',
@@ -139,6 +140,7 @@ class laporanRekapitulasiabsenController extends Controller
                         'waktu_absen' => '14:00:00',
                         'keterangan' => 'cepat 90 menit'
                     ];
+                    $jml_kehadiran[$dataAbsen[0]['tanggal_absen']] = 'checkout';
                 }
 
                 $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
@@ -186,8 +188,8 @@ class laporanRekapitulasiabsenController extends Controller
         $result['kehadiran'] = count($jml_kehadiran);
         $result['potongan_kehadiran'] = $jml_potongan_kehadiran;
         $result['persentase_pemotongan'] = round($persentase_pemotongan_tunjangan, 2);
-        $result['pegawai'] = $pegawai;
         $result['tanpa_keterangan'] = count($temps_absensi['alpa']);
+        $result['pegawai'] = $pegawai;
         $result['data_absen'] = $rekapAbsen;
 
 
@@ -241,7 +243,7 @@ class laporanRekapitulasiabsenController extends Controller
 
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
-            $getAbsen = DB::table('tb_absen')->where('id_pegawai', $id_pegawai)->where('tanggal_absen', $value['date'])->get();
+            $getAbsen = DB::table('tb_absen')->where('id_pegawai', $id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->get();
             foreach ($getAbsen as $i => $v) {
 
                 $keterangan = '';
@@ -263,7 +265,7 @@ class laporanRekapitulasiabsenController extends Controller
                         $keterangan = 'Tepat waktu';
                     }
                 } else {
-                    $jml_kehadiran[] = $v->jenis;
+                    $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
                     $selisih_waktu = $this->konvertWaktu('checkout', $v->waktu_absen);
 
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
@@ -288,6 +290,7 @@ class laporanRekapitulasiabsenController extends Controller
                 $dataAbsen[$i] = [
                     'jenis' => $v->jenis,
                     'status_absen' => $v->status,
+                    'tanggal_absen' => $v->tanggal_absen,
                     'waktu_absen' => $v->waktu_absen,
                     'keterangan' => $keterangan
                 ];
@@ -296,14 +299,18 @@ class laporanRekapitulasiabsenController extends Controller
             if (count($dataAbsen) == 1) {
 
                 if ($dataAbsen[0]['status_absen'] == 'hadir' || $dataAbsen[0]['status_absen'] == 'dinas luar') {
-                    $jml_kehadiran[] = 'checkout';
+                    // $jml_kehadiran[] = 'checkout';
                 }
-                $dataAbsen[1] = [
-                    'jenis' => 'checkout',
-                    'status_absen' => 'hadir',
-                    'waktu_absen' => '14:00:00',
-                    'keterangan' => 'cepat 90 menit'
-                ];
+                if ($value['date'] < date('Y-m-d')) {
+
+                    $dataAbsen[1] = [
+                        'jenis' => 'checkout',
+                        'status_absen' => 'hadir',
+                        'waktu_absen' => '14:00:00',
+                        'keterangan' => 'cepat 90 menit'
+                    ];
+                    $jml_kehadiran[$dataAbsen[0]['tanggal_absen']] = 'checkout';
+                }
                 $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
             }
 
@@ -332,6 +339,7 @@ class laporanRekapitulasiabsenController extends Controller
                 }
             }
         }
+        // return $jml_kehadiran;
 
         $jml_potongan_kehadiran = (count($temps_absensi['alpa']) * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
 
@@ -339,10 +347,10 @@ class laporanRekapitulasiabsenController extends Controller
 
         $result['jml_hari_kerja'] = count($rekapAbsen);
         $result['kehadiran'] = count($jml_kehadiran);
+        $result['tanpa_keterangan'] = count($temps_absensi['alpa']);
         $result['potongan_kehadiran'] = $jml_potongan_kehadiran;
         $result['persentase_pemotongan'] = round($persentase_pemotongan_tunjangan, 2);
         $result['pegawai'] = $pegawai;
-        $result['tanpa_keterangan'] = count($temps_absensi['alpa']);
         $result['data_absen'] = $rekapAbsen;
 
         if ($result) {
