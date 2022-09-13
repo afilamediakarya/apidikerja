@@ -83,6 +83,8 @@ class reviewRealisasiSkpController extends Controller
             ->where('tb_target_skp.bulan', $bulan)
             ->groupBy('tb_aspek_skp.id')
             ->orderBy('tb_skp.jenis', 'ASC')
+            ->orderBy('tb_skp.id_skp_atasan', 'ASC')
+            ->orderBy('tb_skp.id', 'ASC')
             ->get();
 
         foreach ($result as $key => $value) {

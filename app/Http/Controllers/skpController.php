@@ -41,6 +41,7 @@ class skpController extends Controller
                     ->where('id_jabatan', $jabatanByPegawai->id)
                     ->groupBy('tb_aspek_skp.id')
                     ->orderBy('tb_skp.jenis', 'ASC')
+                    ->orderBy('tb_skp.id_skp_atasan', 'ASC')
                     ->orderBy('tb_skp.id', 'ASC')
                     ->get();
 
@@ -82,6 +83,7 @@ class skpController extends Controller
                 ->where('id_jabatan', $jabatanByPegawai->id)
                 ->where('tb_target_skp.bulan', request('bulan'))
                 ->orderBy('tb_skp.jenis', 'ASC')
+                ->orderBy('tb_skp.id_skp_atasan', 'ASC')
                 ->orderBy('tb_skp.id', 'ASC')
                 ->get();
 
@@ -243,6 +245,7 @@ class skpController extends Controller
         $review = new review_skp();
         $review->id_skp = $skp->id;
         $review->kesesuaian = 'tidak';
+        $review->bulan = '0';
         // $review->id_pegawai = $data->id_pegawai;
         $review->save();
 
@@ -298,7 +301,11 @@ class skpController extends Controller
 
         $data =  DB::table('tb_jabatan')->select('tb_jabatan.id', 'tb_jabatan.id_pegawai')->join('tb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')->where('tb_jabatan.id_pegawai', Auth::user()->id_pegawai)->first();
 
-        // return $data;
+        $review = new review_skp();
+        $review->id_skp = $request['rencana_kerja'];
+        $review->kesesuaian = 'tidak';
+        $review->bulan = $request['bulan'];
+        $review->save();
 
         $review_realisasi_skp = new review_realisasi_skp();
         $review_realisasi_skp->id_skp = $request['rencana_kerja'];
@@ -403,6 +410,12 @@ class skpController extends Controller
                 $aspek_add->iki = $val['iki'];
                 $aspek_add->satuan = $val['satuan'];
                 $aspek_add->save();
+
+                $realisasi_skp = new realisasi_skp();
+                $realisasi_skp->id_aspek_skp = $aspek_add->id;
+                $realisasi_skp->realisasi_bulanan = 0;
+                $realisasi_skp->bulan = '0';
+                $realisasi_skp->save();
 
                 $target_add = new target_skp();
                 $target_add->id_aspek_skp = $aspek_add->id;
@@ -693,18 +706,36 @@ class skpController extends Controller
     {
         $type = request('type');
         if ($type == 'tahunan') {
+
             $check = $this->checkSkpAtasan($params);
             $checkSkpBulanan = $this->checkSkpBulanan($params);
-            // return $checkSkpBulanan;
-            if ($check > 0 || $checkSkpBulanan > 0) {
+
+            if ($check > 0) {
                 return response()->json([
-                    'message' => 'failed',
+                    'message' => 'Rencana Kerja digunakan oleh bawahan',
+                    'status' => false,
+                ]);
+            } elseif ($checkSkpBulanan > 0) {
+                return response()->json([
+                    'message' => 'Rencana Kerja digunakan pada Target SKP Bulanan',
                     'status' => false,
                 ]);
             } else {
+                // get aspek_skp based id_skp
+                $aspek = DB::table('tb_aspek_skp')->where('id_skp', $params)->get();
+                foreach ($aspek as $key => $value) {
+                    // delete data realisasi based id_aspek_skp and bulan = 0
+                    DB::table('tb_realisasi_skp')->where('id_aspek_skp', $value->id)->where('bulan', '0')->delete();
+                }
+
+                // get data skp based id
                 $data = skp::where('id', $params)->first();
                 $data->delete();
 
+                // delete data in tb_review based id_skp
+                DB::table('tb_review')->where('id_skp', $params)->delete();
+
+                // return response when success deleted data
                 return response()->json([
                     'message' => 'Success',
                     'status' => true,

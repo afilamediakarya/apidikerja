@@ -27,7 +27,8 @@ class reviewController extends Controller
             // return $myArray;
 
             foreach ($myArray as $key => $value) {
-                $skp = DB::table('tb_skp')->select('tb_review.kesesuaian')->join('tb_review', 'tb_review.id_skp', '=', 'tb_skp.id')->where('tb_skp.id_jabatan', $value->id)->where('tb_skp.tahun', request('tahun'))->get()->toArray();
+                $skp = DB::table('tb_skp')->select('tb_review.kesesuaian')->join('tb_review', 'tb_review.id_skp', '=', 'tb_skp.id')->where('tb_skp.id_jabatan', $value->id)->where('tb_skp.tahun', request('tahun'))->where('tb_review.bulan', '0')->get()->toArray();
+
                 $filter_ = array_column($skp, 'kesesuaian');
                 if (in_array("tidak", $filter_) == true && in_array("ya", $filter_) == true) {
                     $status = 'Belum Sesuai';
@@ -236,8 +237,11 @@ class reviewController extends Controller
             ->join('tb_target_skp', 'tb_target_skp.id_aspek_skp', 'tb_aspek_skp.id')
             ->join('tb_review', 'tb_review.id_skp', '=', 'tb_skp.id')
             ->where('tb_skp.tahun', $tahun)
+            ->where('tb_review.bulan', '0')
+            ->where('tb_target_skp.bulan', '0')
             ->where('id_jabatan', $jabatanByPegawai->id)
             ->orderBy('tb_skp.jenis', 'ASC')
+            ->orderBy('tb_skp.id_skp_atasan', 'ASC')
             ->orderBy('tb_skp.id', 'ASC')
             ->get();
 

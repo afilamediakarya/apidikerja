@@ -11,8 +11,9 @@ use DB;
 
 class aktivitasController extends Controller
 {
-    public function list(){
-        $data = aktivitas::where('id_pegawai',Auth::user()->id_pegawai)->latest()->get();
+    public function list()
+    {
+        $data = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->latest()->get();
 
         if ($data) {
             return response()->json([
@@ -20,7 +21,7 @@ class aktivitasController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -28,22 +29,23 @@ class aktivitasController extends Controller
         }
     }
 
-    public function convertNamaBulan($params){
+    public function convertNamaBulan($params)
+    {
         switch ($params) {
             case '1':
-              return 'Januari';
+                return 'Januari';
             case '2':
-              return 'Februari';
+                return 'Februari';
             case '3':
-              return 'Maret';
+                return 'Maret';
             case '4':
-              return 'April';
+                return 'April';
             case '5':
-              return 'Mei';
+                return 'Mei';
             case '6':
-              return 'Juni';
+                return 'Juni';
             case '7':
-              return 'Juli';
+                return 'Juli';
             case '8':
                 return 'Juli';
             case '9':
@@ -53,15 +55,16 @@ class aktivitasController extends Controller
             case '11':
                 return 'November';
             default:
-              return 'Desember';
-          }
+                return 'Desember';
+        }
     }
 
-    public function listByUser(){
- 
+    public function listByUser()
+    {
+
         $result = [];
-      
-       $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('bulan')->get();
+
+        $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai', Auth::user()->id_pegawai)->groupBy('bulan')->get();
 
         $bulan = '';
 
@@ -71,7 +74,7 @@ class aktivitasController extends Controller
             // return $value;
             $bulan = $this->convertNamaBulan($value->bulan);
 
-            $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'))->whereMonth('tanggal',$value->bulan)->groupBy('date')->orderBy('date')->get();
+            $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'))->whereMonth('tanggal', $value->bulan)->groupBy('date')->orderBy('date')->get();
             // foreach ($aktivitasgetDate as $x => $y) {
             //     $getAktivitas = aktivitas::where('tanggal',$y->date)->get();
             //     $aktivitas[$x] = $getAktivitas;
@@ -84,23 +87,21 @@ class aktivitasController extends Controller
 
             // TESTING
             foreach ($aktivitasgetDate as $x => $y) {
-                $getAktivitas = aktivitas::where('tanggal',$y->date)->get();
+                $getAktivitas = aktivitas::where('tanggal', $y->date)->get();
                 // $aktivitas[$y->date][$x] = $getAktivitas;
-            
+
                 // array_push($aktivitas_data_date,$getAktivitas);
                 $aktivitas[$x] = [
-                    'tanggal' =>$y->date,
-                    'data_tanggal'=>$getAktivitas 
+                    'tanggal' => $y->date,
+                    'data_tanggal' => $getAktivitas
                 ];
             }
 
             // $result[$key][$bulan][] = $aktivitas;
             $result[$key] = [
-                'bulan'=>$bulan,
-                'data_bulan'=>$aktivitas
+                'bulan' => $bulan,
+                'data_bulan' => $aktivitas
             ];
-
-          
         }
 
         if ($result) {
@@ -109,18 +110,18 @@ class aktivitasController extends Controller
                 'status' => true,
                 'data' => $result
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Aktivitas belum ada',
                 'status' => false
             ]);
-        }   
-
+        }
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         // return $request;
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'id_skp' => 'required|numeric',
             'nama_aktivitas' => 'required|string',
             'keterangan' => 'required',
@@ -131,8 +132,8 @@ class aktivitasController extends Controller
             'hasil' => 'required|numeric'
         ]);
 
-        if($validator->fails()){
-            return response()->json($validator->errors(),422);       
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
         }
 
         $data = new aktivitas();
@@ -155,7 +156,7 @@ class aktivitasController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -163,8 +164,9 @@ class aktivitasController extends Controller
         }
     }
 
-    public function show($params){
-        $data = aktivitas::where('id',$params)->first();
+    public function show($params)
+    {
+        $data = aktivitas::where('id', $params)->first();
 
         if ($data) {
             return response()->json([
@@ -172,7 +174,7 @@ class aktivitasController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -180,8 +182,9 @@ class aktivitasController extends Controller
         }
     }
 
-    public function update($params,Request $request){
-        $validator = Validator::make($request->all(),[
+    public function update($params, Request $request)
+    {
+        $validator = Validator::make($request->all(), [
             'id_skp' => 'required|numeric',
             'nama_aktivitas' => 'required|string',
             'keterangan' => 'required',
@@ -192,11 +195,11 @@ class aktivitasController extends Controller
             'hasil' => 'required|numeric'
         ]);
 
-        if($validator->fails()){
-            return response()->json($validator->errors());       
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
         }
 
-        $data = aktivitas::where('id',$params)->first();
+        $data = aktivitas::where('id', $params)->first();
         $data->id_pegawai = Auth::user()->id_pegawai;
         $data->id_skp = $request->id_skp;
         $data->nama_aktivitas = $request->nama_aktivitas;
@@ -215,7 +218,7 @@ class aktivitasController extends Controller
                 'status' => true,
                 'data' => $data
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -223,8 +226,9 @@ class aktivitasController extends Controller
         }
     }
 
-    public function delete($params){
-        $data = aktivitas::where('id',$params)->first();
+    public function delete($params)
+    {
+        $data = aktivitas::where('id', $params)->first();
         $data->delete();
 
         if ($data) {
@@ -232,7 +236,7 @@ class aktivitasController extends Controller
                 'message' => 'Success',
                 'status' => true,
             ]);
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Failed',
                 'status' => false
@@ -240,23 +244,36 @@ class aktivitasController extends Controller
         }
     }
 
-    public function optionSkp(){
+    public function optionSkp()
+    {
         $result = [];
         $data = array();
         $tahun = request('tahun');
 
-        $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id','tb_jabatan.id_pegawai')->join('tb_pegawai','tb_jabatan.id_pegawai','=','tb_pegawai.id')->where('tb_jabatan.id_pegawai',Auth::user()->id_pegawai)->first();
+        $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id', 'tb_jabatan.id_pegawai')->join('tb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')->where('tb_jabatan.id_pegawai', Auth::user()->id_pegawai)->first();
 
         if (isset($tahun)) {
-            $data = skp::where('id_jabatan',$jabatanByPegawai->id)->latest()->where('tahun',$tahun)->get();
-        }else{
-            $data = skp::where('id_jabatan',$jabatanByPegawai->id)->latest()->where('tahun',date('Y'))->get();
+            // $data = skp::where('id_jabatan',$jabatanByPegawai->id)->latest()->where('tahun',$tahun)->get();
+            $data = skp::where('id_jabatan', $jabatanByPegawai->id)
+                ->where('tahun', $tahun)
+                ->orderBy('jenis', 'ASC')
+                ->orderBy('id_skp_atasan', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->get();
+        } else {
+            // $data = skp::where('id_jabatan', $jabatanByPegawai->id)->latest()->where('tahun', date('Y'))->get();
+            $data = skp::where('id_jabatan', $jabatanByPegawai->id)
+                ->where('tahun', date('Y'))
+                ->orderBy('jenis', 'ASC')
+                ->orderBy('id_skp_atasan', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->get();
         }
 
         foreach ($data as $key => $value) {
             $result[$key] = [
                 'id' => $value->id,
-                'value'=> $value->rencana_kerja
+                'value' => $value->rencana_kerja
             ];
         }
         return response()->json($result);
