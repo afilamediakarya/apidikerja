@@ -501,7 +501,6 @@ class dashboardController extends Controller
 	}
 
 	public function opd_dashboard()
-	// 0
 	{
 		$count_skp = 0;
 		$count_realisasi = 0;
