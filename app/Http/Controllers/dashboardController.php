@@ -481,7 +481,8 @@ class dashboardController extends Controller
 
 
 		$result = [
-			'jumlah_skp' => $jumlah_skp,
+			// 'jumlah_skp' => $jumlah_skp,
+			'jumlah_skp' => 0,
 			'jumlah_realisasi_skp' => $jumlah_realisasi_skp,
 			'pegawai_diniai' => count($getJabatanByCurrentParent),
 			'aktivitas' => $countAktivitas,
@@ -500,6 +501,7 @@ class dashboardController extends Controller
 	}
 
 	public function opd_dashboard()
+	// 0
 	{
 		$count_skp = 0;
 		$count_realisasi = 0;
