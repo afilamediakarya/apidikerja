@@ -15,6 +15,8 @@ use App\Models\aspek_skp;
 use DB;
 use Auth;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
+use App\Http\Controllers\laporanRekapitulasiabsenController;
+
 
 class dashboardController extends Controller
 {
@@ -424,9 +426,11 @@ class dashboardController extends Controller
 		$first_date =  date("Y-m-01", strtotime($current_date));
 		// Last day of the month.
 		$last_date =  date('Y-m-t', strtotime($current_date));
-		$url = env('APP_URL');
-		$request_data_absen = Request::create($url . "/view-rekapByUser/{$first_date}/{$last_date}/" . Auth::user()->id_pegawai, 'GET');
-		$response_data_absen = \Illuminate\Support\Facades\Route::dispatch($request_data_absen);
+
+		// $url = env('APP_URL');
+		// $request_data_absen = Request::create($url . "/view-rekapByUser/{$first_date}/{$last_date}/" . Auth::user()->id_pegawai, 'GET');
+		// $response_data_absen = \Illuminate\Support\Facades\Route::dispatch($request_data_absen);
+		$response_data_absen = (new laporanRekapitulasiabsenController)->viewrekapByUser($first_date, $last_date, Auth::user()->id_pegawai);
 
 		$total_kehadiran = $response_data_absen->getData()->data->persentase_pemotongan;
 
@@ -481,8 +485,7 @@ class dashboardController extends Controller
 
 
 		$result = [
-			// 'jumlah_skp' => $jumlah_skp,
-			'jumlah_skp' => 0,
+			'jumlah_skp' => $jumlah_skp,
 			'jumlah_realisasi_skp' => $jumlah_realisasi_skp,
 			'pegawai_diniai' => count($getJabatanByCurrentParent),
 			'aktivitas' => $countAktivitas,
