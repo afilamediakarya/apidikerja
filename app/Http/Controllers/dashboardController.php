@@ -102,7 +102,7 @@ class dashboardController extends Controller
 			->join('tb_jenis_jabatan', 'tb_jabatan.id_jenis_jabatan', '=', 'tb_jenis_jabatan.id')
 			->where('tb_pegawai.id', Auth::user()->id_pegawai)->first();
 
-		// return $get_pegawai;
+		
 		if (isset($info_pegawai)) {
 			$info_pegawai = [
 				'nama' => $get_pegawai['nama'],
@@ -129,14 +129,6 @@ class dashboardController extends Controller
 			];
 		}
 
-
-		// INFO SKP
-		// // $data_skp = DB::table('tb_skp')
-		// 	->select('tb_skp.id')
-		// 	->join('tb_jabatan', 'tb_skp.id_jabatan', 'tb_jabatan.id')
-		// 	->join('tb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')
-		// 	->where('tb_jabatan.id_pegawai', Auth::user()->id_pegawai)
-		// 	->get();
 		$bulan = request('bulan');
 
 		$get_skp =
@@ -188,6 +180,8 @@ class dashboardController extends Controller
 		$total_target = 0;
 		$total_kinerja = 0;
 		$total_kehadiran = 0;
+		$tunjangan_prestasi_kerja = 0;
+		$tunjangan_kehadiran_kerja = 0;
 
 		$nilai_besaran_tpp = 0;
 		$nilai_besaran_tpp = $get_pegawai['nilai_jabatan'];
@@ -419,6 +413,20 @@ class dashboardController extends Controller
 
 		$total_kinerja = round($nilai_utama + $nilai_tambahan, 1);
 
+		// return $get_pegawai->nilai_jabatan. '|'.$total_kinerja;
+
+		if ($get_pegawai->nilai_jabatan > 0 ) {
+			$tunjangan_prestasi_kerja = (60 * $get_pegawai->nilai_jabatan / 100) * ($total_kinerja/120);
+		}
+
+		if ($get_pegawai->nilai_jabatan > 0) {
+			$tunjangan_kehadiran_kerja = (40 * $get_pegawai->nilai_jabatan / 100) * ($total_kehadiran - 40*$get_pegawai->nilai_jabatan / 100);
+		}
+
+		// (40*nilai_jabatan/100)*(potongan-(40*nilai_jabatan/100)
+
+		// total_kehadiran
+		
 		// INFO TPP
 		// KEHADIRAN
 		$current_date = date("Y-{$bulan}-d");
@@ -494,8 +502,8 @@ class dashboardController extends Controller
 			'list_rekap_nilai' => $list_pegawai,
 			'informasi_tpp' => [
 				'besaran_tpp' => number_format($nilai_besaran_tpp, 2),
-				'tunjangan_prestasi_kerja' => $total_kinerja,
-				'tunjangan_prestasi_kehadiran' => $total_kehadiran,
+				'tunjangan_prestasi_kerja' => number_format($tunjangan_prestasi_kerja,2),
+				'tunjangan_prestasi_kehadiran' => number_format($tunjangan_kehadiran_kerja,2),
 			],
 			'bulan' => request('bulan')
 		];
