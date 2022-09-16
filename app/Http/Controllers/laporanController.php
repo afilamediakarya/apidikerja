@@ -36,13 +36,18 @@ class laporanController extends Controller
         } else {
             // $level_[] = 0;
             $status_fails = 'Jabatan tidak di temukan, Mohon hubungi admin opd';
+            return response()->json([
+                // 'message' => 'Gagal Login',
+                'messages_' => $status_fails
+            ], 422);
         }
 
         if (count($level_) > 0) {
             $level = max($level_);
-        } else {
-            $level = 0;
         }
+        // else {
+        //     $level = 0;
+        // }
 
         if ($level !== '') {
             return response()->json([
@@ -76,22 +81,25 @@ class laporanController extends Controller
         // return $listPegawai;
 
         foreach ($listPegawai as $key => $value) {
-            $jabatan = jabatan::with('jenis_jabatan')->select('id', 'id_jenis_jabatan')->where('id_pegawai', $value->id)->first();
+            // $jabatan = jabatan::with('jenis_jabatan')->select('id', 'id_jenis_jabatan')->where('id_pegawai', $value->id)->first();
 
             $result = [];
-            $skp = [];
-            $atasan = '';
+            // $skp = [];
+            // $atasan = '';
             $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai', $value->id)->first();
+            // return $jabatanByPegawai;
 
-            $jabatan_atasan = DB::table('tb_jabatan')->where('id', $value->parent_id)->first();
+            // $jabatan_atasan = DB::table('tb_jabatan')->where('id', $value->parent_id)->first();
 
             $skp_utama =
-                skp::with(['aspek_skp' => function ($query) use ($bulan) {
-                    $query->with(['target_skp' => function ($select) use ($bulan) {
-                        $select->where('bulan', "{$bulan}");
-                    }])
+                skp::select('tb_skp.id', 'tb_skp.id_jabatan', 'tb_skp.id_satuan_kerja', 'tb_skp.id_skp_atasan', 'tb_skp.jenis', 'tb_skp.rencana_kerja', 'tb_skp.tahun')
+                ->with(['aspek_skp' => function ($query) use ($bulan) {
+                    $query
+                        ->select('tb_aspek_skp.id', 'tb_aspek_skp.id_skp', 'tb_aspek_skp.iki', 'tb_aspek_skp.aspek_skp', 'tb_aspek_skp.satuan')->with(['target_skp' => function ($select) use ($bulan) {
+                            $select->select('tb_target_skp.id', 'tb_target_skp.id_aspek_skp', 'tb_target_skp.target', 'tb_target_skp.bulan')->where('bulan', "{$bulan}");
+                        }])
                         ->with(['realisasi_skp' => function ($select) use ($bulan) {
-                            $select->where('bulan', "{$bulan}");
+                            $select->select('tb_realisasi_skp.id', 'tb_realisasi_skp.id_aspek_skp', 'tb_realisasi_skp.realisasi_bulanan', 'tb_realisasi_skp.bulan')->where('bulan', "{$bulan}");
                         }]);
                 }])
                 ->whereHas('aspek_skp', function ($query) use ($bulan) {
@@ -313,6 +321,7 @@ class laporanController extends Controller
             //     $value->skp_utama = $skp_utama;
             //     $value->skp_tambahan = $skp_tambahan;
             // }
+            // return $value;
         }
 
         $result['satuan_kerja'] = $satuanKerja;
