@@ -420,7 +420,7 @@ class dashboardController extends Controller
 		}
 
 		if ($get_pegawai->nilai_jabatan > 0) {
-			$tunjangan_kehadiran_kerja = (40 * $get_pegawai->nilai_jabatan / 100) * ($total_kehadiran - 40*$get_pegawai->nilai_jabatan / 100);
+			$tunjangan_kehadiran_kerja = $get_pegawai->nilai_jabatan - ($get_pegawai->nilai_jabatan * $total_kehadiran);
 		}
 
 		// (40*nilai_jabatan/100)*(potongan-(40*nilai_jabatan/100)
@@ -435,9 +435,6 @@ class dashboardController extends Controller
 		// Last day of the month.
 		$last_date =  date('Y-m-t', strtotime($current_date));
 
-		// $url = env('APP_URL');
-		// $request_data_absen = Request::create($url . "/view-rekapByUser/{$first_date}/{$last_date}/" . Auth::user()->id_pegawai, 'GET');
-		// $response_data_absen = \Illuminate\Support\Facades\Route::dispatch($request_data_absen);
 		$response_data_absen = (new laporanRekapitulasiabsenController)->viewrekapByUser($first_date, $last_date, Auth::user()->id_pegawai);
 
 		$total_kehadiran = $response_data_absen->getData()->data->persentase_pemotongan;

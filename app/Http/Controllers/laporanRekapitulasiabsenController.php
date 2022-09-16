@@ -66,6 +66,7 @@ class laporanRekapitulasiabsenController extends Controller
         $result = [];
         $rekapAbsen = [];
         $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', Auth::user()->id_pegawai)->first();
+        
 
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
@@ -97,6 +98,7 @@ class laporanRekapitulasiabsenController extends Controller
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
 
                     $selisih_waktu = $this->konvertWaktu('checkout', $v->waktu_absen);
+               
 
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
                         $temps_absensi['cpk']['cpk_30'][] = $selisih_waktu;
@@ -129,6 +131,7 @@ class laporanRekapitulasiabsenController extends Controller
 
                 if ($dataAbsen[0]['status_absen'] == 'hadir' || $dataAbsen[0]['status_absen'] == 'dinas luar') {
                     // $jml_kehadiran[] = 'checkout';
+
                 }
 
                 // cek if val date > date now, set checkout cepat 90 menit
@@ -143,7 +146,7 @@ class laporanRekapitulasiabsenController extends Controller
                     $jml_kehadiran[$dataAbsen[0]['tanggal_absen']] = 'checkout';
                 }
 
-                $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
+                // $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
             }
 
 
@@ -179,6 +182,8 @@ class laporanRekapitulasiabsenController extends Controller
         // return $temps_absensi;
         // return $jml_kehadiran;
 
+        // return count($temps_absensi['kmk']['kmk_30']).' | '.count($temps_absensi['kmk']['kmk_60']).' | '.count($temps_absensi['kmk']['kmk_90']).' | '.count($temps_absensi['kmk']['kmk_90_keatas']).' | '.count($temps_absensi['cpk']['cpk_30']).' | '.count($temps_absensi['cpk']['cpk_60']).' | '.count($temps_absensi['cpk']['cpk_90']).' | '.count($temps_absensi['cpk']['cpk_90_keatas']);
+
 
         $jml_potongan_kehadiran = (count($temps_absensi['alpa']) * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
 
@@ -191,7 +196,6 @@ class laporanRekapitulasiabsenController extends Controller
         $result['tanpa_keterangan'] = count($temps_absensi['alpa']);
         $result['pegawai'] = $pegawai;
         $result['data_absen'] = $rekapAbsen;
-
 
         if ($result) {
             return response()->json([
@@ -311,7 +315,7 @@ class laporanRekapitulasiabsenController extends Controller
                     ];
                     $jml_kehadiran[$dataAbsen[0]['tanggal_absen']] = 'checkout';
                 }
-                $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
+                // $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
             }
 
             if ($value['date'] > date('Y-m-d')) {
@@ -420,6 +424,7 @@ class laporanRekapitulasiabsenController extends Controller
     {
 
         $satker = intval($satuan_kerja);
+      
         $result = [];
         $pegawai_data = [];
         $satuan_kerja_ = '';
@@ -428,25 +433,23 @@ class laporanRekapitulasiabsenController extends Controller
         $startTime = strtotime($startDate);
         $endTime = strtotime($endDate);
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
+     
+        $range = $this->jmlHariKerja($startDate, date('Y-m-d'));
         $hariLibur = $this->cekHariLibur($jmlHariKerja);
 
         for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
-
             if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
                 $getDatatanggal[]['date'] = date('Y-m-d', $i);
             }
         }
 
-
-        // return count($jmlHariKerja['hari_kerja']) - count($getDatatanggal);
-
-
         if ($satker > 0) {
-            $getSatuankerjaById = DB::table('tb_satuan_kerja')->where('id', $satker)->first();
-            $satuan_kerja_ = $getSatuankerjaById->nama_satuan_kerja;
+            // $getSatuankerjaById = DB::table('tb_satuan_kerja')->where('id', $satker)->first();
+            // return $getSatuankerjaById;
+            // $satuan_kerja_ = $getSatuankerjaById['nama_satuan_kerja'];
             $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama')
                 ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
-                ->where('tb_pegawai.id_satuan_kerja', $satuan_kerja)
+                ->where('tb_pegawai.id_satuan_kerja', $satker)
                 ->orderBy('tb_jabatan.id_jenis_jabatan', 'asc')
                 ->get();
         } else {
@@ -462,7 +465,7 @@ class laporanRekapitulasiabsenController extends Controller
 
         foreach ($pegawaiBySatuanKerja as $key => $value) {
             $getAbsenPegawai = absen::where('id_pegawai', $value->id)
-                ->select('id', 'id_pegawai', 'waktu_absen', 'status', 'jenis')
+                ->select('id', 'id_pegawai', 'waktu_absen', 'status', 'jenis','tanggal_absen')
                 ->where('tanggal_absen', '>=', $startDate)
                 ->where('tanggal_absen', '<=', $endDate)
                 ->where('validation', 1)
@@ -479,14 +482,11 @@ class laporanRekapitulasiabsenController extends Controller
             }
         }
 
-        // return $pegawai_data;
-
-        // $jml_hari = $this->jmlHariKerja($startDate, $endDate);
-
         return $result = [
             'satuan_kerja' => $satuan_kerja_,
             'hari_kerja' => count($getDatatanggal),
-            'pegawai' => $pegawai_data
+            'pegawai' => $pegawai_data,
+            'range' => $range['hari_kerja'],
         ];
     }
 }
