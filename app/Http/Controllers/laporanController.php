@@ -74,6 +74,7 @@ class laporanController extends Controller
             ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
             ->join('tb_jenis_jabatan', 'tb_jabatan.id_jenis_jabatan', '=', 'tb_jenis_jabatan.id')
             ->where('tb_pegawai.id_satuan_kerja', $adminOpd->id_satuan_kerja)
+            ->orderBy('tb_jabatan.id_jenis_jabatan', 'ASC')
             // ->where('tb_pegawai.id', 2691)
             // ->orWhere('tb_pegawai.id', 2696)
             ->get();
