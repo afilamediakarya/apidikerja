@@ -253,7 +253,9 @@ class jabatanController extends Controller
         $current_user = pegawai::where('id', Auth::user()->id_pegawai)->first();
         // return $current_user;
 
-        $data = pegawai::where('tb_pegawai.id_satuan_kerja', $current_user['id_satuan_kerja'])
+        $data = DB::table('tb_pegawai')
+            ->select('tb_pegawai.id', 'tb_pegawai.nama')
+            ->where('tb_pegawai.id_satuan_kerja', $current_user['id_satuan_kerja'])
             ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
             ->orderBy('tb_jabatan.id_jenis_jabatan', 'ASC')
             ->get();
