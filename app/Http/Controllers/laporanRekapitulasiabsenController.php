@@ -72,6 +72,8 @@ class laporanRekapitulasiabsenController extends Controller
             $dataAbsen = [];
             $getAbsen = DB::table('tb_absen')->where('id_pegawai', Auth::user()->id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->get();
 
+            $tes[] = $getAbsen;
+
             foreach ($getAbsen as $i => $v) {
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
@@ -98,7 +100,8 @@ class laporanRekapitulasiabsenController extends Controller
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
 
                     $selisih_waktu = $this->konvertWaktu('checkout', $v->waktu_absen);
-               
+
+              
 
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
                         $temps_absensi['cpk']['cpk_30'][] = $selisih_waktu;
@@ -128,13 +131,6 @@ class laporanRekapitulasiabsenController extends Controller
             }
 
             if (count($dataAbsen) == 1) {
-
-                if ($dataAbsen[0]['status_absen'] == 'hadir' || $dataAbsen[0]['status_absen'] == 'dinas luar') {
-                    // $jml_kehadiran[] = 'checkout';
-
-                }
-
-                // cek if val date > date now, set checkout cepat 90 menit
                 if ($value['date'] < date('Y-m-d')) {
 
                     $dataAbsen[1] = [
@@ -146,7 +142,7 @@ class laporanRekapitulasiabsenController extends Controller
                     $jml_kehadiran[$dataAbsen[0]['tanggal_absen']] = 'checkout';
                 }
 
-                // $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
+                $temps_absensi['cpk']['cpk_90_keatas'][] = 90; 
             }
 
           
@@ -179,13 +175,9 @@ class laporanRekapitulasiabsenController extends Controller
             // return $rekapAbsen;
 
         }
-       
-        // return $tes;
-        // return $jml_kehadiran;
 
         // return count($temps_absensi['kmk']['kmk_30']).' | '.count($temps_absensi['kmk']['kmk_60']).' | '.count($temps_absensi['kmk']['kmk_90']).' | '.count($temps_absensi['kmk']['kmk_90_keatas']).' | '.count($temps_absensi['cpk']['cpk_30']).' | '.count($temps_absensi['cpk']['cpk_60']).' | '.count($temps_absensi['cpk']['cpk_90']).' | '.count($temps_absensi['cpk']['cpk_90_keatas']);
-
-        // return $jumlah_alpa;
+        // return count($temps_absensi['cpk']['cpk_90']).' | '.count($temps_absensi['cpk']['cpk_90_keatas']);
 
         // return ($jumlah_alpa * 3) .' || '. (count($temps_absensi['kmk']['kmk_30']) * 0.5) .' || '. (count($temps_absensi['kmk']['kmk_60'])) .' || '. (count($temps_absensi['kmk']['kmk_90']) * 1.25) .' || '. (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) .' || '. (count($temps_absensi['cpk']['cpk_30']) * 0.5) .' || '. (count($temps_absensi['cpk']['cpk_60'])) .' || '. (count($temps_absensi['cpk']['cpk_90']) * 1.25) .' || '. (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
 
