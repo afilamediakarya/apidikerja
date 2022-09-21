@@ -503,9 +503,9 @@ class laporanController extends Controller
                         $query->with(['target_skp' => function ($select) use ($bulan) {
                             $select->where('bulan', "{$bulan}");
                         }])
-                            ->with(['realisasi_skp' => function ($select) use ($bulan) {
-                                $select->where('bulan', "{$bulan}");
-                            }]);
+                        ->with(['realisasi_skp' => function ($select) use ($bulan) {
+                            $select->where('bulan', "{$bulan}");
+                        }]);
                     }])
                     ->whereHas('aspek_skp', function ($query) use ($bulan) {
                         $query->whereHas('target_skp', function ($query) use ($bulan) {

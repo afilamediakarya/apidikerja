@@ -66,21 +66,19 @@ class laporanRekapitulasiabsenController extends Controller
         $result = [];
         $rekapAbsen = [];
         $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', Auth::user()->id_pegawai)->first();
-        $tes = array();
 
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
-            $getAbsen = DB::table('tb_absen')->where('id_pegawai', Auth::user()->id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->get();
+            $getAbsen = DB::table('tb_absen')->where('id_pegawai', Auth::user()->id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
+
 
             $tes[] = $getAbsen;
 
             foreach ($getAbsen as $i => $v) {
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
-
+                    $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
                     $selisih_waktu = $this->konvertWaktu('checkin', $v->waktu_absen);
-                    // return $selisih_waktu;
-
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
                         $temps_absensi['kmk']['kmk_30'][] = $selisih_waktu;
                     } elseif ($selisih_waktu >= 31 && $selisih_waktu <= 60) {
@@ -97,12 +95,7 @@ class laporanRekapitulasiabsenController extends Controller
                     }
                 } else {
 
-                    $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
-
                     $selisih_waktu = $this->konvertWaktu('checkout', $v->waktu_absen);
-
-              
-
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
                         $temps_absensi['cpk']['cpk_30'][] = $selisih_waktu;
                     } elseif ($selisih_waktu >= 31 && $selisih_waktu <= 60) {
@@ -119,7 +112,6 @@ class laporanRekapitulasiabsenController extends Controller
                         $keterangan = 'Tepat waktu';
                     }
                 }
-
 
                 $dataAbsen[$i] = [
                     'jenis' => $v->jenis,
@@ -243,7 +235,8 @@ class laporanRekapitulasiabsenController extends Controller
 
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
-            $getAbsen = DB::table('tb_absen')->where('id_pegawai', $id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->get();
+            $getAbsen = DB::table('tb_absen')->where('id_pegawai', $id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
+
             foreach ($getAbsen as $i => $v) {
 
                 $keterangan = '';
@@ -471,7 +464,8 @@ class laporanRekapitulasiabsenController extends Controller
                 ->where('tanggal_absen', '>=', $startDate)
                 ->where('tanggal_absen', '<=', $endDate)
                 ->where('validation', 1)
-                ->groupBy('tb_absen.id')
+                // ->groupBy('tb_absen.id')
+                ->groupBy('tb_absen.tanggal_absen','tb_absen.jenis')
                 ->get();
 
             if (count($getAbsenPegawai) > 0) {
