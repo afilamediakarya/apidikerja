@@ -179,7 +179,7 @@ class dashboardController extends Controller
 		$total_realisasi = 0;
 		$total_target = 0;
 		$total_kinerja = 0;
-		$total_kehadiran = 0;
+		$persentase_pemotongan = 0;
 		$tunjangan_prestasi_kerja = 0;
 		$tunjangan_kehadiran_kerja = 0;
 
@@ -415,17 +415,10 @@ class dashboardController extends Controller
 
 		// return $get_pegawai->nilai_jabatan. '|'.$total_kinerja;
 
-		if ($get_pegawai->nilai_jabatan > 0 ) {
-			$tunjangan_prestasi_kerja = (60 * $get_pegawai->nilai_jabatan / 100) * ($total_kinerja/120);
-		}
-
-		if ($get_pegawai->nilai_jabatan > 0) {
-			$tunjangan_kehadiran_kerja = $get_pegawai->nilai_jabatan - ($get_pegawai->nilai_jabatan * $total_kehadiran);
-		}
 
 		// (40*nilai_jabatan/100)*(potongan-(40*nilai_jabatan/100)
 
-		// total_kehadiran
+		// persentase_pemotongan
 		
 		// INFO TPP
 		// KEHADIRAN
@@ -437,7 +430,20 @@ class dashboardController extends Controller
 
 		$response_data_absen = (new laporanRekapitulasiabsenController)->viewrekapByUser($first_date, $last_date, Auth::user()->id_pegawai);
 
-		$total_kehadiran = $response_data_absen->getData()->data->persentase_pemotongan;
+		$persentase_pemotongan = $response_data_absen->getData()->data->persentase_pemotongan;
+		$total_tpp = 0;
+
+		if ($get_pegawai->nilai_jabatan > 0 ) {
+			$tunjangan_prestasi_kerja = (60 * $get_pegawai->nilai_jabatan / 100) * ($total_kinerja/120);
+		}
+
+		if ($get_pegawai->nilai_jabatan > 0) {
+			$percent_nilai_jabatan = 40 * $get_pegawai->nilai_jabatan / 100;
+			$tunjangan_kehadiran_kerja = $percent_nilai_jabatan - ($percent_nilai_jabatan * ($persentase_pemotongan / 100));
+			// $tunjangan_kehadiran_kerja = $persentase_pemotongan;
+		}
+
+		$total_tpp = $tunjangan_prestasi_kerja + $tunjangan_kehadiran_kerja;
 
 
 		// // AKTIVITAS
@@ -501,6 +507,7 @@ class dashboardController extends Controller
 				'besaran_tpp' => number_format($nilai_besaran_tpp, 2),
 				'tunjangan_prestasi_kerja' => number_format($tunjangan_prestasi_kerja,2),
 				'tunjangan_prestasi_kehadiran' => number_format($tunjangan_kehadiran_kerja,2),
+				'tpp_diterima' => number_format($total_tpp,2)
 			],
 			'bulan' => request('bulan')
 		];

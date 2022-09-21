@@ -173,7 +173,7 @@ class laporanRekapitulasiabsenController extends Controller
             }
 
             // return $rekapAbsen;
-
+ 
         }
 
         // return count($temps_absensi['kmk']['kmk_30']).' | '.count($temps_absensi['kmk']['kmk_60']).' | '.count($temps_absensi['kmk']['kmk_90']).' | '.count($temps_absensi['kmk']['kmk_90_keatas']).' | '.count($temps_absensi['cpk']['cpk_30']).' | '.count($temps_absensi['cpk']['cpk_60']).' | '.count($temps_absensi['cpk']['cpk_90']).' | '.count($temps_absensi['cpk']['cpk_90_keatas']);
@@ -311,7 +311,7 @@ class laporanRekapitulasiabsenController extends Controller
                     ];
                     $jml_kehadiran[$dataAbsen[0]['tanggal_absen']] = 'checkout';
                 }
-                // $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
+                $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
             }
 
             if ($value['date'] > date('Y-m-d')) {
