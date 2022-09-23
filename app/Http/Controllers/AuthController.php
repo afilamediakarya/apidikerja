@@ -86,7 +86,7 @@ class AuthController extends Controller
                 'access_token' => $token, 
                 'role' => $user->role,
                 'current' => $user,
-                'check_atasan'=> $data,
+                // 'check_atasan'=> $data,
                 'level_jabatan' => $level,
                 'token_type' => 'Bearer', 
             ]);
