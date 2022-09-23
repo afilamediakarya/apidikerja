@@ -27,12 +27,16 @@ class AuthController extends Controller
         $status_login_fails = '';
         $token = '';
 
-        $user = User::where('username', $request['username'])->firstOrFail();
+        // $user = User::where('username', $request['username'])->firstOrFail();
+
+        $user = User::select('users.id','id_pegawai','role','tb_pegawai.id_satuan_kerja','nama','nip','golongan')->join('tb_pegawai','tb_pegawai.id','users.id_pegawai')->where('username', $request['username'])->firstOrFail();
+
+        // return $user;
          
         // return $user;
         
         // $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
-        $data = '';
+        // $data = '';
 
          if ($user['role'] == 'admin_opd' || $user['role'] == 'super_admin') {
                $token = $user->createToken('auth_token')->plainTextToken; 
@@ -41,7 +45,7 @@ class AuthController extends Controller
                 'access_token' => $token, 
                 'role' => $user->role,
                 'current' => $user,
-                'check_atasan'=> $data,
+                // 'check_atasan'=> $data,
                 'level_jabatan' => $level,
                 'token_type' => 'Bearer', 
             ]);
@@ -195,31 +199,19 @@ class AuthController extends Controller
           // $data = User::findOrFail(Auth::user()->id);
         // $current = [];
 
-        $user = DB::table('users')->select('users.id','users.id_pegawai','users.role','users.username','users.email','tb_pegawai.id_satuan_kerja','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.id','tb_pegawai.face_character','tb_pegawai.tempat_lahir','tb_pegawai.golongan','tb_pegawai.tmt_golongan','tb_pegawai.tmt_pegawai','tb_pegawai.jenis_kelamin','tb_pegawai.agama','tb_pegawai.status_perkawinan','tb_pegawai.pendidikan','tb_pegawai.jurusan','tb_pegawai.lulus_pendidikan','tb_pegawai.tanggal_lahir','tb_satuan_kerja.nama_satuan_kerja','tb_satuan_kerja.inisial_satuan_kerja','tb_satuan_kerja.kode_satuan_kerja','tb_satuan_kerja.status_kepala','tb_lokasi.nama_lokasi','tb_lokasi.lat','tb_lokasi.long')->join('tb_pegawai','users.id_pegawai','=','tb_pegawai.id')->where('users.id',Auth::user()->id)->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_lokasi','tb_jabatan.id_lokasi','=','tb_lokasi.id')->first();
+        $user = DB::table('users')->select('users.id','users.id_pegawai','users.role','tb_pegawai.id_satuan_kerja','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.id','tb_pegawai.face_character','tb_pegawai.golongan','tb_satuan_kerja.nama_satuan_kerja','tb_satuan_kerja.inisial_satuan_kerja','tb_satuan_kerja.kode_satuan_kerja','tb_satuan_kerja.status_kepala','tb_lokasi.nama_lokasi','tb_lokasi.lat','tb_lokasi.long')->join('tb_pegawai','users.id_pegawai','=','tb_pegawai.id')->where('users.id',Auth::user()->id)->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_lokasi','tb_jabatan.id_lokasi','=','tb_lokasi.id')->first();
 
         if (isset($user)) {
            $current = [
                 'id' => $user->id,
                 'id_pegawai' => $user->id_pegawai,
                 'role' => $user->role,
-                'username' => $user->username,
-                'email' => $user->email,
                 'pegawai' => [
                     'id' => $user->id_pegawai,
                     'id_satuan_kerja' => $user->id_satuan_kerja,
                     'nama' => $user->nama,
-                    'tempat_lahir' => $user->tempat_lahir,
-                    'tanggal_lahir' => $user->tanggal_lahir,
                     'nip' => $user->nip,
                     'golongan' => $user->golongan,
-                    'tmt_golongan' => $user->tmt_golongan,
-                    'tmt_pegawai' => $user->tmt_pegawai,
-                    'jenis_kelamin' => $user->jenis_kelamin,
-                    'agama' => $user->agama,
-                    'status_perkawinan' => $user->status_perkawinan,
-                    'pendidikan' => $user->pendidikan,
-                    'jurusan' => $user->jurusan,
-                    'lulus_pendidikan' => $user->lulus_pendidikan,
                     'face_character' => $user->face_character,
                     'satuan_kerja' => [
                         'id' => $user->id_satuan_kerja,
