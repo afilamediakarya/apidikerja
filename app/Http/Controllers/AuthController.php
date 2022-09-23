@@ -26,10 +26,16 @@ class AuthController extends Controller
         $level_ = [];
         $status_login_fails = '';
         $token = '';
+        $user = array();
 
-        // $user = User::where('username', $request['username'])->firstOrFail();
 
-        $user = User::select('users.id','id_pegawai','role','tb_pegawai.id_satuan_kerja','nama','nip','golongan')->join('tb_pegawai','tb_pegawai.id','users.id_pegawai')->where('username', $request['username'])->firstOrFail();
+        if ($request->username !== 'super_admin') {
+            $user = User::select('users.id','id_pegawai','role','tb_pegawai.id_satuan_kerja','nama','nip','golongan')->join('tb_pegawai','tb_pegawai.id','users.id_pegawai')->where('username', $request['username'])->firstOrFail();
+        }else{
+            $user = User::where('username', $request['username'])->firstOrFail();
+        }
+
+   
 
         // return $user;
          
