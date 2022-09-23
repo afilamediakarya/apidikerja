@@ -11,7 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable,HasApiTokens;
-    protected $with = ['pegawai'];
+    // protected $with = ['pegawai'];
 
     /**
      * The attributes that are mass assignable.
