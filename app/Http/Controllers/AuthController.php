@@ -30,19 +30,10 @@ class AuthController extends Controller
 
 
         if ($request->username !== 'super_admin') {
-            $user = User::select('users.id','id_pegawai','role','tb_pegawai.id_satuan_kerja','nama','nip','golongan')->join('tb_pegawai','tb_pegawai.id','users.id_pegawai')->where('username', $request['username'])->firstOrFail();
+            $user = User::select('users.id','id_pegawai','role','tb_pegawai.id_satuan_kerja','nama','nip','golongan','tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai','tb_pegawai.id','users.id_pegawai')->join('tb_satuan_kerja','tb_satuan_kerja.id','tb_pegawai.id_satuan_kerja')->where('username', $request['username'])->firstOrFail();
         }else{
             $user = User::where('username', $request['username'])->firstOrFail();
         }
-
-   
-
-        // return $user;
-         
-        // return $user;
-        
-        // $data = DB::table('tb_pegawai')->join('tb_atasan','tb_pegawai.id', '=', 'tb_atasan.id_pegawai')->where('tb_pegawai.id',Auth::user()->id_pegawai)->get();
-        // $data = '';
 
          if ($user['role'] == 'admin_opd' || $user['role'] == 'super_admin') {
                $token = $user->createToken('auth_token')->plainTextToken; 
@@ -51,7 +42,6 @@ class AuthController extends Controller
                 'access_token' => $token, 
                 'role' => $user->role,
                 'current' => $user,
-                // 'check_atasan'=> $data,
                 'level_jabatan' => $level,
                 'token_type' => 'Bearer', 
             ]);
