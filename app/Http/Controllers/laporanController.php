@@ -60,20 +60,23 @@ class laporanController extends Controller
             ], 422);
         }
     }
-    public function laporanRekapitulasiSkp($bulan)
+    public function laporanRekapitulasiSkp(Request $request, $bulan)
     {
         $result = [];
         $adminOpd = DB::table('tb_pegawai')->where('id', Auth::user()->id_pegawai)->first();
+
+        $idSatuanKerja = (request('dinas') !== null) ? request('dinas') : $adminOpd->id_satuan_kerja;
+
         $satuanKerja = DB::table('tb_satuan_kerja')
             ->select('nama_satuan_kerja')
-            ->where('id', $adminOpd->id_satuan_kerja)
+            ->where('id', $idSatuanKerja)
             ->first();
 
         $listPegawai = DB::table('tb_pegawai')
             ->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.id as id_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_jabatan.parent_id', 'tb_jenis_jabatan.level')
             ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
             ->join('tb_jenis_jabatan', 'tb_jabatan.id_jenis_jabatan', '=', 'tb_jenis_jabatan.id')
-            ->where('tb_pegawai.id_satuan_kerja', $adminOpd->id_satuan_kerja)
+            ->where('tb_pegawai.id_satuan_kerja', $idSatuanKerja)
             ->orderBy('tb_jabatan.id_jenis_jabatan', 'ASC')
             // ->where('tb_pegawai.id', 2691)
             // ->orWhere('tb_pegawai.id', 2696)
@@ -503,9 +506,9 @@ class laporanController extends Controller
                         $query->with(['target_skp' => function ($select) use ($bulan) {
                             $select->where('bulan', "{$bulan}");
                         }])
-                        ->with(['realisasi_skp' => function ($select) use ($bulan) {
-                            $select->where('bulan', "{$bulan}");
-                        }]);
+                            ->with(['realisasi_skp' => function ($select) use ($bulan) {
+                                $select->where('bulan', "{$bulan}");
+                            }]);
                     }])
                     ->whereHas('aspek_skp', function ($query) use ($bulan) {
                         $query->whereHas('target_skp', function ($query) use ($bulan) {
