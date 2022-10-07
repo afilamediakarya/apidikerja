@@ -38,6 +38,20 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/change-role/{params}', [App\Http\Controllers\AuthController::class, 'changeRolePegawai']);
     });
 
+    Route::prefix('profile')->group(function () {
+        Route::get('/personal-data', [App\Http\Controllers\ProfileController::class, 'personalData']);
+        Route::get('/get-list-pendidikan', [App\Http\Controllers\ProfileController::class, 'getListPendidikan']);
+        Route::get('/list-pendidikan-formal', [App\Http\Controllers\ProfileController::class, 'listPendidikanFormal']);
+        Route::get('/get-pendidikan-formal/{id}', [App\Http\Controllers\ProfileController::class, 'getPendidikanFormal']);
+        Route::post('/store-pendidikan-formal', [App\Http\Controllers\ProfileController::class, 'storePendidikanFormal']);
+        Route::post('/update-pendidikan-formal/{id}', [App\Http\Controllers\ProfileController::class, 'updatePendidikanFormal']);
+        Route::delete('/delete-pendidikan-formal/{id}', [App\Http\Controllers\ProfileController::class, 'deletePendidikanFormal']);
+    });
+
+    Route::prefix('verifikasi')->group(function () {
+        Route::get('/pendidikan-formal', [App\Http\Controllers\VerfikasiController::class, 'pendidikanFormal']);
+    });
+
     Route::prefix('satuan')->group(function () {
         Route::get('/list', [App\Http\Controllers\satuanController::class, 'list']);
         Route::post('/store', [App\Http\Controllers\satuanController::class, 'store']);
