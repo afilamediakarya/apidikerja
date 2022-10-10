@@ -41,11 +41,20 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('profile')->group(function () {
         Route::get('/personal-data', [App\Http\Controllers\ProfileController::class, 'personalData']);
         Route::get('/get-list-pendidikan', [App\Http\Controllers\ProfileController::class, 'getListPendidikan']);
+
+        // pendidikan formal
         Route::get('/list-pendidikan-formal', [App\Http\Controllers\ProfileController::class, 'listPendidikanFormal']);
         Route::get('/get-pendidikan-formal/{id}', [App\Http\Controllers\ProfileController::class, 'getPendidikanFormal']);
         Route::post('/store-pendidikan-formal', [App\Http\Controllers\ProfileController::class, 'storePendidikanFormal']);
         Route::post('/update-pendidikan-formal/{id}', [App\Http\Controllers\ProfileController::class, 'updatePendidikanFormal']);
         Route::delete('/delete-pendidikan-formal/{id}', [App\Http\Controllers\ProfileController::class, 'deletePendidikanFormal']);
+
+        // pendidikan nonformal
+        Route::get('/list-pendidikan-nonformal', [App\Http\Controllers\ProfileController::class, 'listPendidikanNonFormal']);
+        Route::post('/store-pendidikan-nonformal', [App\Http\Controllers\ProfileController::class, 'storePendidikanNonFormal']);
+        Route::get('/get-pendidikan-nonformal/{id}', [App\Http\Controllers\ProfileController::class, 'getPendidikanNonFormal']);
+        Route::post('/update-pendidikan-nonformal/{id}', [App\Http\Controllers\ProfileController::class, 'updatePendidikanNonFormal']);
+        Route::delete('/delete-pendidikan-nonformal/{id}', [App\Http\Controllers\ProfileController::class, 'deletePendidikanNonFormal']);
     });
 
     Route::prefix('verifikasi')->group(function () {

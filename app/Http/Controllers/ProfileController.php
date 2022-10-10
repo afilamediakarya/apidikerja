@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\pegawai;
 use App\Models\riwayatPendidikan;
+use App\Models\riwayatPendidikanNonformal;
 use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +44,8 @@ class ProfileController extends Controller
         return $pendidikan;
     }
 
+
+    // pendidikan formal
     public function listPendidikanFormal(Request $request)
     {
         $data = DB::table('tb_riwayat_pendidikan')
@@ -128,7 +131,7 @@ class ProfileController extends Controller
         $data->nama_kepala_sekolah = $request->nama_kepala_sekolah;
         $data->nama_sekolah = $request->nama_sekolah;
         $data->alamat_sekolah = $request->alamat_sekolah;
-        $data->document = $request->foto_ijazah;
+        $data->document_formal = $request->foto_ijazah;
         $data->verifikasi = 0;
         $data->id_pegawai_verifikator = 0;
         $data->save();
@@ -179,7 +182,7 @@ class ProfileController extends Controller
         $data->alamat_sekolah = $request->alamat_sekolah;
 
         if ($request->foto_ijazah !== null) {
-            $data->document = $request->foto_ijazah;
+            $data->document_formal = $request->foto_ijazah;
         }
 
         $data->save();
@@ -216,4 +219,187 @@ class ProfileController extends Controller
             ]);
         }
     }
+    // end pendidikan formal
+
+
+    // pendidikan nonformal
+    public function listPendidikanNonFormal(Request $request)
+    {
+        $data = DB::table('tb_riwayat_pendidikan_nonformal')
+            ->select('tb_riwayat_pendidikan_nonformal.*', 'tb_pegawai.nama',)
+            ->join('tb_pegawai', 'tb_riwayat_pendidikan_nonformal.id_pegawai', '=', 'tb_pegawai.id')
+            ->where('tb_riwayat_pendidikan_nonformal.id_pegawai', Auth::user()->id_pegawai)
+            ->where('tb_riwayat_pendidikan_nonformal.jenis_pendidikan', 'nonformal')
+            ->orderBy('tb_riwayat_pendidikan_nonformal.tanggal_ijazah', 'ASC')
+            ->get();
+
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false,
+                'data' => $data
+            ]);
+        }
+    }
+
+    public function storePendidikanNonFormal(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_pegawai' => 'required|numeric',
+            'nama_kursus' => 'required',
+            'tanggal_mulai' => 'required',
+            'tanggal_akhir' => 'required',
+            'nomor_ijazah' => 'required',
+            'tanggal_ijazah' => 'required',
+            'nama_pejabat' => 'required',
+            'instansi_penyelenggara' => 'required',
+            'tempat' => 'required',
+            'document_nonformal' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
+
+        $data = new riwayatPendidikanNonformal();
+        $data->id_pegawai = $request->id_pegawai;
+        $data->jenis_pendidikan = $request->jenis_pendidikan;
+        $data->nama_kursus = $request->nama_kursus;
+        $data->tanggal_mulai = $request->tanggal_mulai;
+        $data->tanggal_akhir = $request->tanggal_akhir;
+        $data->tanggal_akhir = $request->tanggal_akhir;
+        $data->nomor_ijazah = $request->nomor_ijazah;
+        $data->tanggal_ijazah = $request->tanggal_ijazah;
+        $data->nama_pejabat = $request->nama_pejabat;
+        $data->instansi_penyelenggara = $request->instansi_penyelenggara;
+        $data->tempat = $request->tempat;
+        $data->document_nonformal = $request->document_nonformal;
+        $data->verifikasi = 0;
+        $data->id_pegawai_verifikator = 0;
+        $data->save();
+        // return $data;
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
+    public function getPendidikanNonFormal(Request $request, $id)
+    {
+        $data = DB::table('tb_riwayat_pendidikan_nonformal')
+            ->select('tb_riwayat_pendidikan_nonformal.*', 'tb_pegawai.nama',)
+            ->join('tb_pegawai', 'tb_riwayat_pendidikan_nonformal.id_pegawai', '=', 'tb_pegawai.id')
+            ->where('tb_riwayat_pendidikan_nonformal.id_pegawai', Auth::user()->id_pegawai)
+            ->where('tb_riwayat_pendidikan_nonformal.jenis_pendidikan', 'nonformal')
+            ->where('tb_riwayat_pendidikan_nonformal.id', $id)
+            ->first();
+        // dd($data);
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false,
+                'data' => $data
+            ]);
+        }
+    }
+
+    public function updatePendidikanNonFormal(Request $request, $id)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'id_pegawai' => 'required|numeric',
+            'nama_kursus' => 'required',
+            'tanggal_mulai' => 'required',
+            'tanggal_akhir' => 'required',
+            'nomor_ijazah' => 'required',
+            'tanggal_ijazah' => 'required',
+            'nama_pejabat' => 'required',
+            'instansi_penyelenggara' => 'required',
+            'tempat' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
+        $data = riwayatPendidikanNonformal::where('id', $id)->first();
+        $data->id_pegawai = $request->id_pegawai;
+        $data->jenis_pendidikan = $request->jenis_pendidikan;
+        $data->nama_kursus = $request->nama_kursus;
+        $data->tanggal_mulai = $request->tanggal_mulai;
+        $data->tanggal_akhir = $request->tanggal_akhir;
+        $data->tanggal_akhir = $request->tanggal_akhir;
+        $data->nomor_ijazah = $request->nomor_ijazah;
+        $data->tanggal_ijazah = $request->tanggal_ijazah;
+        $data->nama_pejabat = $request->nama_pejabat;
+        $data->instansi_penyelenggara = $request->instansi_penyelenggara;
+        $data->tempat = $request->tempat;
+        $data->document_nonformal = $request->document_nonformal;
+        $data->verifikasi = 0;
+        $data->id_pegawai_verifikator = 0;
+        $data->save();
+
+        if ($request->document_nonformal !== null) {
+            $data->document_nonformal = $request->document_nonformal;
+        }
+
+        $data->save();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
+    public function deletePendidikanNonFormal($id)
+    {
+        $data = riwayatPendidikanNonformal::where('id', $id)->first();
+        $data->delete();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data,
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+    // end pendidikan nonformal
+
 }
