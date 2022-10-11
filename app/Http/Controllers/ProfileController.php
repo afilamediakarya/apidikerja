@@ -229,7 +229,7 @@ class ProfileController extends Controller
             ->select('tb_riwayat_pendidikan_nonformal.*', 'tb_pegawai.nama',)
             ->join('tb_pegawai', 'tb_riwayat_pendidikan_nonformal.id_pegawai', '=', 'tb_pegawai.id')
             ->where('tb_riwayat_pendidikan_nonformal.id_pegawai', Auth::user()->id_pegawai)
-            ->where('tb_riwayat_pendidikan_nonformal.jenis_pendidikan', 'nonformal')
+            // ->where('tb_riwayat_pendidikan_nonformal.jenis_pendidikan', 'nonformal')
             ->orderBy('tb_riwayat_pendidikan_nonformal.tanggal_ijazah', 'ASC')
             ->get();
 
@@ -307,7 +307,7 @@ class ProfileController extends Controller
             ->select('tb_riwayat_pendidikan_nonformal.*', 'tb_pegawai.nama',)
             ->join('tb_pegawai', 'tb_riwayat_pendidikan_nonformal.id_pegawai', '=', 'tb_pegawai.id')
             ->where('tb_riwayat_pendidikan_nonformal.id_pegawai', Auth::user()->id_pegawai)
-            ->where('tb_riwayat_pendidikan_nonformal.jenis_pendidikan', 'nonformal')
+            // ->where('tb_riwayat_pendidikan_nonformal.jenis_pendidikan', 'nonformal')
             ->where('tb_riwayat_pendidikan_nonformal.id', $id)
             ->first();
         // dd($data);
