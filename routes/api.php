@@ -41,6 +41,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('profile')->group(function () {
         Route::get('/personal-data', [App\Http\Controllers\ProfileController::class, 'personalData']);
         Route::get('/get-list-pendidikan', [App\Http\Controllers\ProfileController::class, 'getListPendidikan']);
+        Route::get('/get-list-golongan', [App\Http\Controllers\ProfileController::class, 'getListGolongan']);
+        Route::get('/get-list-unitkerja', [App\Http\Controllers\ProfileController::class, 'getListUnitkerja']);
 
         // pendidikan formal
         Route::get('/list-pendidikan-formal', [App\Http\Controllers\ProfileController::class, 'listPendidikanFormal']);
@@ -55,6 +57,20 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/get-pendidikan-nonformal/{id}', [App\Http\Controllers\ProfileController::class, 'getPendidikanNonFormal']);
         Route::post('/update-pendidikan-nonformal/{id}', [App\Http\Controllers\ProfileController::class, 'updatePendidikanNonFormal']);
         Route::delete('/delete-pendidikan-nonformal/{id}', [App\Http\Controllers\ProfileController::class, 'deletePendidikanNonFormal']);
+
+        // kepangkatan
+        Route::get('/list-kepangkatan', [App\Http\Controllers\ProfileController::class, 'listKepangkatan']);
+        Route::post('/store-kepangkatan', [App\Http\Controllers\ProfileController::class, 'storeKepangkatan']);
+        Route::get('/get-kepangkatan/{id}', [App\Http\Controllers\ProfileController::class, 'getKepangkatan']);
+        Route::post('/update-kepangkatan/{id}', [App\Http\Controllers\ProfileController::class, 'updateKepangkatan']);
+        Route::delete('/delete-kepangkatan/{id}', [App\Http\Controllers\ProfileController::class, 'deleteKepangkatan']);
+
+        // jabatan
+        Route::get('/list-jabatan', [App\Http\Controllers\ProfileController::class, 'listJabatan']);
+        Route::post('/store-jabatan', [App\Http\Controllers\ProfileController::class, 'storeJabatan']);
+        Route::get('/get-jabatan/{id}', [App\Http\Controllers\ProfileController::class, 'getJabatan']);
+        Route::post('/update-jabatan/{id}', [App\Http\Controllers\ProfileController::class, 'updateJabatan']);
+        Route::delete('/delete-jabatan/{id}', [App\Http\Controllers\ProfileController::class, 'deleteJabatan']);
     });
 
     Route::prefix('verifikasi')->group(function () {

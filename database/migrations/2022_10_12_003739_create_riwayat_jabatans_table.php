@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRiwayatKepangkatansTable extends Migration
+class CreateRiwayatJabatansTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,17 @@ class CreateRiwayatKepangkatansTable extends Migration
      */
     public function up()
     {
-        Schema::create('tb_riwayat_kepangkatan', function (Blueprint $table) {
+        Schema::create('tb_riwayat_jabatan', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_pegawai')->constrained('tb_pegawai')->onDelete('cascade');
             $table->foreignId('id_golongan')->constrained('tb_golongan')->onDelete('cascade');
             $table->foreignId('id_satuan_kerja')->constrained('tb_satuan_kerja')->onDelete('cascade');
-            $table->string('tahun_kerja', 10);
-            $table->string('bulan_kerja', 10);
-            $table->bigInteger('gaji_pokok');
+            $table->string('nama_jabatan', 20);
             $table->string('nomor_sk', 20);
             $table->date('tanggal_sk');
-            $table->date('tmt');
             $table->string('nama_pejabat', 20);
-            $table->string('document_kepangkatan', 255);
+            $table->date('tmt');
+            $table->string('document_jabatan', 255);
             $table->boolean('verifikasi')->default(0);
             $table->integer('id_pegawai_verifikator');
             $table->timestamps();
@@ -39,6 +37,6 @@ class CreateRiwayatKepangkatansTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tb_riwayat_kepangkatan');
+        Schema::dropIfExists('tb_riwayat_jabatan');
     }
 }

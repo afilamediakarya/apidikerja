@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\pegawai;
+use App\Models\riwayatJabatan;
+use App\Models\riwayatKepangkatan;
 use App\Models\riwayatPendidikan;
 use App\Models\riwayatPendidikanNonformal;
 use Validator;
@@ -42,6 +43,24 @@ class ProfileController extends Controller
             ->get();
 
         return $pendidikan;
+    }
+
+    public function getListGolongan()
+    {
+        $golongan = DB::table("tb_golongan")
+            ->select("id", "nama_golongan")
+            ->get();
+
+        return $golongan;
+    }
+
+    public function getListUnitkerja()
+    {
+        $unitKerja = DB::table("tb_satuan_kerja")
+            ->select("id", "nama_satuan_kerja")
+            ->get();
+
+        return $unitKerja;
     }
 
 
@@ -105,7 +124,7 @@ class ProfileController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'id_pegawai' => 'required|numeric',
-            'id_pendidikan' => 'required|numeric|unique:tb_riwayat_pendidikan,id_pendidikan',
+            'id_pendidikan' => 'required|numeric',
             'fakultas' => 'required',
             'jurusan' => 'required',
             'nomor_ijazah' => 'required',
@@ -275,7 +294,6 @@ class ProfileController extends Controller
         $data->nama_kursus = $request->nama_kursus;
         $data->tanggal_mulai = $request->tanggal_mulai;
         $data->tanggal_akhir = $request->tanggal_akhir;
-        $data->tanggal_akhir = $request->tanggal_akhir;
         $data->nomor_ijazah = $request->nomor_ijazah;
         $data->tanggal_ijazah = $request->tanggal_ijazah;
         $data->nama_pejabat = $request->nama_pejabat;
@@ -357,7 +375,6 @@ class ProfileController extends Controller
         $data->nama_pejabat = $request->nama_pejabat;
         $data->instansi_penyelenggara = $request->instansi_penyelenggara;
         $data->tempat = $request->tempat;
-        $data->document_nonformal = $request->document_nonformal;
         $data->verifikasi = 0;
         $data->id_pegawai_verifikator = 0;
         $data->save();
@@ -401,5 +418,352 @@ class ProfileController extends Controller
         }
     }
     // end pendidikan nonformal
+
+    // kepangkatan
+    public function listKepangkatan(Request $request)
+    {
+        $data = DB::table('tb_riwayat_kepangkatan')
+            ->select('tb_riwayat_kepangkatan.*', 'tb_pegawai.nama', 'tb_golongan.nama_golongan', 'tb_satuan_kerja.nama_satuan_kerja')
+            ->join('tb_pegawai', 'tb_riwayat_kepangkatan.id_pegawai', '=', 'tb_pegawai.id')
+            ->join('tb_golongan', 'tb_riwayat_kepangkatan.id_golongan', '=', 'tb_golongan.id')
+            ->join('tb_satuan_kerja', 'tb_riwayat_kepangkatan.id_satuan_kerja', '=', 'tb_satuan_kerja.id')
+            ->where('tb_riwayat_kepangkatan.id_pegawai', Auth::user()->id_pegawai)
+            ->get();
+
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false,
+                'data' => $data
+            ]);
+        }
+    }
+
+    public function storeKepangkatan(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_pegawai' => 'required|numeric',
+            'id_golongan' => 'required',
+            'tahun_kerja' => 'required',
+            'bulan_kerja' => 'required',
+            'gaji_pokok' => 'required',
+            'nomor_sk' => 'required',
+            'tanggal_sk' => 'required',
+            'nama_pejabat' => 'required',
+            'tmt' => 'required',
+            'id_satuan_kerja' => 'required',
+            'document_kepangkatan' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
+        $data = new riwayatKepangkatan();
+        $data->id_pegawai = $request->id_pegawai;
+        $data->id_golongan = $request->id_golongan;
+        $data->tahun_kerja = $request->tahun_kerja;
+        $data->bulan_kerja = $request->bulan_kerja;
+        $data->gaji_pokok = $request->gaji_pokok;
+        $data->nomor_sk = $request->nomor_sk;
+        $data->tanggal_sk = $request->tanggal_sk;
+        $data->nama_pejabat = $request->nama_pejabat;
+        $data->tmt = $request->tmt;
+        $data->id_satuan_kerja = $request->id_satuan_kerja;
+        $data->document_kepangkatan = $request->document_kepangkatan;
+        $data->verifikasi = 0;
+        $data->id_pegawai_verifikator = 0;
+        $data->save();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
+    public function getKepangkatan(Request $request, $id)
+    {
+        $data = DB::table('tb_riwayat_kepangkatan')
+            ->select('tb_riwayat_kepangkatan.*', 'tb_pegawai.nama', 'tb_golongan.nama_golongan', 'tb_satuan_kerja.nama_satuan_kerja',)
+            ->join('tb_pegawai', 'tb_riwayat_kepangkatan.id_pegawai', '=', 'tb_pegawai.id')
+            ->join('tb_golongan', 'tb_riwayat_kepangkatan.id_golongan', '=', 'tb_golongan.id')
+            ->join('tb_satuan_kerja', 'tb_riwayat_kepangkatan.id_satuan_kerja', '=', 'tb_satuan_kerja.id')
+            ->where('tb_riwayat_kepangkatan.id_pegawai', Auth::user()->id_pegawai)
+            ->where('tb_riwayat_kepangkatan.id', $id)
+            ->first();
+        // dd($data);
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false,
+                'data' => $data
+            ]);
+        }
+    }
+
+    public function updateKepangkatan(Request $request, $id)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'id_pegawai' => 'required|numeric',
+            'id_golongan' => 'required',
+            'tahun_kerja' => 'required',
+            'bulan_kerja' => 'required',
+            'gaji_pokok' => 'required',
+            'nomor_sk' => 'required',
+            'tanggal_sk' => 'required',
+            'nama_pejabat' => 'required',
+            'tmt' => 'required',
+            'id_satuan_kerja' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
+        $data = riwayatKepangkatan::where('id', $id)->first();
+        $data->id_pegawai = $request->id_pegawai;
+        $data->id_golongan = $request->id_golongan;
+        $data->tahun_kerja = $request->tahun_kerja;
+        $data->bulan_kerja = $request->bulan_kerja;
+        $data->gaji_pokok = $request->gaji_pokok;
+        $data->nomor_sk = $request->nomor_sk;
+        $data->tanggal_sk = $request->tanggal_sk;
+        $data->nama_pejabat = $request->nama_pejabat;
+        $data->tmt = $request->tmt;
+        $data->id_satuan_kerja = $request->id_satuan_kerja;
+        $data->verifikasi = 0;
+        $data->id_pegawai_verifikator = 0;
+        $data->save();
+
+        if ($request->document_kepangkatan !== null) {
+            $data->document_kepangkatan = $request->document_kepangkatan;
+        }
+
+        $data->save();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
+    public function deleteKepangkatan($id)
+    {
+        $data = riwayatKepangkatan::where('id', $id)->first();
+        $data->delete();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data,
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+    // end kepangkatan
+
+    // jabatan
+    public function listJabatan(Request $request)
+    {
+        $data = DB::table('tb_riwayat_jabatan')
+            ->select('tb_riwayat_jabatan.*', 'tb_pegawai.nama', 'tb_golongan.nama_golongan', 'tb_satuan_kerja.nama_satuan_kerja')
+            ->join('tb_pegawai', 'tb_riwayat_jabatan.id_pegawai', '=', 'tb_pegawai.id')
+            ->join('tb_golongan', 'tb_riwayat_jabatan.id_golongan', '=', 'tb_golongan.id')
+            ->join('tb_satuan_kerja', 'tb_riwayat_jabatan.id_satuan_kerja', '=', 'tb_satuan_kerja.id')
+            ->where('tb_riwayat_jabatan.id_pegawai', Auth::user()->id_pegawai)
+            ->get();
+
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false,
+                'data' => $data
+            ]);
+        }
+    }
+
+    public function storeJabatan(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_pegawai' => 'required|numeric',
+            'nama_jabatan' => 'required',
+            'id_golongan' => 'required',
+            'nomor_sk' => 'required',
+            'tanggal_sk' => 'required',
+            'nama_pejabat' => 'required',
+            'tmt' => 'required',
+            'id_satuan_kerja' => 'required',
+            'document_jabatan' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
+        $data = new riwayatJabatan();
+        $data->id_pegawai = $request->id_pegawai;
+        $data->id_golongan = $request->id_golongan;
+        $data->nama_jabatan = $request->nama_jabatan;
+        $data->nomor_sk = $request->nomor_sk;
+        $data->tanggal_sk = $request->tanggal_sk;
+        $data->nama_pejabat = $request->nama_pejabat;
+        $data->tmt = $request->tmt;
+        $data->id_satuan_kerja = $request->id_satuan_kerja;
+        $data->document_jabatan = $request->document_jabatan;
+        $data->verifikasi = 0;
+        $data->id_pegawai_verifikator = 0;
+        $data->save();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
+    public function getJabatan(Request $request, $id)
+    {
+        $data = DB::table('tb_riwayat_jabatan')
+            ->select('tb_riwayat_jabatan.*', 'tb_pegawai.nama', 'tb_golongan.nama_golongan', 'tb_satuan_kerja.nama_satuan_kerja',)
+            ->join('tb_pegawai', 'tb_riwayat_jabatan.id_pegawai', '=', 'tb_pegawai.id')
+            ->join('tb_golongan', 'tb_riwayat_jabatan.id_golongan', '=', 'tb_golongan.id')
+            ->join('tb_satuan_kerja', 'tb_riwayat_jabatan.id_satuan_kerja', '=', 'tb_satuan_kerja.id')
+            ->where('tb_riwayat_jabatan.id_pegawai', Auth::user()->id_pegawai)
+            ->where('tb_riwayat_jabatan.id', $id)
+            ->first();
+        // dd($data);
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false,
+                'data' => $data
+            ]);
+        }
+    }
+
+    public function updateJabatan(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_pegawai' => 'required|numeric',
+            'nama_jabatan' => 'required',
+            'id_golongan' => 'required',
+            'nomor_sk' => 'required',
+            'tanggal_sk' => 'required',
+            'nama_pejabat' => 'required',
+            'tmt' => 'required',
+            'id_satuan_kerja' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors());
+        }
+
+        $data = riwayatJabatan::where('id', $id)->first();
+        $data->id_pegawai = $request->id_pegawai;
+        $data->id_golongan = $request->id_golongan;
+        $data->nama_jabatan = $request->nama_jabatan;
+        $data->nomor_sk = $request->nomor_sk;
+        $data->tanggal_sk = $request->tanggal_sk;
+        $data->nama_pejabat = $request->nama_pejabat;
+        $data->tmt = $request->tmt;
+        $data->id_satuan_kerja = $request->id_satuan_kerja;
+        $data->verifikasi = 0;
+        $data->id_pegawai_verifikator = 0;
+        $data->save();
+
+        if ($request->document_jabatan !== null) {
+            $data->document_jabatan = $request->document_jabatan;
+        }
+
+        $data->save();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
+    public function deleteJabatan($id)
+    {
+        $data = riwayatJabatan::where('id', $id)->first();
+        $data->delete();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data,
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+    // end jabatan
 
 }
