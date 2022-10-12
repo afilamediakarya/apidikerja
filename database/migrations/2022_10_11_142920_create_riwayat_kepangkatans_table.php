@@ -18,8 +18,11 @@ class CreateRiwayatKepangkatansTable extends Migration
             $table->foreignId('id_pegawai')->constrained('tb_pegawai')->onDelete('cascade');
             $table->foreignId('id_golongan')->constrained('tb_golongan')->onDelete('cascade');
             $table->foreignId('id_satuan_kerja')->constrained('tb_satuan_kerja')->onDelete('cascade');
+            $table->enum('jenis_kenaikan_pangkat', ['reguler', 'jabatan struktural', 'jabatan fungsional', 'penyesuaian ijzah']);
             $table->string('tahun_kerja', 10);
             $table->string('bulan_kerja', 10);
+            $table->string('nomor_nota', 10);
+            $table->date('tanggal_nota');
             $table->bigInteger('gaji_pokok');
             $table->string('nomor_sk', 20);
             $table->date('tanggal_sk');
