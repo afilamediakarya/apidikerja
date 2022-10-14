@@ -106,7 +106,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('pegawai')->group(function () {
         Route::get('/list', [App\Http\Controllers\pegawaiController::class, 'list']);
         Route::get('/BySatuanKerja/{params}', [App\Http\Controllers\pegawaiController::class, 'pegawaiBySatuanKerja']);
-        Route::get('/listBySatuanKerja/{params}', [App\Http\Controllers\pegawaiController::class, 'listPegawaiBySatuanKerja']);
+        Route::get('/listBySatuanKerja', [App\Http\Controllers\pegawaiController::class, 'listPegawaiBySatuanKerja']);
         Route::post('/store', [App\Http\Controllers\pegawaiController::class, 'store']);
         Route::get('/show/{params}', [App\Http\Controllers\pegawaiController::class, 'show']);
         Route::post('/update/{params}', [App\Http\Controllers\pegawaiController::class, 'update']);

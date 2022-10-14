@@ -67,12 +67,48 @@ class pegawaiController extends Controller
         return response()->json($result);
     }
 
-    public function listPegawaiBySatuanKerja($params)
+    public function listPegawaiBySatuanKerja(Request $request)
     {
+        $id_satuan_kerja = request('id_satuan_kerja');
+        $jenis_kelamin = request('jenis_kelamin');
+        $status_pernikahan = request('status_pernikahan');
+        $agama = request('agama');
+        $pendidikan = request('pendidikan');
+        $gol_pangkat = request('gol_pangkat');
+
+        $where = '';
+
+        // get all pegawai if id_satuan_kerja === 'semua'
+        $where .= ($id_satuan_kerja !== 'semua') ? "`tb_pegawai`.`id_satuan_kerja` = $id_satuan_kerja " : "`tb_pegawai`.`id_satuan_kerja` != 0 ";
+
+        if ($jenis_kelamin !== 'semua') {
+            $where .= "AND `tb_pegawai`.`jenis_kelamin` = '$jenis_kelamin'";
+        }
+
+        if ($status_pernikahan !== 'semua') {
+            $where .= "AND `tb_pegawai`.`status_perkawinan` = '$status_pernikahan'";
+        }
+
+        if ($agama !== 'semua') {
+            $where .= "AND `tb_pegawai`.`agama` = '$agama'";
+        }
+
+        if ($pendidikan !== 'semua') {
+            $where .= "AND `tb_pegawai`.`pendidikan` = '$pendidikan'";
+        }
+
+        if ($gol_pangkat !== 'semua') {
+            $where .= "AND `tb_pegawai`.`golongan` = '$gol_pangkat'";
+        }
+
         $data = '';
-        $data = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_jabatan.nama_jabatan')
+        $data = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.agama', 'tb_pegawai.jenis_kelamin', 'tb_pegawai.id_satuan_kerja', 'tb_jabatan.id', 'tb_jabatan.nama_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_satuan_kerja.id', 'tb_satuan_kerja.nama_satuan_kerja',)
+            ->join('tb_satuan_kerja', 'tb_pegawai.id_satuan_kerja', '=', 'tb_satuan_kerja.id')
             ->leftJoin('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
-            ->where('tb_pegawai.id_satuan_kerja', $params)->get();
+            ->whereRaw("$where")
+            ->orderBy('tb_satuan_kerja.id')
+            ->orderBy('tb_jabatan.id_jenis_jabatan')
+            ->get();
 
         if ($data) {
             return response()->json([
