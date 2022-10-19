@@ -423,6 +423,7 @@ class laporanRekapitulasiabsenController extends Controller
         $endTime = strtotime($endDate);
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
         $range = array();
+        // return $jmlHariKerja;
         if ($endDate <= date('Y-m-d')) {
             // return 'A';
             $range = $this->jmlHariKerja($startDate, $endDate);
@@ -431,6 +432,13 @@ class laporanRekapitulasiabsenController extends Controller
         }
     
         $hariLibur = $this->cekHariLibur($jmlHariKerja);
+    
+        foreach ($hariLibur as $k => $liburDay) {
+            if (in_array($liburDay, $range['hari_kerja'])) {
+                $index = array_search($liburDay, $range['hari_kerja']);
+                \array_splice($range['hari_kerja'], $index, 1);
+            }
+        }
 
         for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
             if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
