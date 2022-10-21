@@ -271,6 +271,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/rekapByOpd/{start_date}/{end_date}/{satuan_kerja}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'rekapByAdminOpd']);
     });
 
+    // rekap tpp
     Route::prefix('laporan-rekapitulasi-tpp')->group(function () {
         Route::get('/admin-opd', [App\Http\Controllers\laporanRekapitulasiTppController::class, 'rekapTpp']);
     });

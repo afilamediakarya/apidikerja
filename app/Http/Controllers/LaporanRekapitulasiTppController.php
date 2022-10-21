@@ -12,6 +12,7 @@ use Auth;
 class laporanRekapitulasiTppController extends Controller
 {
 
+    // rekap tpp
     public function rekapTpp()
     {
         $satuanKerja = request('satuan_kerja');
