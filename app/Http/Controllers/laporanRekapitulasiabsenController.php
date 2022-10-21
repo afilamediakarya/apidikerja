@@ -65,16 +65,14 @@ class laporanRekapitulasiabsenController extends Controller
         // return $startDate. ' - '.$endDate;
         $result = [];
         $rekapAbsen = [];
+        $tes = [];
         $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', Auth::user()->id_pegawai)->first();
-
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
             $getAbsen = DB::table('tb_absen')->where('id_pegawai', Auth::user()->id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
 
-
-            $tes[] = $getAbsen;
-
             foreach ($getAbsen as $i => $v) {
+                
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
@@ -136,7 +134,6 @@ class laporanRekapitulasiabsenController extends Controller
 
                 $temps_absensi['cpk']['cpk_90_keatas'][] = 90; 
             }
-
           
             if ($value['date'] > date('Y-m-d')) {
                 $rekapAbsen[$key] = [
@@ -168,8 +165,12 @@ class laporanRekapitulasiabsenController extends Controller
  
         }
 
-        // return count($temps_absensi['kmk']['kmk_30']).' | '.count($temps_absensi['kmk']['kmk_60']).' | '.count($temps_absensi['kmk']['kmk_90']).' | '.count($temps_absensi['kmk']['kmk_90_keatas']).' | '.count($temps_absensi['cpk']['cpk_30']).' | '.count($temps_absensi['cpk']['cpk_60']).' | '.count($temps_absensi['cpk']['cpk_90']).' | '.count($temps_absensi['cpk']['cpk_90_keatas']);
-        // return count($temps_absensi['cpk']['cpk_90']).' | '.count($temps_absensi['cpk']['cpk_90_keatas']);
+        // return count($temps_absensi['kmk']['kmk_30']).' | '.count($temps_absensi['kmk']['kmk_60']).' | '.count($temps_absensi['kmk']['kmk_90']).' | '.count($temps_absensi['kmk']['kmk_90_keatas']).' | '.count($temps_absensi['cpk']['cpk_30']).' | '.count($temps_absensi['cpk']['cpk_60']).' | '.count($temps_absensi['cpk']['cpk_90']).' | '.count($temps_absensi['cpk']['cpk_90_keatas']); 
+
+        // return $tes;
+
+        // return ($jumlah_alpa) .' || '. (count($temps_absensi['kmk']['kmk_30'])) .' || '. (count($temps_absensi['kmk']['kmk_60'])) .' || '. (count($temps_absensi['kmk']['kmk_90'])) .' || '. (count($temps_absensi['kmk']['kmk_90_keatas'])) .' || '. (count($temps_absensi['cpk']['cpk_30'])) .' || '. (count($temps_absensi['cpk']['cpk_60'])) .' || '. (count($temps_absensi['cpk']['cpk_90'])) .' || '. (count($temps_absensi['cpk']['cpk_90_keatas']));
+
 
         // return ($jumlah_alpa * 3) .' || '. (count($temps_absensi['kmk']['kmk_30']) * 0.5) .' || '. (count($temps_absensi['kmk']['kmk_60'])) .' || '. (count($temps_absensi['kmk']['kmk_90']) * 1.25) .' || '. (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) .' || '. (count($temps_absensi['cpk']['cpk_30']) * 0.5) .' || '. (count($temps_absensi['cpk']['cpk_60'])) .' || '. (count($temps_absensi['cpk']['cpk_90']) * 1.25) .' || '. (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
 
@@ -469,8 +470,9 @@ class laporanRekapitulasiabsenController extends Controller
         foreach ($pegawaiBySatuanKerja as $key => $value) {
             $getAbsenPegawai = absen::where('id_pegawai', $value->id)
                 ->select('id', 'id_pegawai', 'waktu_absen', 'status', 'jenis','tanggal_absen')
-                ->where('tanggal_absen', '>=', $startDate)
-                ->where('tanggal_absen', '<=', $endDate)
+                // ->where('tanggal_absen', '>=', $startDate)
+                // ->where('tanggal_absen', '<=', $endDate)
+                ->whereIn('tanggal_absen',$getDatatanggal)
                 ->where('validation', 1)
                 // ->groupBy('tb_absen.id')
                 ->groupBy('tb_absen.tanggal_absen','tb_absen.jenis')
@@ -485,6 +487,8 @@ class laporanRekapitulasiabsenController extends Controller
                 ];
             }
         }
+
+   
 
         return $result = [
             'satuan_kerja' => $satuan_kerja_,
