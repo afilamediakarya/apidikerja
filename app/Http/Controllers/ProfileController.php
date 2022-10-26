@@ -150,9 +150,17 @@ class ProfileController extends Controller
         $data->nama_kepala_sekolah = $request->nama_kepala_sekolah;
         $data->nama_sekolah = $request->nama_sekolah;
         $data->alamat_sekolah = $request->alamat_sekolah;
-        $data->document_formal = $request->foto_ijazah;
+        if (isset($request->foto_ijazah)) {
+            if ($request->hasFile('foto_ijazah')) {
+                $file = $request->file('foto_ijazah');
+                $filename = $file->getClientOriginalName();
+                $file->storeAs('/public/image',$filename);
+                $data->document_formal = $filename;
+            }
+        }
         $data->verifikasi = 0;
         $data->id_pegawai_verifikator = 0;
+
         $data->save();
 
         if ($data) {
@@ -184,6 +192,8 @@ class ProfileController extends Controller
             'alamat_sekolah' => 'required',
         ]);
 
+        // dd($request->foto_ijazah);
+
         if ($validator->fails()) {
             return response()->json($validator->errors());
         }
@@ -199,9 +209,16 @@ class ProfileController extends Controller
         $data->nama_kepala_sekolah = $request->nama_kepala_sekolah;
         $data->nama_sekolah = $request->nama_sekolah;
         $data->alamat_sekolah = $request->alamat_sekolah;
-
         if ($request->foto_ijazah !== null) {
-            $data->document_formal = $request->foto_ijazah;
+            if (isset($request->foto_ijazah)) {
+                if ($request->hasFile('foto_ijazah')) {
+                    $file = $request->file('foto_ijazah');
+                    $filename = $file->getClientOriginalName();
+
+                    $file->storeAs('/public/image',$filename);
+                    $data->document_formal = $filename;
+                }
+            }
         }
 
         $data->save();
@@ -280,7 +297,7 @@ class ProfileController extends Controller
             'nama_pejabat' => 'required',
             'instansi_penyelenggara' => 'required',
             'tempat' => 'required',
-            'document_nonformal' => 'required',
+            'foto_ijazah' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -299,7 +316,18 @@ class ProfileController extends Controller
         $data->nama_pejabat = $request->nama_pejabat;
         $data->instansi_penyelenggara = $request->instansi_penyelenggara;
         $data->tempat = $request->tempat;
-        $data->document_nonformal = $request->document_nonformal;
+        // $data->document_nonformal = $request->document_nonformal;
+
+       if (isset($request->foto_ijazah)) {
+            if ($request->hasFile('foto_ijazah')) {
+                $file = $request->file('foto_ijazah');
+                $filename = $file->getClientOriginalName();
+                $file->storeAs('/public/image',$filename);
+                $data->document_nonformal = $filename;
+            }
+        }
+
+
         $data->verifikasi = 0;
         $data->id_pegawai_verifikator = 0;
         $data->save();
@@ -377,11 +405,22 @@ class ProfileController extends Controller
         $data->tempat = $request->tempat;
         $data->verifikasi = 0;
         $data->id_pegawai_verifikator = 0;
+        if ($request->foto_ijazah !== null) {
+            if (isset($request->foto_ijazah)) {
+                if ($request->hasFile('foto_ijazah')) {
+                    $file = $request->file('foto_ijazah');
+                    $filename = $file->getClientOriginalName();
+
+                    $file->storeAs('/public/image',$filename);
+                    $data->document_nonformal = $filename;
+                }
+            }
+        }
         $data->save();
 
-        if ($request->document_nonformal !== null) {
-            $data->document_nonformal = $request->document_nonformal;
-        }
+        // if ($request->document_nonformal !== null) {
+        //     $data->document_nonformal = $request->document_nonformal;
+        // }
 
         $data->save();
 
@@ -462,7 +501,7 @@ class ProfileController extends Controller
             'nama_pejabat' => 'required',
             'tmt' => 'required',
             'id_satuan_kerja' => 'required',
-            'document_kepangkatan' => 'required',
+            'sk_pangkat' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -483,9 +522,20 @@ class ProfileController extends Controller
         $data->nama_pejabat = $request->nama_pejabat;
         $data->tmt = $request->tmt;
         $data->id_satuan_kerja = $request->id_satuan_kerja;
-        $data->document_kepangkatan = $request->document_kepangkatan;
+        // $data->document_kepangkatan = $request->sk_pangkat;
         $data->verifikasi = 0;
         $data->id_pegawai_verifikator = 0;
+
+        if (isset($request->sk_pangkat)) {
+            if ($request->hasFile('sk_pangkat')) {
+                $file = $request->file('sk_pangkat');
+                $filename = $file->getClientOriginalName();
+                $file->storeAs('/public/image',$filename);
+                $data->document_kepangkatan = $filename;
+            }
+        }
+
+
         $data->save();
 
         if ($data) {
@@ -569,8 +619,17 @@ class ProfileController extends Controller
         $data->id_pegawai_verifikator = 0;
         $data->save();
 
-        if ($request->document_kepangkatan !== null) {
-            $data->document_kepangkatan = $request->document_kepangkatan;
+        if ($request->sk_pangkat !== null) {
+            // $data->document_kepangkatan = $request->document_kepangkatan;
+            if (isset($request->sk_pangkat)) {
+                if ($request->hasFile('sk_pangkat')) {
+                    $file = $request->file('sk_pangkat');
+                    $filename = $file->getClientOriginalName();
+                    $file->storeAs('/public/image',$filename);
+                    $data->document_kepangkatan = $filename;
+                }
+            }
+
         }
 
         $data->save();
@@ -650,7 +709,7 @@ class ProfileController extends Controller
             'nama_pejabat' => 'required',
             'tmt' => 'required',
             'id_satuan_kerja' => 'required',
-            'document_jabatan' => 'required',
+            'sk_jabatan' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -669,7 +728,16 @@ class ProfileController extends Controller
         $data->nama_pejabat = $request->nama_pejabat;
         $data->tmt = $request->tmt;
         $data->id_satuan_kerja = $request->id_satuan_kerja;
-        $data->document_jabatan = $request->document_jabatan;
+        // $data->document_jabatan = $request->document_jabatan;
+        if (isset($request->sk_jabatan)) {
+            if ($request->hasFile('sk_jabatan')) {
+                $file = $request->file('sk_jabatan');
+                $filename = $file->getClientOriginalName();
+                $file->storeAs('/public/image',$filename);
+                $data->document_jabatan = $filename;
+            }
+        }
+
         $data->verifikasi = 0;
         $data->id_pegawai_verifikator = 0;
         $data->save();
@@ -751,7 +819,14 @@ class ProfileController extends Controller
         $data->save();
 
         if ($request->document_jabatan !== null) {
-            $data->document_jabatan = $request->document_jabatan;
+            if (isset($request->sk_jabatan)) {
+                if ($request->hasFile('sk_jabatan')) {
+                    $file = $request->file('sk_jabatan');
+                    $filename = $file->getClientOriginalName();
+                    $file->storeAs('/public/image',$filename);
+                    $data->document_jabatan = $filename;
+                }
+            }
         }
 
         $data->save();
