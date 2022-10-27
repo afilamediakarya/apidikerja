@@ -102,7 +102,7 @@ class pegawaiController extends Controller
         }
 
         $data = '';
-        $data = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.agama', 'tb_pegawai.jenis_kelamin', 'tb_pegawai.id_satuan_kerja', 'tb_jabatan.id', 'tb_jabatan.nama_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_satuan_kerja.id', 'tb_satuan_kerja.nama_satuan_kerja',)
+        $data = DB::table('tb_pegawai')->select('tb_pegawai.id AS id_pegawai', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_pegawai.jenis_jabatan', 'tb_pegawai.agama', 'tb_pegawai.jenis_kelamin', 'tb_pegawai.id_satuan_kerja', 'tb_jabatan.id', 'tb_jabatan.nama_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_satuan_kerja.id', 'tb_satuan_kerja.nama_satuan_kerja',)
             ->join('tb_satuan_kerja', 'tb_pegawai.id_satuan_kerja', '=', 'tb_satuan_kerja.id')
             ->leftJoin('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
             ->whereRaw("$where")
