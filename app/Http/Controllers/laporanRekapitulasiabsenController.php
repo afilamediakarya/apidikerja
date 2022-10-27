@@ -62,7 +62,6 @@ class laporanRekapitulasiabsenController extends Controller
             }
         }
 
-        // return $startDate. ' - '.$endDate;
         $result = [];
         $rekapAbsen = [];
         $tes = [];
@@ -72,7 +71,6 @@ class laporanRekapitulasiabsenController extends Controller
             $getAbsen = DB::table('tb_absen')->where('id_pegawai', Auth::user()->id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
 
             foreach ($getAbsen as $i => $v) {
-                
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
@@ -160,9 +158,6 @@ class laporanRekapitulasiabsenController extends Controller
                     ];
                 }
             }
-
-            // return $rekapAbsen;
- 
         }
 
         // return count($temps_absensi['kmk']['kmk_30']).' | '.count($temps_absensi['kmk']['kmk_60']).' | '.count($temps_absensi['kmk']['kmk_90']).' | '.count($temps_absensi['kmk']['kmk_90_keatas']).' | '.count($temps_absensi['cpk']['cpk_30']).' | '.count($temps_absensi['cpk']['cpk_60']).' | '.count($temps_absensi['cpk']['cpk_90']).' | '.count($temps_absensi['cpk']['cpk_90_keatas']); 
