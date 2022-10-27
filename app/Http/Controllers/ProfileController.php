@@ -151,12 +151,7 @@ class ProfileController extends Controller
         $data->nama_sekolah = $request->nama_sekolah;
         $data->alamat_sekolah = $request->alamat_sekolah;
         if (isset($request->foto_ijazah)) {
-            if ($request->hasFile('foto_ijazah')) {
-                $file = $request->file('foto_ijazah');
-                $filename = $file->getClientOriginalName();
-                $file->storeAs('/public/image',$filename);
-                $data->document_formal = $filename;
-            }
+            $data->document_formal = $request->foto_ijazah;
         }
         $data->verifikasi = 0;
         $data->id_pegawai_verifikator = 0;
@@ -211,13 +206,7 @@ class ProfileController extends Controller
         $data->alamat_sekolah = $request->alamat_sekolah;
         if ($request->foto_ijazah !== null) {
             if (isset($request->foto_ijazah)) {
-                if ($request->hasFile('foto_ijazah')) {
-                    $file = $request->file('foto_ijazah');
-                    $filename = $file->getClientOriginalName();
-
-                    $file->storeAs('/public/image',$filename);
-                    $data->document_formal = $filename;
-                }
+                 $data->document_formal = $request->foto_ijazah;
             }
         }
 
@@ -319,12 +308,7 @@ class ProfileController extends Controller
         // $data->document_nonformal = $request->document_nonformal;
 
        if (isset($request->foto_ijazah)) {
-            if ($request->hasFile('foto_ijazah')) {
-                $file = $request->file('foto_ijazah');
-                $filename = $file->getClientOriginalName();
-                $file->storeAs('/public/image',$filename);
-                $data->document_nonformal = $filename;
-            }
+             $data->document_nonformal = $request->foto_ijazah;
         }
 
 
@@ -406,15 +390,7 @@ class ProfileController extends Controller
         $data->verifikasi = 0;
         $data->id_pegawai_verifikator = 0;
         if ($request->foto_ijazah !== null) {
-            if (isset($request->foto_ijazah)) {
-                if ($request->hasFile('foto_ijazah')) {
-                    $file = $request->file('foto_ijazah');
-                    $filename = $file->getClientOriginalName();
-
-                    $file->storeAs('/public/image',$filename);
-                    $data->document_nonformal = $filename;
-                }
-            }
+             $data->document_nonformal = $request->foto_ijazah;
         }
         $data->save();
 
@@ -527,12 +503,13 @@ class ProfileController extends Controller
         $data->id_pegawai_verifikator = 0;
 
         if (isset($request->sk_pangkat)) {
-            if ($request->hasFile('sk_pangkat')) {
-                $file = $request->file('sk_pangkat');
-                $filename = $file->getClientOriginalName();
-                $file->storeAs('/public/image',$filename);
-                $data->document_kepangkatan = $filename;
-            }
+            $data->document_kepangkatan = $request->sk_pangkat;
+            // if ($request->hasFile('sk_pangkat')) {
+            //     $file = $request->file('sk_pangkat');
+            //     $filename = $file->getClientOriginalName();
+            //     $file->storeAs('/public/image',$filename);
+            //     $data->document_kepangkatan = $filename;
+            // }
         }
 
 
@@ -622,12 +599,13 @@ class ProfileController extends Controller
         if ($request->sk_pangkat !== null) {
             // $data->document_kepangkatan = $request->document_kepangkatan;
             if (isset($request->sk_pangkat)) {
-                if ($request->hasFile('sk_pangkat')) {
-                    $file = $request->file('sk_pangkat');
-                    $filename = $file->getClientOriginalName();
-                    $file->storeAs('/public/image',$filename);
-                    $data->document_kepangkatan = $filename;
-                }
+                $data->document_kepangkatan = $request->sk_pangkat;
+                // if ($request->hasFile('sk_pangkat')) {
+                //     $file = $request->file('sk_pangkat');
+                //     $filename = $file->getClientOriginalName();
+                //     $file->storeAs('/public/image',$filename);
+                //     $data->document_kepangkatan = $filename;
+                // }
             }
 
         }
@@ -730,12 +708,13 @@ class ProfileController extends Controller
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         // $data->document_jabatan = $request->document_jabatan;
         if (isset($request->sk_jabatan)) {
-            if ($request->hasFile('sk_jabatan')) {
-                $file = $request->file('sk_jabatan');
-                $filename = $file->getClientOriginalName();
-                $file->storeAs('/public/image',$filename);
-                $data->document_jabatan = $filename;
-            }
+            $data->document_jabatan = $request->sk_jabatan;
+            // if ($request->hasFile('sk_jabatan')) {
+            //     $file = $request->file('sk_jabatan');
+            //     $filename = $file->getClientOriginalName();
+            //     $file->storeAs('/public/image',$filename);
+            //     $data->document_jabatan = $filename;
+            // }
         }
 
         $data->verifikasi = 0;
@@ -819,14 +798,15 @@ class ProfileController extends Controller
         $data->save();
 
         if ($request->document_jabatan !== null) {
-            if (isset($request->sk_jabatan)) {
-                if ($request->hasFile('sk_jabatan')) {
-                    $file = $request->file('sk_jabatan');
-                    $filename = $file->getClientOriginalName();
-                    $file->storeAs('/public/image',$filename);
-                    $data->document_jabatan = $filename;
-                }
-            }
+           $data->document_jabatan = $request->sk_jabatan;
+            // if (isset($request->sk_jabatan)) {
+            //     if ($request->hasFile('sk_jabatan')) {
+            //         $file = $request->file('sk_jabatan');
+            //         $filename = $file->getClientOriginalName();
+            //         $file->storeAs('/public/image',$filename);
+            //         $data->document_jabatan = $filename;
+            //     }
+            // }
         }
 
         $data->save();
