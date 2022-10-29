@@ -688,6 +688,7 @@ class ProfileController extends Controller
             'tmt' => 'required',
             'id_satuan_kerja' => 'required',
             'sk_jabatan' => 'required',
+            'tingkatan_jabatan' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -706,15 +707,10 @@ class ProfileController extends Controller
         $data->nama_pejabat = $request->nama_pejabat;
         $data->tmt = $request->tmt;
         $data->id_satuan_kerja = $request->id_satuan_kerja;
+        $data->tingkatan_jabatan = $request->tingkatan_jabatan;
         // $data->document_jabatan = $request->document_jabatan;
         if (isset($request->sk_jabatan)) {
             $data->document_jabatan = $request->sk_jabatan;
-            // if ($request->hasFile('sk_jabatan')) {
-            //     $file = $request->file('sk_jabatan');
-            //     $filename = $file->getClientOriginalName();
-            //     $file->storeAs('/public/image',$filename);
-            //     $data->document_jabatan = $filename;
-            // }
         }
 
         $data->verifikasi = 0;
@@ -775,6 +771,7 @@ class ProfileController extends Controller
             'nama_pejabat' => 'required',
             'tmt' => 'required',
             'id_satuan_kerja' => 'required',
+            'tingkatan_jabatan' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -795,6 +792,7 @@ class ProfileController extends Controller
         $data->id_satuan_kerja = $request->id_satuan_kerja;
         $data->verifikasi = 0;
         $data->id_pegawai_verifikator = 0;
+        $data->tingkatan_jabatan = $request->tingkatan_jabatan;
         $data->save();
 
         if ($request->document_jabatan !== null) {
