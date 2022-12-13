@@ -85,6 +85,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/delete/{params}', [App\Http\Controllers\satuanController::class, 'delete']);
     });
 
+    Route::prefix('kelompok_jabatan')->group(function () {
+        Route::get('/list', [App\Http\Controllers\KelompokjabatanController::class, 'list']);
+        Route::post('/store', [App\Http\Controllers\KelompokjabatanController::class, 'store']);
+        Route::get('/show/{params}', [App\Http\Controllers\KelompokjabatanController::class, 'show']);
+        Route::post('/update/{params}', [App\Http\Controllers\KelompokjabatanController::class, 'update']);
+        Route::delete('/delete/{params}', [App\Http\Controllers\KelompokjabatanController::class, 'delete']);
+    });
+
     Route::prefix('harilibur')->group(function () {
         Route::get('/list', [App\Http\Controllers\hariliburController::class, 'list']);
         Route::post('/store', [App\Http\Controllers\hariliburController::class, 'store']);
