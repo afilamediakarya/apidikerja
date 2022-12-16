@@ -3,16 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use DB;
-use App\Models\kelompok_jabatan;
 use Validator;
 use Auth;
-class KelompokjabatanController extends Controller
+use DB;
+use App\Models\masterAktivitas;
+
+class masterAktivitasController extends Controller
 {
     public function list(){
-
-        $data = DB::table('tb_kelompok_jabatan')->select('tb_kelompok_jabatan.id','tb_kelompok_jabatan.kelompok','tb_kelompok_jabatan.id_jenis_jabatan',
-        'tb_jenis_jabatan.jenis_jabatan')->join('tb_jenis_jabatan','tb_kelompok_jabatan.id_jenis_jabatan','=','tb_jenis_jabatan.id')->get();
+        $data = masterAktivitas::with("kelompok_jabatan")->get();
 
         if ($data) {
             return response()->json([
@@ -29,21 +28,33 @@ class KelompokjabatanController extends Controller
         }
     }
 
+    public function option(){
+        $jabatan = DB::table('tb_jabatan')->select('id_kelompok_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
+        $data = masterAktivitas::select('id','aktivitas as value')->where('id_kelompok_jabatan',$jabatan->id_kelompok_jabatan)->get();
+        return $data;
+    }
+
     public function store(Request $request)
     {
 
         $validator = Validator::make($request->all(), [
-            'kelompok' => 'required',
-            'jenis_jabatan' => 'required|numeric',
+            'kelompok_jabatan' => 'required',
+            'aktivitas' => 'required',
+            'satuan' => 'required',
+            'waktu' => 'required',
+            'jenis' => 'required',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors());
         }
 
-        $data = new kelompok_jabatan();
-        $data->kelompok = $request->kelompok;
-        $data->id_jenis_jabatan = $request->jenis_jabatan;
+        $data = new masterAktivitas();
+        $request->jenis == 'umum' ? $data->id_kelompok_jabatan = 0 : $data->id_kelompok_jabatan = $request->kelompok_jabatan;
+        $data->aktivitas = $request->aktivitas;
+        $data->satuan = $request->satuan;
+        $data->waktu = $request->waktu;
+        $data->jenis = $request->jenis;
         $data->user_insert = Auth::user()->id;
         $data->save();
 
@@ -63,8 +74,11 @@ class KelompokjabatanController extends Controller
 
     public function show($params)
     {  
-       
-        $data = DB::table('tb_kelompok_jabatan')->select('tb_kelompok_jabatan.id','tb_kelompok_jabatan.kelompok','tb_kelompok_jabatan.id_jenis_jabatan as jenis_jabatan')->join('tb_jenis_jabatan','tb_kelompok_jabatan.id_jenis_jabatan','=','tb_jenis_jabatan.id')->where('tb_kelompok_jabatan.id',$params)->first();
+
+        // return DB::table('tb_master_aktivitas')->join('tb_kelompok_jabatan','')->where('id',$params)->first();
+        // $data = DB::table('tb_master_aktivitas')->select('tb_master_aktivitas.id','tb_master_aktivitas.aktivitas','tb_master_aktivitas.satuan','tb_master_aktivitas.waktu','tb_master_aktivitas.jenis','tb_kelompok_jabatan.id as kelompok_jabatan')->join('tb_kelompok_jabatan','tb_master_aktivitas.id_kelompok_jabatan','=','tb_kelompok_jabatan.id')->where('tb_master_aktivitas.id',$params)->first();
+
+        $data = masterAktivitas::with("kelompok_jabatan")->where('id',$params)->first();
     
         if ($data) {
             return response()->json([
@@ -82,19 +96,26 @@ class KelompokjabatanController extends Controller
 
     public function update($params, Request $request)
     {
+
         $validator = Validator::make($request->all(), [
-            'kelompok' => 'required',
-            'jenis_jabatan' => 'required|numeric',
+            'kelompok_jabatan' => 'required',
+            'aktivitas' => 'required',
+            'satuan' => 'required',
+            'waktu' => 'required',
+            'jenis' => 'required',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors());
         }
 
-        $data = kelompok_jabatan::where('id',$params)->first();
-        $data->kelompok = $request->kelompok;
-        $data->id_jenis_jabatan = $request->jenis_jabatan;
-        $data->user_update = Auth::user()->id;
+        $data = masterAktivitas::where('id',$params)->first();
+        $request->jenis == 'umum' ? $data->id_kelompok_jabatan = 0 : $data->id_kelompok_jabatan = $request->kelompok_jabatan;      
+        $data->aktivitas = $request->aktivitas;
+        $data->satuan = $request->satuan;
+        $data->waktu = $request->waktu;
+        $data->jenis = $request->jenis;
+        $data->user_insert = Auth::user()->id;
         $data->save();
 
         if ($data) {
@@ -113,7 +134,7 @@ class KelompokjabatanController extends Controller
 
     public function delete($params)
     {
-        $data = kelompok_jabatan::where('id', $params)->first();
+        $data = masterAktivitas::where('id', $params)->first();
         $data->delete();
 
         if ($data) {
@@ -128,10 +149,5 @@ class KelompokjabatanController extends Controller
                 'status' => false
             ]);
         }
-    }
-
-    public function getOption(){
-        $data = kelompok_jabatan::select('id','kelompok as value')->orderBy('id', 'DESC')->get();
-        return response()->json($data);
     }
 }

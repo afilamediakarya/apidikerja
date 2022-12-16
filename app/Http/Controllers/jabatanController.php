@@ -71,7 +71,8 @@ class jabatanController extends Controller
             'pembayaran_tpp' => 'required',
             'nama_jabatan' => 'required',
             'status_jabatan' => 'required',
-            'id_lokasi' => 'required'
+            'id_lokasi' => 'required',
+            'kelompok_jabatan' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -93,6 +94,7 @@ class jabatanController extends Controller
         $data->status_jabatan = $request->status_jabatan;
         $data->pembayaran_tpp = $request->pembayaran_tpp;
         $data->id_lokasi = $request->id_lokasi;
+        $data->id_kelompok_jabatan = $request->kelompok_jabatan;
         $data->nilai_jabatan = str_replace(',', '', $request->nilai_jabatan);
         $data->save();
 
@@ -133,6 +135,7 @@ class jabatanController extends Controller
             'status_jabatan' => $data->status_jabatan,
             'pegawai' => $data->pegawai,
             'pembayaran_tpp' => $data->pembayaran_tpp,
+            'kelompok_jabatan' => $data->id_kelompok_jabatan,
             'parent_id' => [
                 'parent_id' => $parent_,
                 'jenis_jabatan' => $data->id_jenis_jabatan,
@@ -164,7 +167,8 @@ class jabatanController extends Controller
             'pembayaran_tpp' => 'required',
             'nama_jabatan' => 'required',
             'status_jabatan' => 'required',
-            'id_lokasi' => 'required'
+            'id_lokasi' => 'required',
+            'kelompok_jabatan' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -180,6 +184,7 @@ class jabatanController extends Controller
         $data->status_jabatan = $request->status_jabatan;
         $data->pembayaran_tpp = $request->pembayaran_tpp;
         $data->id_lokasi = $request->id_lokasi;
+        $data->id_kelompok_jabatan = $request->kelompok_jabatan;
         $data->nilai_jabatan = str_replace(',', '', $request->nilai_jabatan);
         $data->save();
 

@@ -87,10 +87,20 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('kelompok_jabatan')->group(function () {
         Route::get('/list', [App\Http\Controllers\KelompokjabatanController::class, 'list']);
+        Route::get('/get-option', [App\Http\Controllers\KelompokjabatanController::class, 'getOption']);
         Route::post('/store', [App\Http\Controllers\KelompokjabatanController::class, 'store']);
         Route::get('/show/{params}', [App\Http\Controllers\KelompokjabatanController::class, 'show']);
         Route::post('/update/{params}', [App\Http\Controllers\KelompokjabatanController::class, 'update']);
         Route::delete('/delete/{params}', [App\Http\Controllers\KelompokjabatanController::class, 'delete']);
+    });
+
+    Route::prefix('master_aktivitas')->group(function () {
+        Route::get('/list', [App\Http\Controllers\masterAktivitasController::class, 'list']);
+        Route::get('/option', [App\Http\Controllers\masterAktivitasController::class, 'option']);
+        Route::post('/store', [App\Http\Controllers\masterAktivitasController::class, 'store']);
+        Route::get('/show/{params}', [App\Http\Controllers\masterAktivitasController::class, 'show']);
+        Route::post('/update/{params}', [App\Http\Controllers\masterAktivitasController::class, 'update']);
+        Route::delete('/delete/{params}', [App\Http\Controllers\masterAktivitasController::class, 'delete']);
     });
 
     Route::prefix('harilibur')->group(function () {
@@ -137,6 +147,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/delete/{params}', [App\Http\Controllers\jadwalController::class, 'delete']);
         Route::get('/option-tahapan', [App\Http\Controllers\jadwalController::class, 'optionTahapan']);
         Route::get('/option-sub-tahapan/{params}', [App\Http\Controllers\jadwalController::class, 'optionSubTahapan']);
+        Route::get('/check_jadwal', [App\Http\Controllers\jadwalController::class, 'check_jadwal']);
+
     });
 
     Route::prefix('profil_daerah')->group(function () {
@@ -213,6 +225,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('absen')->group(function () {
         Route::get('/list', [App\Http\Controllers\absenController::class, 'list']);
+        Route::get('/check-absen-today', [App\Http\Controllers\absenController::class, 'checkAbsenToday']);
         Route::get('/list-filter-absen', [App\Http\Controllers\absenController::class, 'list_filter_absen']);
         Route::get('/get-time-now', [App\Http\Controllers\absenController::class, 'getTime']);
         Route::post('/store', [App\Http\Controllers\absenController::class, 'store']);
@@ -222,6 +235,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/check-absen', [App\Http\Controllers\absenController::class, 'checkAbsen']);
         Route::get('/check-absen-admin/{id_pegawai}/{tanggal}', [App\Http\Controllers\absenController::class, 'absenCheckAdmin']);
         Route::post('/change-validation', [App\Http\Controllers\absenController::class, 'change_validation']);
+
+        
     });
 
     Route::prefix('review_skp')->group(function () {

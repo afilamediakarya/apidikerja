@@ -81,7 +81,7 @@ class bankomController extends Controller
             if ($request->hasFile('sertifikat')) {
                 $file = $request->file('sertifikat');
                 $filename = time().'.'.$file->getClientOriginalExtension();
-                $file->storeAs('public/image',$filename);
+                $file->storeAs('http://127.0.0.1:8000/public/image',$filename);
                 $data->sertifikat = $filename;
             }
         }

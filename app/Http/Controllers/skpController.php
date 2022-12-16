@@ -758,15 +758,15 @@ class skpController extends Controller
 
     public function satuan()
     {
-        $result = [];
-        $data = satuan::where('status', 'active')->latest()->get();
-        foreach ($data as $key => $value) {
-            $result[$key] = [
-                'value' => $value->nama_satuan
-            ];
-        }
+    
+        $data = satuan::select('nama_satuan as value')->where('status', 'active')->latest()->get();
+        // foreach ($data as $key => $value) {
+        //     $result[$key] = [
+        //         'value' => $value->nama_satuan
+        //     ];
+        // }
 
-        return response()->json($result);
+        return response()->json($data);
         // return collect($data)->pluck('nama_satuan')->toArray();
     }
 

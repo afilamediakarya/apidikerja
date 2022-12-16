@@ -147,6 +147,9 @@ class aktivitasController extends Controller
         $data->tanggal = $request->tanggal;
         $data->tahun = date('Y');
         $data->hasil = $request->hasil;
+        $data->waktu = $request->waktu;
+        $data->satuan = $request->satuan;
+        $data->jenis = $request->jenis;
         $data->save();
 
 
@@ -166,7 +169,16 @@ class aktivitasController extends Controller
 
     public function show($params)
     {
-        $data = aktivitas::where('id', $params)->first();
+                $data = aktivitas::where('id', $params)->first();
+
+        $tgl1 = strtotime($data->tanggal); 
+        $tgl2 = strtotime(date('Y-m-d')); 
+
+        $jarak = $tgl2 - $tgl1;
+
+        $range = $jarak / 60 / 60 / 24;
+
+        $data->range = $range;
 
         if ($data) {
             return response()->json([
@@ -210,6 +222,10 @@ class aktivitasController extends Controller
         $data->tanggal = $request->tanggal;
         $data->tahun = date('Y');
         $data->hasil = $request->hasil;
+        $data->waktu = $request->waktu;
+        $data->satuan = $request->satuan;
+        $data->jenis = $request->jenis;
+
         $data->save();
 
         if ($data) {

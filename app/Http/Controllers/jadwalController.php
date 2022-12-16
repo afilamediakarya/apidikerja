@@ -143,13 +143,24 @@ class jadwalController extends Controller
     }
 
     public function check_jadwal(){
-        // if ($type == 'target') {
-        //     $tahapan = request('tahapan');
-        //     $sub_tahapan = request('sub_tahapan');
-        //     $tanggal_awal = request('tanggal_awal');
-        //     $tanggal_akhir = request('tanggal_akhir');
-        // }else{
+        $tahapan = request('tahapan');
+        $date = date('Y-m-d');
+        $jadwal = jadwal::where('tahapan',$tahapan)
+                ->where('sub_tahapan',date('m'))
+                ->whereRaw('"'.$date.'" not between `tanggal_awal` and `tanggal_akhir`')
+                ->where('tahun',date('Y'))->first();
 
-        // }
+        if ($jadwal) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $jadwal
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
     }
 }

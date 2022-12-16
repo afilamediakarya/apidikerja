@@ -29,6 +29,24 @@ class absenController extends Controller
         }
     }
 
+    public function checkAbsenToday(){
+        // return Auth::user()->id_pegawai;
+        $data = DB::table('tb_absen')->select('status')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',date('Y-m-d'))->first();
+
+         if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }    
+    }
+
     public function list_filter_absen(){
         
         $satuan_kerja = request('satuan_kerja');
