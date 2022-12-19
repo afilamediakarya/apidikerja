@@ -9,10 +9,10 @@ class aktivitas extends Model
 {
     use HasFactory;
     protected $table = 'tb_aktivitas';
-    protected $with = ['skp'];
+    // protected $with = ['skp'];
 
     public function skp() {
-        return $this->hasOne('App\Models\skp', 'id', 'id_skp');
+        return $this->belongsTo('App\Models\skp', 'id_skp','id');
     }
 
 

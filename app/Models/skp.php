@@ -23,7 +23,7 @@ class skp extends Model
     }
 
     public function aktivitas(){
-        return $this->belongsTo('App\Models\aktivitas','id_skp','id');
+        return $this->hasMany('App\Models\aktivitas','id_skp','id');
     }
 
 
