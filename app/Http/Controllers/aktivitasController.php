@@ -120,7 +120,7 @@ class aktivitasController extends Controller
 
     public function store(Request $request)
     {
-        // return $request;
+
         $validator = Validator::make($request->all(), [
             'id_skp' => 'required|numeric',
             'nama_aktivitas' => 'required|string',
@@ -136,6 +136,25 @@ class aktivitasController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+        $waktu = 0;
+        $jumlah_kinerja = $this->checkMenitKinerja();
+        $ax = $request->waktu + $jumlah_kinerja['count'];
+
+        // return $ax;
+
+        if ($ax > 420) {
+            $n_ = (420 - $jumlah_kinerja['count']) - $request->waktu;
+            $waktu = $ax + $n_;
+            $waktu = $waktu - $jumlah_kinerja['count'];  
+
+            if ($waktu == 0) {
+                return response()->json([
+                'error' => 'Jumlah waktu sudah cukup, anda tidak bisa menambah aktivitas'], 422);
+            }
+        }else{
+            $waktu = $request->waktu;
+        }
+
         $data = new aktivitas();
         $data->id_pegawai = Auth::user()->id_pegawai;
         $data->id_skp = $request->id_skp;
@@ -147,7 +166,7 @@ class aktivitasController extends Controller
         $data->tanggal = $request->tanggal;
         $data->tahun = date('Y');
         $data->hasil = $request->hasil;
-        $data->waktu = $request->waktu;
+        $data->waktu = $waktu;
         $data->satuan = $request->satuan;
         $data->jenis = $request->jenis;
         $data->save();
@@ -294,5 +313,9 @@ class aktivitasController extends Controller
         }
         return response()->json($result);
         // return collect($data)->pluck('rencana_kerja','id')->toArray();
+    }
+
+    public function checkMenitKinerja(){
+        return aktivitas::select(DB::raw("SUM(waktu) as count"))->where('tanggal',date('Y-m-d'))->first();
     }
 }

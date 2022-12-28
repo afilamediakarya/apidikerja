@@ -15,5 +15,9 @@ class aktivitas extends Model
         return $this->belongsTo('App\Models\skp', 'id_skp','id');
     }
 
+   public function pegawai() {
+        return $this->belongsTo('App\Models\pegawai', 'id_pegawai','id');
+    }
+
 
 }

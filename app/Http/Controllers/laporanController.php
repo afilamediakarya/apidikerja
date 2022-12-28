@@ -597,7 +597,7 @@ class laporanController extends Controller
         // return $query;
 
       $data =  DB::table('tb_jabatan')
-        ->select('tb_jabatan.id', 'tb_jabatan.id_pegawai','tb_jabatan.parent_id','tb_jabatan.nama_jabatan','tb_pegawai.nama as nama_pegawai','tb_pegawai.nip','tb_pegawai.golongan','tb_satuan_kerja.nama_satuan_kerja')
+        ->select('tb_jabatan.id', 'tb_jabatan.id_pegawai','tb_jabatan.parent_id','tb_jabatan.nama_jabatan','tb_pegawai.nama as nama_pegawai','tb_pegawai.nip','tb_pegawai.golongan','tb_satuan_kerja.nama_satuan_kerja','tb_jabatan.target_waktu')
         ->join('tb_pegawai','tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')
         ->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')
         ->whereRaw($query."=".$params)->first();
@@ -611,10 +611,6 @@ class laporanController extends Controller
         $pegawai_dinilai = array();
         $pegawai_penilai = array();
         $bulan = request('bulan');
-        // $start_date = request('start_date');
-        // $end_date = request('end_date');
-
-        // return $start_date.' - '.$end_date;
 
         $current_pegawai =  $this->jabatanByPegawai(Auth::user()->id_pegawai,'pegawai');
         $atasan = $this->jabatanByPegawai($current_pegawai->parent_id,'atasan');
@@ -624,7 +620,8 @@ class laporanController extends Controller
             'nip' => $current_pegawai->nip,
             'golongan' => $current_pegawai->golongan,
             'jabatan' => $current_pegawai->nama_jabatan,
-            'unit_kerja' => $current_pegawai->nama_satuan_kerja
+            'unit_kerja' => $current_pegawai->nama_satuan_kerja,
+            'waktu' => $current_pegawai->target_waktu
         ];
 
         $pegawai_penilai = [
@@ -643,9 +640,6 @@ class laporanController extends Controller
                 ->with(['aktivitas'=> function($query) use ($bulan) {
                     $query->select('id','nama_aktivitas','id_skp','waktu','satuan','hasil','tanggal');
                     $query->whereMonth('tanggal',$bulan);
-                    // $query->whereRaw("tanggal_awal >= ".$start_date." AND tanggal_akhir <= ".$end_date);
-                    // $query->where('tanggal_awal','>=',$start_date);
-                    // $query->where('tanggal_akhir','<=',$end_date);
                 }])
                 ->where('tahun',date('Y'))
                 ->where('id_jabatan',$current_pegawai->id)
@@ -659,9 +653,20 @@ class laporanController extends Controller
         ];
 
         return $result;
+    }
 
+    public function kinerjaByOpd(){
+        $bulan = request('bulan');
+           return pegawai::query()
+                ->select('tb_pegawai.id','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_jabatan.target_waktu','tb_jabatan.kelas_jabatan')
+                ->with(['aktivitas'=> function($query) use ($bulan) {
+                    $query->select('id','id_pegawai','hasil',DB::raw("SUM(waktu) as count"));
+                    $query->whereMonth('tanggal',$bulan);
+                }])
+                ->join('tb_jabatan','tb_jabatan.id_pegawai','=','tb_pegawai.id')
+                ->where('tb_pegawai.id_satuan_kerja',27)
+                           // ->with('aktivitas')
+                ->get();
 
-
-        return $bulan;
     }
 }

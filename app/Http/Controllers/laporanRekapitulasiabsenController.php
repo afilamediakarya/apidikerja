@@ -409,6 +409,8 @@ class laporanRekapitulasiabsenController extends Controller
     {
 
         $satker = intval($satuan_kerja);
+
+        $endDate_if = '';
       
         $result = [];
         $pegawai_data = [];
@@ -417,7 +419,11 @@ class laporanRekapitulasiabsenController extends Controller
         $getDatatanggal = [];
         $startTime = strtotime($startDate);
         $endTime = strtotime($endDate);
+        $count_monday = 0;
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
+
+    $endDate > date('Y-m-d') ? $endDate_if = strtotime(date('Y-m-d')) : $endDate_if = $endTime;
+
         $range = array();
         // return $jmlHariKerja;
         if ($endDate <= date('Y-m-d')) {
@@ -438,14 +444,24 @@ class laporanRekapitulasiabsenController extends Controller
 
         for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
             if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
-                $getDatatanggal[]['date'] = date('Y-m-d', $i);
+                $date_ = date('Y-m-d', $i);
+                $getDatatanggal[] = ['date' => $date_];            
             }
         }
 
+        for ($i = $startTime; $i <= $endDate_if; $i = $i + 86400) {
+            if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
+                $date_ = date('Y-m-d', $i);
+                $day_ = date('l', strtotime($date_));
+                if ($day_ == 'Monday') {
+                    $count_monday += 1;          
+                }      
+            }
+
+        }
+
+
         if ($satker > 0) {
-            // $getSatuankerjaById = DB::table('tb_satuan_kerja')->where('id', $satker)->first();
-            // return $getSatuankerjaById;
-            // $satuan_kerja_ = $getSatuankerjaById['nama_satuan_kerja'];
             $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama')
                 ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
                 ->where('tb_pegawai.id_satuan_kerja', $satker)
@@ -461,12 +477,12 @@ class laporanRekapitulasiabsenController extends Controller
                 ->get();
         }
 
+        // return $getDatatanggal;
+
 
         foreach ($pegawaiBySatuanKerja as $key => $value) {
             $getAbsenPegawai = absen::where('id_pegawai', $value->id)
-                ->select('id', 'id_pegawai', 'waktu_absen', 'status', 'jenis','tanggal_absen')
-                // ->where('tanggal_absen', '>=', $startDate)
-                // ->where('tanggal_absen', '<=', $endDate)
+                ->select('id', 'id_pegawai', 'waktu_absen', 'status', 'jenis','tanggal_absen',DB::raw('COUNT(IF(status = "apel", 1, NULL)) "jumlah_apel"'))
                 ->whereIn('tanggal_absen',$getDatatanggal)
                 ->where('validation', 1)
                 // ->groupBy('tb_absen.id')
@@ -490,6 +506,7 @@ class laporanRekapitulasiabsenController extends Controller
             'hari_kerja' => count($getDatatanggal),
             'pegawai' => $pegawai_data,
             'range' => $range['hari_kerja'],
+            'count_monday' => $count_monday
         ];
     }
 }

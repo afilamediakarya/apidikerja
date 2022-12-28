@@ -203,6 +203,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/update/{params}', [App\Http\Controllers\aktivitasController::class, 'update']);
         Route::delete('/delete/{params}', [App\Http\Controllers\aktivitasController::class, 'delete']);
         Route::get('/get-option-sasaran-kinerja', [App\Http\Controllers\aktivitasController::class, 'optionSkp']);
+        Route::get('/checkMenitKinerja', [App\Http\Controllers\aktivitasController::class, 'checkMenitKinerja']);
+
     });
 
     Route::prefix('realisasi_skp')->group(function () {
@@ -305,6 +307,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/skp/rekapitulasi/{bulan}', [App\Http\Controllers\laporanController::class, 'laporanRekapitulasiSkp']);
         Route::get('/skp/{level}/{bulan}/{id_pegawai}', [App\Http\Controllers\laporanController::class, 'laporanSkp']);
         Route::get('/kinerja', [App\Http\Controllers\laporanController::class, 'kinerja']);
+        Route::get('/kinerjaByOpd', [App\Http\Controllers\laporanController::class, 'kinerjaByOpd']);
     });
 
     Route::prefix('bankom')->group(function () {

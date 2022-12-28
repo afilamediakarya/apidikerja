@@ -18,6 +18,12 @@ class pegawai extends Model
         return $this->hasMany('App\Models\skp','id_pegawai','id');
     }
 
+
+    public function aktivitas(){
+        return $this->hasMany('App\Models\aktivitas','id_pegawai','id');
+    }
+
+
     public function user(){
         return $this->belongsTo('App\Models\User','id','id_pegawai');
     }

@@ -32,7 +32,6 @@ class skpController extends Controller
         if ($type == 'tahunan') {
             if ($params == 'pegawai') {
 
-                // $result = skp::with('aspek_skp')->where('tahun', $tahun)->where('id_jabatan', $jabatanByPegawai->id)->orderBy('jenis', 'ASC')->get();
 
                 $result = DB::table('tb_skp')
                     ->join('tb_aspek_skp', 'tb_aspek_skp.id_skp', 'tb_skp.id')

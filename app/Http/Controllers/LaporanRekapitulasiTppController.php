@@ -6,6 +6,7 @@ use App\Models\absen;
 use Illuminate\Http\Request;
 use App\Models\pegawai;
 use App\Models\skp;
+use App\Models\aktivitas;
 use DB;
 use Auth;
 
@@ -59,7 +60,7 @@ class laporanRekapitulasiTppController extends Controller
             ->first();
 
         if ($satuanKerja > 0) {
-            $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_pegawai.jenis_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.nilai_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_jenis_jabatan.level')
+            $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_pegawai.jenis_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.nilai_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_jenis_jabatan.level','tb_jabatan.target_waktu','tb_jabatan.kelas_jabatan')
                 ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
                 ->join('tb_jenis_jabatan', 'tb_jabatan.id_jenis_jabatan', '=', 'tb_jenis_jabatan.id')
                 ->where('tb_pegawai.id_satuan_kerja', $satuanKerja)
@@ -69,7 +70,7 @@ class laporanRekapitulasiTppController extends Controller
         } else {
             $pegawai = pegawai::where('id', Auth::user()->id_pegawai)->first();
 
-            $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_pegawai.jenis_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.nilai_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_jenis_jabatan.level')
+            $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_pegawai.jenis_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.nilai_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_jenis_jabatan.level','tb_jabatan.target_waktu','tb_jabatan.kelas_jabatan')
                 ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
                 ->join('tb_jenis_jabatan', 'tb_jabatan.id_jenis_jabatan', '=', 'tb_jenis_jabatan.id')
                 ->where('id_satuan_kerja', $pegawai->id_satuan_kerja)
@@ -82,262 +83,25 @@ class laporanRekapitulasiTppController extends Controller
             $result = [];
             $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai', $value->id)->first();
 
-            $get_skp =
-                skp::select('tb_skp.id', 'tb_skp.id_jabatan', 'tb_skp.id_satuan_kerja', 'tb_skp.id_skp_atasan', 'tb_skp.jenis', 'tb_skp.rencana_kerja', 'tb_skp.tahun')
-                ->with(['aspek_skp' => function ($query) use ($bulan) {
-                    $query
-                        ->select('tb_aspek_skp.id', 'tb_aspek_skp.id_skp', 'tb_aspek_skp.iki', 'tb_aspek_skp.aspek_skp', 'tb_aspek_skp.satuan')->with(['target_skp' => function ($select) use ($bulan) {
-                            $select->select('tb_target_skp.id', 'tb_target_skp.id_aspek_skp', 'tb_target_skp.target', 'tb_target_skp.bulan')->where('bulan', "{$bulan}");
-                        }])
-                        ->with(['realisasi_skp' => function ($select) use ($bulan) {
-                            $select->select('tb_realisasi_skp.id', 'tb_realisasi_skp.id_aspek_skp', 'tb_realisasi_skp.realisasi_bulanan', 'tb_realisasi_skp.bulan')->where('bulan', "{$bulan}");
-                        }]);
-                }])
-                ->whereHas('aspek_skp', function ($query) use ($bulan) {
-                    $query->whereHas('target_skp', function ($query) use ($bulan) {
-                        $query->where('bulan', "{$bulan}");
-                    });
-                })
-                ->where('id_jabatan', $jabatanByPegawai->id)
-                ->whereHas('aspek_skp', function ($query) use ($bulan) {
-                    $query->whereHas('target_skp', function ($query) use ($bulan) {
-                        $query->where('bulan', '' . $bulan . '');
-                    });
-                })
-                ->orderBy('jenis')
-                ->get();
+            // pegawai::query()
+            //     ->select('tb_pegawai.id','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_jabatan.target_waktu','tb_jabatan.kelas_jabatan')
+            //     ->with(['aktivitas'=> function($query) use ($bulan) {
+            //         $query->select('id','id_pegawai','hasil',DB::raw("SUM(waktu) as count"));
+            //         $query->whereMonth('tanggal',$bulan);
+            //     }])
+            //     ->join('tb_jabatan','tb_jabatan.id_pegawai','=','tb_pegawai.id')
+            //     ->where('tb_pegawai.id_satuan_kerja',27)
+            //                // ->with('aktivitas')
+            //     ->get();
 
 
-
-            $value->skp = $get_skp;
-
-            if (isset($get_skp)) {
-
-                $nilai_utama = 0;
-                $nilai_tambahan = 0;
-
-                $total_utama = 0;
-                $total_tambahan = 0;
-
-                $data_utama = 0;
-                $index_data = 0;
-
-                $jumlah_data = 0;
-                $sum_nilai_iki = 0;
-
-                if ($value->level == 1 || $value->level == 2) {
-                    foreach ($get_skp as $index => $val) {
-
-
-                        // cek if isset skp_utama
-                        if ($val->jenis == "utama") {
-
-                            $index_data++;
-                            $data_utama++;
-
-                            $sum_capaian = 0;
-                            foreach ($val->aspek_skp as $key => $v) {
-
-                                foreach ($v['target_skp'] as $mk => $rr) {
-                                    $kategori_ = '';
-                                    if ($rr['bulan'] ==  $bulan) {
-
-                                        $single_rate = ($v['realisasi_skp'][$mk]['realisasi_bulanan'] / $rr['target']) * 100;
-
-                                        if ($single_rate > 110) {
-                                            $nilai_iki = 110 + ((120 - 110) / (110 - 101)) * (110 - 101);
-                                        } elseif ($single_rate >= 101 && $single_rate <= 110) {
-                                            $nilai_iki = 110 + ((120 - 110) / (110 - 101)) * ($single_rate - 101);
-                                        } elseif ($single_rate == 100) {
-                                            $nilai_iki = 109;
-                                        } elseif ($single_rate >= 80 && $single_rate <= 99) {
-                                            $nilai_iki = 70 + ((89 - 70) / (99 - 80)) * ($single_rate - 80);
-                                        } elseif ($single_rate >= 60 && $single_rate <= 79) {
-                                            $nilai_iki = 50 + ((69 - 50) / (79 - 60)) * ($single_rate - 60);
-                                        } elseif ($single_rate >= 0 && $single_rate <= 79) {
-                                            $nilai_iki = (49 / 59) * $single_rate;
-                                        }
-
-                                        $sum_nilai_iki += $nilai_iki;
-                                        $jumlah_data++;
-                                    }
-                                }
-                            }
-
-
-                            // cek if total_utama & data_utama != 0
-                            if ($sum_nilai_iki != 0 && $jumlah_data != 0) {
-                                $nilai_utama = round($sum_nilai_iki / $jumlah_data, 1);
-                            } else {
-                                $nilai_utama = 0;
-                            }
-                        } elseif ($val->jenis == "tambahan") {
-
-                            $sum_capaian = 0;
-                            foreach ($val->aspek_skp as $k => $v) {
-
-                                foreach ($v['target_skp'] as $mk => $rr) {
-                                    $kategori_ = '';
-                                    if ($rr['bulan'] ==  $bulan) {
-
-                                        $single_rate = ($v['realisasi_skp'][$mk]['realisasi_bulanan'] / $rr['target']) * 100;
-
-                                        if ($single_rate > 110) {
-                                            $nilai_iki = 110 + ((120 - 110) / (110 - 101)) * (110 - 101);
-                                        } elseif ($single_rate >= 101 && $single_rate <= 110) {
-                                            $nilai_iki = 110 + ((120 - 110) / (110 - 101)) * ($single_rate - 101);
-                                        } elseif ($single_rate == 100) {
-                                            $nilai_iki = 109;
-                                        } elseif ($single_rate >= 80 && $single_rate <= 99) {
-                                            $nilai_iki = 70 + ((89 - 70) / (99 - 80)) * ($single_rate - 80);
-                                        } elseif ($single_rate >= 60 && $single_rate <= 79) {
-                                            $nilai_iki = 50 + ((69 - 50) / (79 - 60)) * ($single_rate - 60);
-                                        } elseif ($single_rate >= 0 && $single_rate <= 79) {
-                                            $nilai_iki = (49 / 59) * $single_rate;
-                                        }
-
-                                        if ($nilai_iki > 110) {
-                                            $total_tambahan += 2.4;
-                                        } elseif ($nilai_iki >= 101 && $nilai_iki <= 110) {
-                                            $total_tambahan += 1.6;
-                                        } elseif ($nilai_iki == 100) {
-                                            $total_tambahan += 1.0;
-                                        } elseif ($nilai_iki >= 80 && $nilai_iki <= 99) {
-                                            $total_tambahan += 0.5;
-                                        } elseif ($nilai_iki >= 60 && $nilai_iki <= 79) {
-                                            $total_tambahan += 0.3;
-                                        } elseif ($nilai_iki >= 0 && $nilai_iki <= 79) {
-                                            $total_tambahan += 0.1;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if ($sum_nilai_iki != 0 && $jumlah_data != 0) {
-                        $nilai_utama = round($sum_nilai_iki / $jumlah_data, 1);
-                    } else {
-                        $nilai_utama = 0;
-                    }
-
-                    $nilai_tambahan = $total_tambahan;
-                } else {
-                    foreach ($get_skp as $index => $val) {
-
-                        // cek if isset skp_utama
-                        if ($val->jenis == "utama") {
-
-                            $index_data++;
-                            $data_utama++;
-
-                            $sum_capaian = 0;
-                            foreach ($val->aspek_skp as $key => $v) {
-
-                                foreach ($v['target_skp'] as $mk => $rr) {
-
-                                    $kategori_ = '';
-                                    if ($rr['bulan'] ==  $bulan) {
-                                        // set capaian_iki based realisasi / target
-                                        $capaian_iki = ($v['realisasi_skp'][$mk]['realisasi_bulanan'] / $rr['target']) * 100;
-
-                                        // set nilai_iki based capaian_iki
-                                        if ($capaian_iki >= 101) {
-                                            $nilai_iki = 16;
-                                        } elseif ($capaian_iki == 100) {
-                                            $nilai_iki = 13;
-                                        } elseif ($capaian_iki >= 80 && $capaian_iki <= 99) {
-                                            $nilai_iki = 8;
-                                        } elseif ($capaian_iki >= 60 && $capaian_iki <= 79) {
-                                            $nilai_iki = 3;
-                                        } elseif ($capaian_iki >= 0 && $capaian_iki <= 79) {
-                                            $nilai_iki = 1;
-                                        }
-                                        $sum_capaian += $nilai_iki;
-                                    }
-                                }
-                            }
-
-                            // set total_utama based sum_capaian
-                            if ($sum_capaian > 42) {
-                                $total_utama += 120;
-                            } elseif ($sum_capaian >= 34) {
-                                $total_utama += 100;
-                            } elseif ($sum_capaian >= 19) {
-                                $total_utama += 80;
-                            } elseif ($sum_capaian >= 7) {
-                                $total_utama += 60;
-                            } elseif ($sum_capaian >= 3) {
-                                $total_utama += 25;
-                            } elseif ($sum_capaian >= 0) {
-                                $total_utama += 25;
-                            }
-
-
-                            // cek if total_utama & data_utama != 0
-                            if ($total_utama != 0 && $data_utama != 0) {
-                                $nilai_utama = round($total_utama / $data_utama, 1);
-                            } else {
-                                $nilai_utama = 0;
-                            }
-                        } elseif ($val->jenis == "tambahan") {
-
-                            $sum_capaian = 0;
-                            foreach ($val->aspek_skp as $k => $v) {
-
-                                foreach ($v['target_skp'] as $mk => $rr) {
-                                    if ($rr['bulan'] ==  $bulan) {
-
-                                        $capaian_iki = ($v['realisasi_skp'][$mk]['realisasi_bulanan'] / $rr['target']) * 100;
-
-                                        if ($capaian_iki >= 101) {
-                                            $nilai_iki = 16;
-                                        } elseif ($capaian_iki == 100) {
-                                            $nilai_iki = 13;
-                                        } elseif ($capaian_iki >= 80 && $capaian_iki <= 99) {
-                                            $nilai_iki = 8;
-                                        } elseif ($capaian_iki >= 60 && $capaian_iki <= 79) {
-                                            $nilai_iki = 3;
-                                        } elseif ($capaian_iki >= 0 && $capaian_iki <= 79) {
-                                            $nilai_iki = 1;
-                                        }
-                                        $sum_capaian += $nilai_iki;
-                                    }
-                                }
-                            }
-
-
-                            if ($sum_capaian >= 42) {
-                                $total_tambahan += 2.4;
-                            } elseif ($sum_capaian >= 34) {
-                                $total_tambahan += 1.6;
-                            } elseif ($sum_capaian >= 19) {
-                                $total_tambahan += 1;
-                            } elseif ($sum_capaian >= 7) {
-                                $total_tambahan += 0.5;
-                            } elseif ($sum_capaian >= 3) {
-                                $total_tambahan += 0.1;
-                            } elseif ($sum_capaian >= 0) {
-                                $total_tambahan += 0.1;
-                            }
-                        }
-                    }
-
-                    // cek if total_utama & data_utama != 0
-                    if ($total_utama != 0 && $data_utama != 0) {
-                        $nilai_utama = round($total_utama / $data_utama, 1);
-                    } else {
-                        $nilai_utama = 0;
-                    }
-
-                    $nilai_tambahan = $total_tambahan;
-                }
-            }
-
-            $total_kinerja = round($nilai_utama + $nilai_tambahan, 1);
-
-            $value->total_kinerja = $total_kinerja;
-
+            $get_kinerja = aktivitas::query()
+                           ->select(DB::raw("SUM(waktu) as count"))
+                           ->where('id_pegawai',$value->id)
+                           ->whereMonth('tanggal',$bulan)
+                           ->first();
+            $value->get_kinerja = $get_kinerja;
+        
             $getAbsenPegawai = DB::table('tb_absen')
                 ->select('id', 'id_pegawai', 'waktu_absen', 'status', 'jenis', 'tanggal_absen')
                 ->where('id_pegawai', $value->id)
@@ -415,6 +179,7 @@ class laporanRekapitulasiTppController extends Controller
                 $persentasePemotonganKehadiran = $jml_potongan_kehadiran * 0.4;
 
                 $value->persentase_pemotongan = round($persentasePemotonganKehadiran, 1);
+                $value->jumlah_alpa = $jml_tanpa_keterangan;
             }
         }
 

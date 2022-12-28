@@ -72,7 +72,9 @@ class jabatanController extends Controller
             'nama_jabatan' => 'required',
             'status_jabatan' => 'required',
             'id_lokasi' => 'required',
-            'kelompok_jabatan' => 'required'
+            'kelompok_jabatan' => 'required',
+             'kelas_jabatan' => 'required',
+            'target_waktu' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -96,6 +98,9 @@ class jabatanController extends Controller
         $data->id_lokasi = $request->id_lokasi;
         $data->id_kelompok_jabatan = $request->kelompok_jabatan;
         $data->nilai_jabatan = str_replace(',', '', $request->nilai_jabatan);
+        $data->kelas_jabatan = $request->kelas_jabatan;
+        $data->target_waktu = $request->target_waktu;
+
         $data->save();
 
         if ($data) {
@@ -168,7 +173,10 @@ class jabatanController extends Controller
             'nama_jabatan' => 'required',
             'status_jabatan' => 'required',
             'id_lokasi' => 'required',
-            'kelompok_jabatan' => 'required'
+            'kelompok_jabatan' => 'required',
+            'kelas_jabatan' => 'required',
+            'target_waktu' => 'required'
+
         ]);
 
         if ($validator->fails()) {
@@ -186,6 +194,8 @@ class jabatanController extends Controller
         $data->id_lokasi = $request->id_lokasi;
         $data->id_kelompok_jabatan = $request->kelompok_jabatan;
         $data->nilai_jabatan = str_replace(',', '', $request->nilai_jabatan);
+        $data->kelas_jabatan = $request->kelas_jabatan;
+        $data->target_waktu = $request->target_waktu;
         $data->save();
 
         if ($data) {
