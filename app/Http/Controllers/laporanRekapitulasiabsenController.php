@@ -40,6 +40,8 @@ class laporanRekapitulasiabsenController extends Controller
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
         $hariLibur = $this->cekHariLibur($jmlHariKerja);
         $jml_kehadiran = [];
+        $endDate_if = '';
+        $monday = array();
         $temps_absensi = [
             'kmk' => [
                 'kmk_30' => [],
@@ -55,11 +57,32 @@ class laporanRekapitulasiabsenController extends Controller
             ]
         ];
         $jumlah_alpa = 0;
+        $potongan_masuk_kerja = 0;
+        $potongan_pulang_kerja = 0;
+        $jumlah_apel = 0;
+
+        $res_jml_alpa = 0;
+        $res_jml_tidak_apel = 0;
+
+        $endDate > date('Y-m-d') ? $endDate_if = strtotime(date('Y-m-d')) : $endDate_if = $endTime;
+
+
         // return $hariLibur;
         for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
             if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
                 $getDatatanggal[]['date'] = date('Y-m-d', $i);
             }
+        }
+
+         for ($i = $startTime; $i <= $endDate_if; $i = $i + 86400) {
+            if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
+                $date_ = date('Y-m-d', $i);
+                $day_ = date('l', strtotime($date_));
+                if ($day_ == 'Monday') {
+                   array_push($monday,date('Y-m-d',strtotime($date_)));
+                }      
+            }
+
         }
 
         $result = [];
@@ -69,12 +92,18 @@ class laporanRekapitulasiabsenController extends Controller
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
             $getAbsen = DB::table('tb_absen')->where('id_pegawai', Auth::user()->id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
-
             foreach ($getAbsen as $i => $v) {
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
-                    $selisih_waktu = $this->konvertWaktu('checkin', $v->waktu_absen);
+                    
+
+                    if (in_array($v->tanggal_absen, $monday)){
+                       if ($v->status !== 'apel') {
+                         $jumlah_apel += 1;
+                        }                                         }
+
+                 $selisih_waktu = $this->konvertWaktu('checkin', $v->waktu_absen);
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
                         $temps_absensi['kmk']['kmk_30'][] = $selisih_waktu;
                     } elseif ($selisih_waktu >= 31 && $selisih_waktu <= 60) {
@@ -169,17 +198,41 @@ class laporanRekapitulasiabsenController extends Controller
 
         // return ($jumlah_alpa * 3) .' || '. (count($temps_absensi['kmk']['kmk_30']) * 0.5) .' || '. (count($temps_absensi['kmk']['kmk_60'])) .' || '. (count($temps_absensi['kmk']['kmk_90']) * 1.25) .' || '. (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) .' || '. (count($temps_absensi['cpk']['cpk_30']) * 0.5) .' || '. (count($temps_absensi['cpk']['cpk_60'])) .' || '. (count($temps_absensi['cpk']['cpk_90']) * 1.25) .' || '. (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
 
-        $jml_potongan_kehadiran = ($jumlah_alpa * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
+        // $jml_potongan_kehadiran = ($jumlah_alpa * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
+
+         $jml_potongan_kehadiran = ($jumlah_alpa * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
+
+         $res_jml_alpa = $jumlah_alpa * 3;
+         $res_jml_tidak_apel = $jumlah_apel * 2;
+
+            
+
+
+        $potongan_masuk_kerja = (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60']) * 1) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5); 
+        $potongan_pulang_kerja = (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60']) * 1) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5); 
+
+
 
         $persentase_pemotongan_tunjangan = $jml_potongan_kehadiran * 0.4;
 
+        $jml_potongan_kehadiran_kerja = $res_jml_alpa + $potongan_masuk_kerja + $potongan_pulang_kerja + $res_jml_tidak_apel;
+
         $result['jml_hari_kerja'] = count($rekapAbsen);
         $result['kehadiran'] = count($jml_kehadiran);
-        $result['potongan_kehadiran'] = $jml_potongan_kehadiran;
-        $result['persentase_pemotongan'] = round($persentase_pemotongan_tunjangan, 2);
+        // $result['persentase_pemotongan'] = round($persentase_pemotongan_tunjangan, 2);
         $result['tanpa_keterangan'] = $jumlah_alpa;
         $result['pegawai'] = $pegawai;
         $result['data_absen'] = $rekapAbsen;
+
+        $result['potongan_tanpa_keterangan'] = $res_jml_alpa;
+        $result['potongan_masuk_kerja'] = $potongan_masuk_kerja;
+        $result['potongan_pulang_kerja'] = $potongan_pulang_kerja;
+        $result['potongan_apel'] = $res_jml_tidak_apel;
+        $result['jml_potongan_kehadiran_kerja'] = $jml_potongan_kehadiran_kerja;
+
+
+
+
 
         if ($result) {
             return response()->json([
