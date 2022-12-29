@@ -130,8 +130,8 @@ class KelompokjabatanController extends Controller
         }
     }
 
-    public function getOption(){
-        $data = kelompok_jabatan::select('id','kelompok as value')->orderBy('id', 'DESC')->get();
+    public function getOption($params){
+        $data = kelompok_jabatan::select('id','kelompok as value')->where('id_jenis_jabatan',$params)->orderBy('id', 'DESC')->get();
         return response()->json($data);
     }
 }

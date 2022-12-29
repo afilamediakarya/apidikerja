@@ -9,7 +9,6 @@ use App\Models\skp;
 use App\Models\aktivitas;
 use DB;
 use Auth;
-
 class laporanRekapitulasiTppController extends Controller
 {
 
@@ -24,6 +23,7 @@ class laporanRekapitulasiTppController extends Controller
         $endDate =  date('Y-m-t', strtotime($currentDate));
 
         $getDatatanggal = [];
+        // tes
 
         $startTime = strtotime($startDate);
         $endTime = strtotime($endDate);

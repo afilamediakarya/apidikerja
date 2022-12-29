@@ -87,7 +87,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('kelompok_jabatan')->group(function () {
         Route::get('/list', [App\Http\Controllers\KelompokjabatanController::class, 'list']);
-        Route::get('/get-option', [App\Http\Controllers\KelompokjabatanController::class, 'getOption']);
+        Route::get('/get-option/{params}', [App\Http\Controllers\KelompokjabatanController::class, 'getOption']);
         Route::post('/store', [App\Http\Controllers\KelompokjabatanController::class, 'store']);
         Route::get('/show/{params}', [App\Http\Controllers\KelompokjabatanController::class, 'show']);
         Route::post('/update/{params}', [App\Http\Controllers\KelompokjabatanController::class, 'update']);
