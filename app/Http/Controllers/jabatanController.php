@@ -135,12 +135,15 @@ class jabatanController extends Controller
             'id_satuan_kerja' => $data->id_satuan_kerja,
             'id_lokasi' => $data->id_lokasi,
             'nama_jabatan' => $data->nama_jabatan,
-            'id_jenis_jabatan' => $data->id_jenis_jabatan,
             'nilai_jabatan' =>  $data->nilai_jabatan,
             'status_jabatan' => $data->status_jabatan,
             'pegawai' => $data->pegawai,
             'pembayaran_tpp' => $data->pembayaran_tpp,
-            'kelompok_jabatan' => $data->id_kelompok_jabatan,
+            'nested_jabatan' => [
+                'id_jenis_jabatan' => $data->id_jenis_jabatan,
+                'kelompok_jabatan' => $data->id_kelompok_jabatan,
+            ],
+            'kelas_jabatan' => $data->kelas_jabatan,
             'parent_id' => [
                 'parent_id' => $parent_,
                 'jenis_jabatan' => $data->id_jenis_jabatan,
