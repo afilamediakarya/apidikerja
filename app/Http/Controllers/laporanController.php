@@ -657,6 +657,8 @@ class laporanController extends Controller
 
     public function kinerjaByOpd(){
         $bulan = request('bulan');
+        $satuanKerja = request('satuan_kerja');
+
            return pegawai::query()
                 ->select('tb_pegawai.id','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_jabatan.target_waktu','tb_jabatan.kelas_jabatan')
                 ->with(['aktivitas'=> function($query) use ($bulan) {
@@ -664,7 +666,7 @@ class laporanController extends Controller
                     $query->whereMonth('tanggal',$bulan);
                 }])
                 ->join('tb_jabatan','tb_jabatan.id_pegawai','=','tb_pegawai.id')
-                ->where('tb_pegawai.id_satuan_kerja',27)
+                ->where('tb_pegawai.id_satuan_kerja',$satuanKerja)
                            // ->with('aktivitas')
                 ->get();
 
