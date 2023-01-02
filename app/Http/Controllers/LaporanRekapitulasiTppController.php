@@ -169,11 +169,16 @@ class laporanRekapitulasiTppController extends Controller
                 }
 
 
-                foreach ($range['hari_kerja'] as $key => $val) {
-                    if (in_array($val, $date_val) == false) {
-                        $jml_tanpa_keterangan += $nums + 1;
+                if (isset($range['hari_kerja'])) {
+                    foreach ($range['hari_kerja'] as $key => $val) {
+                        if (in_array($val, $date_val) == false) {
+                            $jml_tanpa_keterangan += $nums + 1;
+                        }
                     }
+
                 }
+
+                
                 $jml_potongan_kehadiran = ($jml_tanpa_keterangan * 3) + (count($kmk_30) * 0.5) + (count($kmk_60)) + (count($kmk_90) * 1.25) + (count($kmk_90_keatas) * 1.5) + (count($cpk_30) * 0.5) + (count($cpk_60)) + (count($cpk_90) * 1.25) + count($cpk_90_keatas) * 1.5;
 
                 $persentasePemotonganKehadiran = $jml_potongan_kehadiran * 0.4;

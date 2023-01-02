@@ -54,17 +54,17 @@ class pegawaiController extends Controller
     public function pegawaiBySatuanKerja($params)
     {
         // return "ok";
-        $result = [];
-        $data = pegawai::where('id_satuan_kerja', $params)->get();
+        // $result = [];
+        $data = pegawai::select('id','nama as value')->where('id_satuan_kerja', $params)->get();
 
-        foreach ($data as $key => $value) {
-            $result[] = [
-                'id' => $value->id,
-                'value' => $value->nama
-            ];
-        }
+        // foreach ($data as $key => $value) {
+        //     $result[] = [
+        //         'id' => $value->id,
+        //         'value' => $value->nama
+        //     ];
+        // }
 
-        return response()->json($result);
+        return response()->json($data);
     }
 
     public function listPegawaiBySatuanKerja(Request $request)

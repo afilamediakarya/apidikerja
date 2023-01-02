@@ -42,6 +42,7 @@ class laporanRekapitulasiabsenController extends Controller
         $jml_kehadiran = [];
         $endDate_if = '';
         $monday = array();
+        $pegawai_ = request('pegawai');
         $temps_absensi = [
             'kmk' => [
                 'kmk_30' => [],
@@ -88,20 +89,20 @@ class laporanRekapitulasiabsenController extends Controller
         $result = [];
         $rekapAbsen = [];
         $tes = [];
-        $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', Auth::user()->id_pegawai)->first();
+        // return $pegawai;
+        $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', $pegawai_)->first();
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
-            $getAbsen = DB::table('tb_absen')->where('id_pegawai', Auth::user()->id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
+            $getAbsen = DB::table('tb_absen')->where('id_pegawai', $pegawai_)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
             foreach ($getAbsen as $i => $v) {
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
-                    
-
                     if (in_array($v->tanggal_absen, $monday)){
                        if ($v->status !== 'apel') {
                          $jumlah_apel += 1;
-                        }                                         }
+                        }             
+                }
 
                  $selisih_waktu = $this->konvertWaktu('checkin', $v->waktu_absen);
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
@@ -161,6 +162,18 @@ class laporanRekapitulasiabsenController extends Controller
 
                 $temps_absensi['cpk']['cpk_90_keatas'][] = 90; 
             }
+            // else{
+            //        // return $dataAbsen;
+            //     if ($dataAbsen[0]['status_absen'] == 'cuti' || $dataAbsen[0]['status_absen'] == 'dinas luar' || $dataAbsen[0]['status_absen'] == 'sakit' || $dataAbsen[0]['status_absen'] == 'izin') {
+            //          $dataAbsen[1] = [
+            //             'jenis' => 'checkout',
+            //             'status_absen' => 'hadir',
+            //             'waktu_absen' => '16:30:00',
+            //             'keterangan' => '-'
+            //         ];
+            //     }
+
+            // }
           
             if ($value['date'] > date('Y-m-d')) {
                 $rekapAbsen[$key] = [
@@ -228,6 +241,7 @@ class laporanRekapitulasiabsenController extends Controller
         $result['potongan_masuk_kerja'] = $potongan_masuk_kerja;
         $result['potongan_pulang_kerja'] = $potongan_pulang_kerja;
         $result['potongan_apel'] = $res_jml_tidak_apel;
+        $result['jumlah_tidak_apel'] = $jumlah_apel;
         $result['jml_potongan_kehadiran_kerja'] = $jml_potongan_kehadiran_kerja;
 
 
@@ -339,10 +353,6 @@ class laporanRekapitulasiabsenController extends Controller
             }
 
             if (count($dataAbsen) == 1) {
-
-                if ($dataAbsen[0]['status_absen'] == 'hadir' || $dataAbsen[0]['status_absen'] == 'dinas luar') {
-                    // $jml_kehadiran[] = 'checkout';
-                }
                 if ($value['date'] < date('Y-m-d')) {
 
                     $dataAbsen[1] = [
@@ -354,6 +364,19 @@ class laporanRekapitulasiabsenController extends Controller
                     $jml_kehadiran[$dataAbsen[0]['tanggal_absen']] = 'checkout';
                 }
                 $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
+            }else{
+                // return $dataAbsen;
+                if (isset($dataAbsen[0])) {
+                    if ($dataAbsen[0]['status_absen'] == 'cuti' || $dataAbsen[0]['status_absen'] == 'dinas luar' || $dataAbsen[0]['status_absen'] == 'sakit') {
+                     $dataAbsen[1] = [
+                        'jenis' => 'checkout',
+                        'status_absen' => 'hadir',
+                        'waktu_absen' => '16:30:00',
+                        'keterangan' => '-'
+                    ];
+                }
+
+                }
             }
 
             if ($value['date'] > date('Y-m-d')) {
