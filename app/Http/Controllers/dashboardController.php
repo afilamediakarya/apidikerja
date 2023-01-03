@@ -189,6 +189,7 @@ class dashboardController extends Controller
 		$target_prod = 0;
 		$nilai_kinerja_tpp = 0;
 		$nilaiKinerja_tpp = 0;
+		$tpp_bruto = 0;
 		$nilaiKinerjaByAktivitas = 0;
 		$nilai_besaran_tpp = $get_pegawai['nilai_jabatan'];
 
@@ -219,9 +220,8 @@ class dashboardController extends Controller
                 
          }
 
-         $nilaiKinerjaByAktivitas <= 50 ? $nilai_kinerja_tpp = 0 : $nilai_kinerja_tpp = $nilai_besaran_tpp * 60/100; 
-
-           $nilaiKinerja_tpp = $nilaiKinerjaByAktivitas * $nilai_kinerja_tpp / 100;
+         $nilai_kinerja_tpp = $nilai_besaran_tpp * 60/100; 
+            $nilaiKinerjaByAktivitas <= 50 ? $nilaiKinerja_tpp = 0 : $nilaiKinerja_tpp = $nilaiKinerjaByAktivitas * $nilai_kinerja_tpp / 100; 
 
         
 		$persentaseKehadiran = 0;
@@ -245,10 +245,21 @@ class dashboardController extends Controller
 		$nilaiKehadiran = $persentaseKehadiran * $persentase_pemotongan / 100;
 		$kehadiran_kerja_tpp = $persentaseKehadiran - $nilaiKehadiran;
 		$total_tpp = 0;
-
+		$golongan = '';
+		$pphPsl = 0;
+		$potongan_bpjs_pph21 = 0;
+   		$get_pegawai['golongan'] !== null ? $golongan = explode("/",$get_pegawai['golongan'])[1] : $golongan = '-';
+   		  if (strstr( $golongan, 'IV' )) {
+	         $pphPsl = 15 * $tppBruto / 100;
+	        }elseif (strstr( $golongan, 'III' )) {
+	                $pphPsl = 5 * $tppBruto / 100;
+	        }else{
+	            $pphPsl = 0;
+	        }
 		$bpjs = 1 * $nilai_besaran_tpp / 100;
 
-		   $total_tpp = $nilaiKinerja_tpp + $kehadiran_kerja_tpp - $bpjs;
+		   $tpp_bruto = $nilaiKinerja_tpp + $kehadiran_kerja_tpp - $bpjs;
+		    $total_tpp = $tpp_bruto - $pphPsl;
 
 		// // AKTIVITAS
 		$countAktivitas = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->count();
@@ -288,6 +299,10 @@ class dashboardController extends Controller
 			}
 		}
 
+// 		Potongan (BPJS & PPH 21) 
+// Nilainya Totalnya potongan  bpjs dan pph 21
+		$potongan_bpjs_pph21 = $bpjs + $pphPsl;
+
 
 
 		if (count($list_pegawai) == 0) {
@@ -311,6 +326,7 @@ class dashboardController extends Controller
 				'besaran_tpp' => number_format($nilai_besaran_tpp, 2),
 				'produktivitas_kerja' => number_format($nilaiKinerja_tpp,2),
 				'kehadiran_kerja' => number_format($kehadiran_kerja_tpp,2),
+				'potongan_bpjs_pph21' => number_format($potongan_bpjs_pph21,2),
 				'tpp_diterima' => number_format($total_tpp,2)
 			],
 			'bulan' => request('bulan')
