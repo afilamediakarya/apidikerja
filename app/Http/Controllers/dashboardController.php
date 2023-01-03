@@ -249,16 +249,22 @@ class dashboardController extends Controller
 		$pphPsl = 0;
 		$potongan_bpjs_pph21 = 0;
    		$get_pegawai['golongan'] !== null ? $golongan = explode("/",$get_pegawai['golongan'])[1] : $golongan = '-';
-   		  if (strstr( $golongan, 'IV' )) {
-	         $pphPsl = 15 * $tpp_bruto / 100;
-	        }elseif (strstr( $golongan, 'III' )) {
-	                $pphPsl = 5 * $tpp_bruto / 100;
-	        }else{
-	            $pphPsl = 0;
-	        }
+
+   		  
 		$bpjs = 1 * $nilai_besaran_tpp / 100;
 
 		   $tpp_bruto = $nilaiKinerja_tpp + $kehadiran_kerja_tpp - $bpjs;
+
+			if (strstr( $golongan, 'IV' )) {
+   		 	         $pphPsl = 15 * $tpp_bruto / 100;
+	        }elseif (strstr( $golongan, 'III' )) {
+	                $pphPsl = 5 * $tpp_bruto / 100;
+	        }else{
+	        	  	return 'tes3';
+	            $pphPsl = 0;
+	        }
+
+
 		    $total_tpp = $tpp_bruto - $pphPsl;
 
 		// // AKTIVITAS
