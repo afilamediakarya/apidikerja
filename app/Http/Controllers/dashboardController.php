@@ -250,9 +250,9 @@ class dashboardController extends Controller
 		$potongan_bpjs_pph21 = 0;
    		$get_pegawai['golongan'] !== null ? $golongan = explode("/",$get_pegawai['golongan'])[1] : $golongan = '-';
    		  if (strstr( $golongan, 'IV' )) {
-	         $pphPsl = 15 * $tppBruto / 100;
+	         $pphPsl = 15 * $tpp_bruto / 100;
 	        }elseif (strstr( $golongan, 'III' )) {
-	                $pphPsl = 5 * $tppBruto / 100;
+	                $pphPsl = 5 * $tpp_bruto / 100;
 	        }else{
 	            $pphPsl = 0;
 	        }
