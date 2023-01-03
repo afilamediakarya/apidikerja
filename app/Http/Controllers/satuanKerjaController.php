@@ -110,8 +110,6 @@ class satuanKerjaController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'nama_satuan_kerja' => 'required|string',
-            'lat_location' => 'required|string',
-            'long_location' => 'required|string',
             'status_kepala' => 'required|string',
             'inisial_satuan_kerja' => 'required|string',
             'tahun' => 'required|string',
@@ -125,8 +123,6 @@ class satuanKerjaController extends Controller
         $data->kode_satuan_kerja = '001';
         $data->nama_satuan_kerja = $request->nama_satuan_kerja;
         $data->inisial_satuan_kerja = $request->inisial_satuan_kerja;
-        $data->lat_location = $request->lat_location;
-        $data->long_location = $request->long_location;
         $data->status_kepala = $request->status_kepala;
         $data->tahun = $request->tahun;
         $data->save();
