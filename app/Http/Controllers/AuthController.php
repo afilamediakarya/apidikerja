@@ -35,7 +35,7 @@ class AuthController extends Controller
             $user = User::where('username', $request['username'])->firstOrFail();
         }
 
-         if ($user['role'] == 'admin_opd' || $user['role'] == 'super_admin') {
+         if ($user['role'] == 'super_admin') {
                $token = $user->createToken('auth_token')->plainTextToken; 
                  return response()->json([
                 'message' => 'Hi '.$user->username.', Berhasil Login',

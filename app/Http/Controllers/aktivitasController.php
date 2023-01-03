@@ -126,8 +126,6 @@ class aktivitasController extends Controller
             'nama_aktivitas' => 'required|string',
             'keterangan' => 'required',
             'satuan' => 'required|string',
-            'waktu_awal' => 'required',
-            'waktu_akhir' => 'required',
             'tanggal' => 'required|date',
             'hasil' => 'required|numeric'
         ]);
@@ -161,8 +159,8 @@ class aktivitasController extends Controller
         $data->nama_aktivitas = $request->nama_aktivitas;
         $data->keterangan = $request->keterangan;
         $data->satuan = $request->satuan;
-        $data->waktu_awal = $request->waktu_awal;
-        $data->waktu_akhir = $request->waktu_akhir;
+        $data->waktu_awal = '12:02:00';
+        $data->waktu_akhir = '12:02:00';        
         $data->tanggal = $request->tanggal;
         $data->tahun = date('Y');
         $data->hasil = $request->hasil;
@@ -220,8 +218,6 @@ class aktivitasController extends Controller
             'nama_aktivitas' => 'required|string',
             'keterangan' => 'required',
             'satuan' => 'required|string',
-            'waktu_awal' => 'required',
-            'waktu_akhir' => 'required',
             'tanggal' => 'required|date',
             'hasil' => 'required|numeric'
         ]);
@@ -236,8 +232,8 @@ class aktivitasController extends Controller
         $data->nama_aktivitas = $request->nama_aktivitas;
         $data->keterangan = $request->keterangan;
         $data->satuan = $request->satuan;
-        $data->waktu_awal = $request->waktu_awal;
-        $data->waktu_akhir = $request->waktu_akhir;
+            $data->waktu_awal = '12:02:00';
+        $data->waktu_akhir = '12:02:00';                
         $data->tanggal = $request->tanggal;
         $data->tahun = date('Y');
         $data->hasil = $request->hasil;

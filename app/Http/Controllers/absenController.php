@@ -42,7 +42,8 @@ class absenController extends Controller
         }else{
             return response()->json([
                 'message' => 'Failed',
-                'status' => false
+                'status' => false,
+                'data' => $data
             ]);
         }    
     }
