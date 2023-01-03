@@ -184,242 +184,50 @@ class dashboardController extends Controller
 		$tunjangan_kehadiran_kerja = 0;
 
 		$nilai_besaran_tpp = 0;
+		$get_kinerja = array();
+		$capaian_prod = 0;
+		$target_prod = 0;
+		$nilai_kinerja_tpp = 0;
+		$nilaiKinerja_tpp = 0;
+		$nilaiKinerjaByAktivitas = 0;
 		$nilai_besaran_tpp = $get_pegawai['nilai_jabatan'];
 
+
+
 		// INFO TPP 
-		// KINERJA
-		if (isset($get_skp)) {
-
-			$nilai_utama = 0;
-			$nilai_tambahan = 0;
-
-			$total_utama = 0;
-			$total_tambahan = 0;
-
-			$data_utama = 0;
-			$index_data = 0;
-
-			$jumlah_data = 0;
-			$sum_nilai_iki = 0;
-
-			if ($info_pegawai['level_jabatan'] == 1 || $info_pegawai['level_jabatan'] == 2) {
-				foreach ($get_skp as $index => $value) {
-
-
-					// cek if isset skp_utama
-					if ($value->jenis == "utama") {
-
-						$index_data++;
-						$data_utama++;
-
-						$sum_capaian = 0;
-						foreach ($value->aspek_skp as $key => $val) {
-
-							foreach ($val['target_skp'] as $mk => $rr) {
-								$kategori_ = '';
-								if ($rr['bulan'] ==  $bulan) {
-
-									$single_rate = ($val['realisasi_skp'][$mk]['realisasi_bulanan'] / $rr['target']) * 100;
-
-									if ($single_rate > 110) {
-										$nilai_iki = 110 + ((120 - 110) / (110 - 101)) * (110 - 101);
-									} elseif ($single_rate >= 101 && $single_rate <= 110) {
-										$nilai_iki = 110 + ((120 - 110) / (110 - 101)) * ($single_rate - 101);
-									} elseif ($single_rate == 100) {
-										$nilai_iki = 109;
-									} elseif ($single_rate >= 80 && $single_rate <= 99) {
-										$nilai_iki = 70 + ((89 - 70) / (99 - 80)) * ($single_rate - 80);
-									} elseif ($single_rate >= 60 && $single_rate <= 79) {
-										$nilai_iki = 50 + ((69 - 50) / (79 - 60)) * ($single_rate - 60);
-									} elseif ($single_rate >= 0 && $single_rate <= 79) {
-										$nilai_iki = (49 / 59) * $single_rate;
-									}
-
-									$sum_nilai_iki += $nilai_iki;
-									$jumlah_data++;
-								}
-							}
-						}
-
-
-						// cek if total_utama & data_utama != 0
-						if ($sum_nilai_iki != 0 && $jumlah_data != 0) {
-							$nilai_utama = round($sum_nilai_iki / $jumlah_data, 1);
-						} else {
-							$nilai_utama = 0;
-						}
-					} elseif ($value->jenis == "tambahan") {
-
-						$sum_capaian = 0;
-						foreach ($value->aspek_skp as $k => $v) {
-
-							foreach ($v['target_skp'] as $mk => $rr) {
-								$kategori_ = '';
-								if ($rr['bulan'] ==  $bulan) {
-
-									$single_rate = ($v['realisasi_skp'][$mk]['realisasi_bulanan'] / $rr['target']) * 100;
-
-									if ($single_rate > 110) {
-										$nilai_iki = 110 + ((120 - 110) / (110 - 101)) * (110 - 101);
-									} elseif ($single_rate >= 101 && $single_rate <= 110) {
-										$nilai_iki = 110 + ((120 - 110) / (110 - 101)) * ($single_rate - 101);
-									} elseif ($single_rate == 100) {
-										$nilai_iki = 109;
-									} elseif ($single_rate >= 80 && $single_rate <= 99) {
-										$nilai_iki = 70 + ((89 - 70) / (99 - 80)) * ($single_rate - 80);
-									} elseif ($single_rate >= 60 && $single_rate <= 79) {
-										$nilai_iki = 50 + ((69 - 50) / (79 - 60)) * ($single_rate - 60);
-									} elseif ($single_rate >= 0 && $single_rate <= 79) {
-										$nilai_iki = (49 / 59) * $single_rate;
-									}
-
-									if ($nilai_iki > 110) {
-										$total_tambahan += 2.4;
-									} elseif ($nilai_iki >= 101 && $nilai_iki <= 110) {
-										$total_tambahan += 1.6;
-									} elseif ($nilai_iki == 100) {
-										$total_tambahan += 1.0;
-									} elseif ($nilai_iki >= 80 && $nilai_iki <= 99) {
-										$total_tambahan += 0.5;
-									} elseif ($nilai_iki >= 60 && $nilai_iki <= 79) {
-										$total_tambahan += 0.3;
-									} elseif ($nilai_iki >= 0 && $nilai_iki <= 79) {
-										$total_tambahan += 0.1;
-									}
-								}
-							}
-						}
-					}
-				}
-
-				if ($sum_nilai_iki != 0 && $jumlah_data != 0) {
-					$nilai_utama = round($sum_nilai_iki / $jumlah_data, 1);
-				} else {
-					$nilai_utama = 0;
-				}
-
-				$nilai_tambahan = $total_tambahan;
-			} else {
-				foreach ($get_skp as $index => $value) {
-
-					// cek if isset skp_utama
-					if ($value->jenis == "utama") {
-
-						$index_data++;
-						$data_utama++;
-
-						$sum_capaian = 0;
-						foreach ($value->aspek_skp as $key => $val) {
-
-							foreach ($val['target_skp'] as $mk => $rr) {
-
-								$kategori_ = '';
-								if ($rr['bulan'] ==  $bulan) {
-									// set capaian_iki based realisasi / target
-									$capaian_iki = ($val['realisasi_skp'][$mk]['realisasi_bulanan'] / $rr['target']) * 100;
-
-									// set nilai_iki based capaian_iki
-									if ($capaian_iki >= 101) {
-										$nilai_iki = 16;
-									} elseif ($capaian_iki == 100) {
-										$nilai_iki = 13;
-									} elseif ($capaian_iki >= 80 && $capaian_iki <= 99) {
-										$nilai_iki = 8;
-									} elseif ($capaian_iki >= 60 && $capaian_iki <= 79) {
-										$nilai_iki = 3;
-									} elseif ($capaian_iki >= 0 && $capaian_iki <= 79) {
-										$nilai_iki = 1;
-									}
-									$sum_capaian += $nilai_iki;
-								}
-							}
-						}
-
-						// set total_utama based sum_capaian
-						if ($sum_capaian > 42) {
-							$total_utama += 120;
-						} elseif ($sum_capaian >= 34) {
-							$total_utama += 100;
-						} elseif ($sum_capaian >= 19) {
-							$total_utama += 80;
-						} elseif ($sum_capaian >= 7) {
-							$total_utama += 60;
-						} elseif ($sum_capaian >= 3) {
-							$total_utama += 25;
-						} elseif ($sum_capaian >= 0) {
-							$total_utama += 25;
-						}
-
-
-						// cek if total_utama & data_utama != 0
-						if ($total_utama != 0 && $data_utama != 0) {
-							$nilai_utama = round($total_utama / $data_utama, 1);
-						} else {
-							$nilai_utama = 0;
-						}
-					} elseif ($value->jenis == "tambahan") {
-
-						$sum_capaian = 0;
-						foreach ($value->aspek_skp as $k => $v) {
-
-							foreach ($v['target_skp'] as $mk => $rr) {
-								if ($rr['bulan'] ==  $bulan) {
-
-									$capaian_iki = ($v['realisasi_skp'][$mk]['realisasi_bulanan'] / $rr['target']) * 100;
-
-									if ($capaian_iki >= 101) {
-										$nilai_iki = 16;
-									} elseif ($capaian_iki == 100) {
-										$nilai_iki = 13;
-									} elseif ($capaian_iki >= 80 && $capaian_iki <= 99) {
-										$nilai_iki = 8;
-									} elseif ($capaian_iki >= 60 && $capaian_iki <= 79) {
-										$nilai_iki = 3;
-									} elseif ($capaian_iki >= 0 && $capaian_iki <= 79) {
-										$nilai_iki = 1;
-									}
-									$sum_capaian += $nilai_iki;
-								}
-							}
-						}
-
-
-						if ($sum_capaian >= 42) {
-							$total_tambahan += 2.4;
-						} elseif ($sum_capaian >= 34) {
-							$total_tambahan += 1.6;
-						} elseif ($sum_capaian >= 19) {
-							$total_tambahan += 1;
-						} elseif ($sum_capaian >= 7) {
-							$total_tambahan += 0.5;
-						} elseif ($sum_capaian >= 3) {
-							$total_tambahan += 0.1;
-						} elseif ($sum_capaian >= 0) {
-							$total_tambahan += 0.1;
-						}
-					}
-				}
-
-				// cek if total_utama & data_utama != 0
-				if ($total_utama != 0 && $data_utama != 0) {
-					$nilai_utama = round($total_utama / $data_utama, 1);
-				} else {
-					$nilai_utama = 0;
-				}
-
-				$nilai_tambahan = $total_tambahan;
-			}
-		}
-
-		$total_kinerja = round($nilai_utama + $nilai_tambahan, 1);
-
-		// return $get_pegawai->nilai_jabatan. '|'.$total_kinerja;
-
-
-		// (40*nilai_jabatan/100)*(potongan-(40*nilai_jabatan/100)
-
-		// persentase_pemotongan
 		
+	     $get_kinerja = aktivitas::query()
+                       ->select(DB::raw("SUM(waktu) as count"))
+                       ->where('id_pegawai',Auth::user()->id_pegawai)
+                       ->whereMonth('tanggal',$bulan)
+                       ->where('tahun',request('tahun'))
+                       ->first();
+        
+        $get_kinerja['count'] !== null ? $capaian_prod = $get_kinerja['count'] : $capaian_prod = 0;
+        $get_pegawai->target_waktu !== null ? $target_prod = $get_pegawai->target_waktu : $target_prod = 0;
+
+
+
+          if ($capaian_prod > 0 || $target_prod > 0) {
+                $nilaiKinerjaByAktivitas = ($capaian_prod / $target_prod) * 100;
+            }else {
+                  if ($get_pegawai->kelas_jabatan == 1 || $get_pegawai->kelas_jabatan == 3 || $get_pegawai->kelas_jabatan == 15) {
+                $nilaiKinerjaByAktivitas = 100;
+            }else{
+                $nilaiKinerjaByAktivitas = 0;
+            }
+                
+         }
+
+         $nilaiKinerjaByAktivitas <= 50 ? $nilai_kinerja_tpp = 0 : $nilai_kinerja_tpp = $nilai_besaran_tpp * 60/100; 
+
+           $nilaiKinerja_tpp = $nilaiKinerjaByAktivitas * $nilai_kinerja_tpp / 100;
+
+        
+		$persentaseKehadiran = 0;
+		$kehadiran_kerja_tpp = 0;
+		$nilaiKehadiran = 0;
+		$bpjs = 0;
 		// INFO TPP
 		// KEHADIRAN
 		$current_date = date("Y-{$bulan}-d");
@@ -430,21 +238,17 @@ class dashboardController extends Controller
 
 		$response_data_absen = (new laporanRekapitulasiabsenController)->viewrekapByUser($first_date, $last_date, Auth::user()->id_pegawai);
 
+		   $persentaseKehadiran = 40 * $nilai_besaran_tpp / 100;
+
 		$persentase_pemotongan = $response_data_absen->getData()->data->persentase_pemotongan;
+
+		$nilaiKehadiran = $persentaseKehadiran * $persentase_pemotongan / 100;
+		$kehadiran_kerja_tpp = $persentaseKehadiran - $nilaiKehadiran;
 		$total_tpp = 0;
 
-		if ($get_pegawai->nilai_jabatan > 0 ) {
-			$tunjangan_prestasi_kerja = (60 * $get_pegawai->nilai_jabatan / 100) * ($total_kinerja/120);
-		}
+		$bpjs = 1 * $nilai_besaran_tpp / 100;
 
-		if ($get_pegawai->nilai_jabatan > 0) {
-			$percent_nilai_jabatan = 40 * $get_pegawai->nilai_jabatan / 100;
-			$tunjangan_kehadiran_kerja = $percent_nilai_jabatan - ($percent_nilai_jabatan * ($persentase_pemotongan / 100));
-			// $tunjangan_kehadiran_kerja = $persentase_pemotongan;
-		}
-
-		$total_tpp = $tunjangan_prestasi_kerja + $tunjangan_kehadiran_kerja;
-
+		   $total_tpp = $nilaiKinerja_tpp + $kehadiran_kerja_tpp - $bpjs;
 
 		// // AKTIVITAS
 		$countAktivitas = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->count();
@@ -505,8 +309,8 @@ class dashboardController extends Controller
 			'list_rekap_nilai' => $list_pegawai,
 			'informasi_tpp' => [
 				'besaran_tpp' => number_format($nilai_besaran_tpp, 2),
-				'tunjangan_prestasi_kerja' => number_format($tunjangan_prestasi_kerja,2),
-				'tunjangan_prestasi_kehadiran' => number_format($tunjangan_kehadiran_kerja,2),
+				'produktivitas_kerja' => number_format($nilaiKinerja_tpp,2),
+				'kehadiran_kerja' => number_format($kehadiran_kerja_tpp,2),
 				'tpp_diterima' => number_format($total_tpp,2)
 			],
 			'bulan' => request('bulan')
