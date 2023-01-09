@@ -260,7 +260,6 @@ class dashboardController extends Controller
 	        }elseif (strstr( $golongan, 'III' )) {
 	                $pphPsl = 5 * $tpp_bruto / 100;
 	        }else{
-	        	  	return 'tes3';
 	            $pphPsl = 0;
 	        }
 

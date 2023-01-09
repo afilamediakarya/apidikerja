@@ -574,7 +574,6 @@ class laporanRekapitulasiabsenController extends Controller
                 ];
             }
         }
-
    
 
         return $result = [

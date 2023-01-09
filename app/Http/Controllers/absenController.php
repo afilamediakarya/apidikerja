@@ -49,7 +49,14 @@ class absenController extends Controller
 
       public function checkAbsenbyDate(){
         // return date('Y-m')
-        $data = DB::table('tb_absen')->select('status')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',request('tanggal'))->first();
+        $data = '';
+        $date = request('tanggal');
+        
+        if (date('D', strtotime($date)) == 'Mon') {
+            $data = null;
+        }else{
+            $data = DB::table('tb_absen')->select('status')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$date)->first();
+        }
 
          if ($data) {
             return response()->json([
