@@ -321,6 +321,6 @@ class aktivitasController extends Controller
     }
 
     public function checkMenitKinerja(){
-        return aktivitas::select(DB::raw("SUM(waktu) as count"))->where('tanggal',date('Y-m-d'))->first();
+        return aktivitas::select(DB::raw("SUM(waktu) as count"))->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal',date('Y-m-d'))->first();
     }
 }
