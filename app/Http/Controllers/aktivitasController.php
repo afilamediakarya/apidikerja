@@ -147,8 +147,17 @@ class aktivitasController extends Controller
 
             if ($waktu == 0) {
                 return response()->json([
-                'error' => 'Jumlah waktu sudah cukup, anda tidak bisa menambah aktivitas'], 422);
+                    'error' => [
+                        'title' =>'Jumlah waktu sudah cukup',
+                        'text' => 'anda tidak bisa menambah aktivitas'
+                    ]
+                ], 422);
             }
+
+              return response()->json(['invalid'=> ['error'=> [
+                'text' => 'Anda belum bisa menambah aktivitas',
+                'title' => 'Maaf Anda belum Absen'
+            ]] ]);
         }else{
             $waktu = $request->waktu;
         }
