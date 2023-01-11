@@ -52,7 +52,7 @@ class absenController extends Controller
         $data = '';
         $date = request('tanggal');
         
-        if (date('D', strtotime($date)) == 'Mon') {
+        if (date('D', strtotime($date)) == 'Sun') {
             $data = null;
         }else{
             $data = DB::table('tb_absen')->select('status')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$date)->first();
