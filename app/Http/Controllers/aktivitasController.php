@@ -29,6 +29,24 @@ class aktivitasController extends Controller
         }
     }
 
+    public function listByDate()
+    {
+        $data = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->where('tanggal',request('tanggal'))->latest()->get();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
     public function convertNamaBulan($params)
     {
         switch ($params) {

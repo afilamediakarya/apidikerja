@@ -659,17 +659,31 @@ class laporanController extends Controller
         $bulan = request('bulan');
         $satuanKerja = request('satuan_kerja');
 
-           return pegawai::query()
+        $pegawai =  pegawai::query()
                 ->select('tb_pegawai.id','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.golongan','tb_jabatan.nama_jabatan','tb_jabatan.target_waktu','tb_jabatan.kelas_jabatan','tb_jenis_jabatan.level')
-                ->with(['aktivitas'=> function($query) use ($bulan) {
-                    $query->select('id','id_pegawai','hasil',DB::raw("SUM(waktu) as count"));
-                    $query->whereMonth('tanggal',$bulan);
-                }])
                 ->join('tb_jabatan','tb_jabatan.id_pegawai','=','tb_pegawai.id')
                 ->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')
                 ->where('tb_pegawai.id_satuan_kerja',$satuanKerja)
-                           // ->with('aktivitas')
+                //  ->with(['aktivitas'=> function($query) use ($bulan) {
+                //     $query->select('id','id_pegawai','hasil',DB::raw("SUM(waktu) as count"));
+                //     $query->whereMonth('tanggal',$bulan);
+                //     // $query->where('id_pegawai',$)
+                // }])
+
                 ->get();
+
+        foreach ($pegawai as $key => $value) {
+            $aktivitas = DB::table('tb_aktivitas')->select('id','id_pegawai','hasil',DB::raw("SUM(waktu) as count"))->whereMonth('tanggal',$bulan)->where('id_pegawai',$value->id)->whereNotNull('id_pegawai')->get();           
+
+            if ($aktivitas[0]->count !== null) {
+                $value->aktivitas = $aktivitas;            
+            }else{
+                $value->aktivitas = [];            
+            }
+            
+        }        
+
+        return $pegawai;
 
     }
 }

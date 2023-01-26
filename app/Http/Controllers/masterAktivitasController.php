@@ -29,8 +29,13 @@ class masterAktivitasController extends Controller
     }
 
     public function option(){
+        $result = [];
         $jabatan = DB::table('tb_jabatan')->select('id_kelompok_jabatan')->where('id_pegawai',Auth::user()->id_pegawai)->first();
-        $data = masterAktivitas::select('id','aktivitas as value')->where('id_kelompok_jabatan',$jabatan->id_kelompok_jabatan)->get();
+        $data = masterAktivitas::select('id','aktivitas as value')->where('id_kelompok_jabatan',$jabatan->id_kelompok_jabatan)->orWhere('jenis','umum')->get();
+        // $general = masterAktivitas::select('id','aktivitas as value')->where
+
+        // $result = collect($data);
+
         return $data;
     }
 
