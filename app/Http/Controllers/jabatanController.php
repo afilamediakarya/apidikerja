@@ -139,6 +139,7 @@ class jabatanController extends Controller
             'status_jabatan' => $data->status_jabatan,
             'pegawai' => $data->pegawai,
             'pembayaran_tpp' => $data->pembayaran_tpp,
+            'target_waktu' => $data->target_waktu,
         'nested_jabatan' => [
                 'id_jenis_jabatan' => $data->id_jenis_jabatan,
                 'kelompok_jabatan' => $data->id_kelompok_jabatan,

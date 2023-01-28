@@ -655,6 +655,55 @@ class laporanController extends Controller
         return $result;
     }
 
+     public function kinerjaView(){
+        $result = array();
+        $pegawai_dinilai = array();
+        $pegawai_penilai = array();
+        $bulan = request('bulan');
+
+        $current_pegawai =  $this->jabatanByPegawai(request('pegawai'),'pegawai');
+        $atasan = $this->jabatanByPegawai($current_pegawai->parent_id,'atasan');
+
+        $pegawai_dinilai = [
+            'nama' => $current_pegawai->nama_pegawai,
+            'nip' => $current_pegawai->nip,
+            'golongan' => $current_pegawai->golongan,
+            'jabatan' => $current_pegawai->nama_jabatan,
+            'unit_kerja' => $current_pegawai->nama_satuan_kerja,
+            'waktu' => $current_pegawai->target_waktu
+        ];
+
+        $pegawai_penilai = [
+            'nama' => $atasan->nama_pegawai,
+            'nip' => $atasan->nip,
+            'golongan' => $atasan->golongan,
+            'jabatan' => $atasan->nama_jabatan,
+            'unit_kerja' => $atasan->nama_satuan_kerja
+        ];
+
+
+        // $data = skp::where('id_jabatan',$current_pegawai->id)->get();
+
+        $data = skp::query()
+                ->select('id','id_satuan_kerja','rencana_kerja','tahun')
+                ->with(['aktivitas'=> function($query) use ($bulan) {
+                    $query->select('id','nama_aktivitas','id_skp','waktu','satuan','hasil','tanggal');
+                    $query->whereMonth('tanggal',$bulan);
+                }])
+                ->where('tahun',date('Y'))
+                ->where('id_jabatan',$current_pegawai->id)
+                ->get();
+
+
+        $result = [
+            'pegawai_dinilai' => $pegawai_dinilai,
+            'pegawai_penilai' => $pegawai_penilai,
+            'kinerja' =>$data
+        ];
+
+        return $result;
+    }
+
     public function kinerjaByOpd(){
         $bulan = request('bulan');
         $satuanKerja = request('satuan_kerja');

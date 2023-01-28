@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 Route::get('/tes/list', [App\Http\Controllers\pegawaiController::class, 'list_tes']);
 Route::get('/view-rekapByUser/{start_date}/{end_date}/{id_pegawai}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'viewrekapByUser']);
+Route::get('laporan-kinerja', [App\Http\Controllers\laporanController::class, 'kinerjaView']);
 Route::get('/manual', [App\Http\Controllers\skpController::class, 'manual']);
 // Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
 Route::group(['middleware' => ['auth:sanctum']], function () {

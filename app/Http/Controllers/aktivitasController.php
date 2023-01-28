@@ -31,7 +31,7 @@ class aktivitasController extends Controller
 
     public function listByDate()
     {
-        $data = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->where('tanggal',request('tanggal'))->latest()->get();
+        $data = aktivitas::with('skp')->where('id_pegawai', Auth::user()->id_pegawai)->where('tanggal',request('tanggal'))->latest()->get();
 
         if ($data) {
             return response()->json([
