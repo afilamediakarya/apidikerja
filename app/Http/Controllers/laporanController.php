@@ -73,28 +73,16 @@ class laporanController extends Controller
             ->first();
 
         $listPegawai = DB::table('tb_pegawai')
-            ->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.id as id_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_jabatan.parent_id', 'tb_jenis_jabatan.level')
+            ->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_jabatan.id as id_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.id_jenis_jabatan', 'tb_jabatan.parent_id', 'tb_jenis_jabatan.level','tb_jabatan.kelas_jabatan')
             ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
             ->join('tb_jenis_jabatan', 'tb_jabatan.id_jenis_jabatan', '=', 'tb_jenis_jabatan.id')
             ->where('tb_pegawai.id_satuan_kerja', $idSatuanKerja)
-            ->orderBy('tb_jabatan.id_jenis_jabatan', 'ASC')
-            // ->where('tb_pegawai.id', 2691)
-            // ->orWhere('tb_pegawai.id', 2696)
+            ->orderBy('tb_jabatan.kelas_jabatan', 'DESC')
             ->get();
 
-        // return $listPegawai;
-
         foreach ($listPegawai as $key => $value) {
-            // $jabatan = jabatan::with('jenis_jabatan')->select('id', 'id_jenis_jabatan')->where('id_pegawai', $value->id)->first();
-
             $result = [];
-            // $skp = [];
-            // $atasan = '';
             $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai', $value->id)->first();
-            // return $jabatanByPegawai;
-
-            // $jabatan_atasan = DB::table('tb_jabatan')->where('id', $value->parent_id)->first();
-
             $skp_utama =
                 skp::select('tb_skp.id', 'tb_skp.id_jabatan', 'tb_skp.id_satuan_kerja', 'tb_skp.id_skp_atasan', 'tb_skp.jenis', 'tb_skp.rencana_kerja', 'tb_skp.tahun')
                 ->with(['aspek_skp' => function ($query) use ($bulan) {

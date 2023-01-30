@@ -153,7 +153,7 @@ class aktivitasController extends Controller
         }
 
         $waktu = 0;
-        $jumlah_kinerja = $this->checkMenitKinerja();
+        $jumlah_kinerja = $this->checkMenitKinerja($request->tanggal);
         $ax = $request->waktu + $jumlah_kinerja['count'];
 
         // return $ax;
@@ -172,10 +172,10 @@ class aktivitasController extends Controller
                 ], 422);
             }
 
-              return response()->json(['invalid'=> ['error'=> [
-                'text' => 'Anda belum bisa menambah aktivitas',
-                'title' => 'Maaf Anda belum Absen'
-            ]] ]);
+            //   return response()->json(['error'=> [
+            //     'text' => 'Anda belum bisa menambah aktivitas',
+            //     'title' => 'Maaf Anda belum Absen'
+            // ] ],422);
         }else{
             $waktu = $request->waktu;
         }
@@ -338,7 +338,7 @@ class aktivitasController extends Controller
         // return collect($data)->pluck('rencana_kerja','id')->toArray();
     }
 
-    public function checkMenitKinerja(){
-        return aktivitas::select(DB::raw("SUM(waktu) as count"))->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal',date('Y-m-d'))->first();
+    public function checkMenitKinerja($params){
+        return aktivitas::select(DB::raw("SUM(waktu) as count"))->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal',$params)->first();
     }
 }

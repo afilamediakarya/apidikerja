@@ -65,7 +65,7 @@ class laporanRekapitulasiTppController extends Controller
                 ->join('tb_jenis_jabatan', 'tb_jabatan.id_jenis_jabatan', '=', 'tb_jenis_jabatan.id')
                 ->where('tb_pegawai.id_satuan_kerja', $satuanKerja)
                 // ->where('tb_pegawai.id', 256)
-                ->orderBy('tb_jabatan.id_jenis_jabatan', 'asc')
+                ->orderBy('tb_jabatan.kelas_jabatan', 'desc')
                 ->get();
         } else {
             $pegawai = pegawai::where('id', Auth::user()->id_pegawai)->first();
@@ -74,6 +74,7 @@ class laporanRekapitulasiTppController extends Controller
                 ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
                 ->join('tb_jenis_jabatan', 'tb_jabatan.id_jenis_jabatan', '=', 'tb_jenis_jabatan.id')
                 ->where('id_satuan_kerja', $pegawai->id_satuan_kerja)
+                ->orderBy('tb_jabatan.kelas_jabatan', 'desc')
                 ->orderBy('nama', 'asc')
                 ->get();
         }
@@ -131,7 +132,7 @@ class laporanRekapitulasiTppController extends Controller
                 $date_val = array();
                 $jml_tanpa_keterangan = 0;
                 $nums = 0;
-
+                $persentasePemotonganKehadiran = 0;
                 foreach ($getAbsenPegawai as $key => $val) {
                     // return $val;
                     if (isset($val->status)) {
@@ -181,9 +182,9 @@ class laporanRekapitulasiTppController extends Controller
                 
                 $jml_potongan_kehadiran = ($jml_tanpa_keterangan * 3) + (count($kmk_30) * 0.5) + (count($kmk_60)) + (count($kmk_90) * 1.25) + (count($kmk_90_keatas) * 1.5) + (count($cpk_30) * 0.5) + (count($cpk_60)) + (count($cpk_90) * 1.25) + count($cpk_90_keatas) * 1.5;
 
-                $persentasePemotonganKehadiran = $jml_potongan_kehadiran * 0.4;
+                // $persentasePemotonganKehadiran = $jml_potongan_kehadiran * 0.4;
 
-                $value->persentase_pemotongan = round($persentasePemotonganKehadiran, 1);
+                $value->persentase_pemotongan = round($jml_potongan_kehadiran, 1);
                 $value->jumlah_alpa = $jml_tanpa_keterangan;
             }
         }

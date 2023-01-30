@@ -200,6 +200,8 @@ class absenController extends Controller
             $user_update = $request->user_update;
         }
 
+        
+
         $data = new absen();
         $data->id_pegawai = $request->id_pegawai;
         $data->tanggal_absen = $request->tanggal_absen;
@@ -213,6 +215,10 @@ class absenController extends Controller
         $data->tahun = date('Y');
         $data->save();
 
+        if ($request->status == 'izin' || $request->status == 'sakit' || $request->status == 'cuti') {
+            $this->generateCheckout($request);
+        }
+
         if ($data) {
             return response()->json([
                 'message'     => 'Success',
@@ -220,14 +226,25 @@ class absenController extends Controller
                 'data' => $data
             ]);
         }else{
-            // return response()->json([
-            //     'message' => 'Failed',
-            //     'status' => false
-            // ],422);
               throw ValidationException::withMessages([
                     'message' => ['Gagal.'],
              ]);
         }
+    }
+
+    public function generateCheckout($request){
+        $data = new absen();
+        $data->id_pegawai = $request->id_pegawai;
+        $data->tanggal_absen = $request->tanggal_absen;
+        $data->waktu_absen = '16:00:00';
+        $data->status = 'hadir';
+        $data->jenis = 'checkout';
+        $data->location_auth = $request->location_auth;
+        $data->face_auth = $request->face_auth;
+        $data->user_update = $request->user_update;
+        $data->validation = $request->validation;
+        $data->tahun = date('Y');
+        $data->save();
     }
 
     // public function store_(Request )

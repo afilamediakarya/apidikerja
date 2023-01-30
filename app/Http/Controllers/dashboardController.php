@@ -209,7 +209,7 @@ class dashboardController extends Controller
 
 
 
-          if ($capaian_prod > 0 || $target_prod > 0) {
+          if ($target_prod > 0) {
                 $nilaiKinerjaByAktivitas = ($capaian_prod / $target_prod) * 100;
             }else {
                   if ($get_pegawai->kelas_jabatan == 1 || $get_pegawai->kelas_jabatan == 3 || $get_pegawai->kelas_jabatan == 15) {

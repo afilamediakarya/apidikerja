@@ -202,24 +202,10 @@ class laporanRekapitulasiabsenController extends Controller
             }
         }
 
-        // return count($temps_absensi['kmk']['kmk_30']).' | '.count($temps_absensi['kmk']['kmk_60']).' | '.count($temps_absensi['kmk']['kmk_90']).' | '.count($temps_absensi['kmk']['kmk_90_keatas']).' | '.count($temps_absensi['cpk']['cpk_30']).' | '.count($temps_absensi['cpk']['cpk_60']).' | '.count($temps_absensi['cpk']['cpk_90']).' | '.count($temps_absensi['cpk']['cpk_90_keatas']); 
-
-        // return $tes;
-
-        // return ($jumlah_alpa) .' || '. (count($temps_absensi['kmk']['kmk_30'])) .' || '. (count($temps_absensi['kmk']['kmk_60'])) .' || '. (count($temps_absensi['kmk']['kmk_90'])) .' || '. (count($temps_absensi['kmk']['kmk_90_keatas'])) .' || '. (count($temps_absensi['cpk']['cpk_30'])) .' || '. (count($temps_absensi['cpk']['cpk_60'])) .' || '. (count($temps_absensi['cpk']['cpk_90'])) .' || '. (count($temps_absensi['cpk']['cpk_90_keatas']));
-
-
-        // return ($jumlah_alpa * 3) .' || '. (count($temps_absensi['kmk']['kmk_30']) * 0.5) .' || '. (count($temps_absensi['kmk']['kmk_60'])) .' || '. (count($temps_absensi['kmk']['kmk_90']) * 1.25) .' || '. (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) .' || '. (count($temps_absensi['cpk']['cpk_30']) * 0.5) .' || '. (count($temps_absensi['cpk']['cpk_60'])) .' || '. (count($temps_absensi['cpk']['cpk_90']) * 1.25) .' || '. (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
-
-        // $jml_potongan_kehadiran = ($jumlah_alpa * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
-
          $jml_potongan_kehadiran = ($jumlah_alpa * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
 
          $res_jml_alpa = $jumlah_alpa * 3;
          $res_jml_tidak_apel = $jumlah_apel * 2;
-
-            
-
 
         $potongan_masuk_kerja = (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60']) * 1) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5); 
         $potongan_pulang_kerja = (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60']) * 1) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5); 
@@ -541,7 +527,7 @@ class laporanRekapitulasiabsenController extends Controller
             $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama')
                 ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
                 ->where('tb_pegawai.id_satuan_kerja', $satker)
-                ->orderBy('tb_jabatan.id_jenis_jabatan', 'asc')
+                ->orderBy('tb_jabatan.kelas_jabatan', 'desc')
                 ->get();
         } else {
             $pegawai = pegawai::where('id', Auth::user()->id_pegawai)->first();
