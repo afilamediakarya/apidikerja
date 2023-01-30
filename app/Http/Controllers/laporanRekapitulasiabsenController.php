@@ -31,8 +31,9 @@ class laporanRekapitulasiabsenController extends Controller
         return $temps;
     }
 
-    public function rekapByUser($startDate, $endDate)
+    public function rekapByUser($startDate, $endDate, $pegawai = null)
     {
+        
         $startTime = strtotime($startDate);
         $endTime = strtotime($endDate);
         $getDatatanggal = [];
@@ -42,7 +43,9 @@ class laporanRekapitulasiabsenController extends Controller
         $jml_kehadiran = [];
         $endDate_if = '';
         $monday = array();
-        $pegawai_ = request('pegawai');
+        $pegawai_ = '';
+        $pegawai == null ? $pegawai_ = request('pegawai') : $pegawai_ = $pegawai;
+       
         $temps_absensi = [
             'kmk' => [
                 'kmk_30' => [],
