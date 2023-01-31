@@ -701,6 +701,8 @@ class laporanController extends Controller
                 ->join('tb_jabatan','tb_jabatan.id_pegawai','=','tb_pegawai.id')
                 ->join('tb_jenis_jabatan','tb_jenis_jabatan.id','=','tb_jabatan.id_jenis_jabatan')
                 ->where('tb_pegawai.id_satuan_kerja',$satuanKerja)
+                ->orderBy('tb_jabatan.kelas_jabatan','DESC')
+                ->orderBy('tb_pegawai.nama', 'ASC')
                 //  ->with(['aktivitas'=> function($query) use ($bulan) {
                 //     $query->select('id','id_pegawai','hasil',DB::raw("SUM(waktu) as count"));
                 //     $query->whereMonth('tanggal',$bulan);

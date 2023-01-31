@@ -527,6 +527,7 @@ class laporanRekapitulasiabsenController extends Controller
                 ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
                 ->where('tb_pegawai.id_satuan_kerja', $satker)
                 ->orderBy('tb_jabatan.kelas_jabatan', 'desc')
+                ->orderBy('tb_pegawai.nama', 'asc')
                 ->get();
         } else {
             $pegawai = pegawai::where('id', Auth::user()->id_pegawai)->first();
