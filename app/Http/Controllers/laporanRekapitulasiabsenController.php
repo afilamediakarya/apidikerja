@@ -233,10 +233,6 @@ class laporanRekapitulasiabsenController extends Controller
         $result['jumlah_tidak_apel'] = $jumlah_apel;
         $result['jml_potongan_kehadiran_kerja'] = $jml_potongan_kehadiran_kerja;
 
-
-
-
-
         if ($result) {
             return response()->json([
                 'message' => 'Success',

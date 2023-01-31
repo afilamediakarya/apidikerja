@@ -95,7 +95,7 @@ class laporanRekapitulasiTppController extends Controller
             $get_absen = (new laporanRekapitulasiabsenController)->rekapByUser($startDate, $endDate, $value->id);
             $datax = $get_absen->getData();
  
-            $value->persentase_pemotongan = round($datax->data->jml_potongan_kehadiran_kerja, 1);
+            $value->persentase_pemotongan = round($datax->data->jml_potongan_kehadiran_kerja, 2);
             $value->jumlah_alpa = $datax->data->tanpa_keterangan;
         
             // $getAbsenPegawai = DB::table('tb_absen')
