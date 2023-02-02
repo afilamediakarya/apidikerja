@@ -236,11 +236,13 @@ class dashboardController extends Controller
 		// Last day of the month.
 		$last_date =  date('Y-m-t', strtotime($current_date));
 
-		$response_data_absen = (new laporanRekapitulasiabsenController)->viewrekapByUser($first_date, $last_date, Auth::user()->id_pegawai);
+		$response_data_absen = (new laporanRekapitulasiabsenController)->rekapByUser($first_date, $last_date, Auth::user()->id_pegawai);
+		// return $response_data_absen;
 
 		   $persentaseKehadiran = 40 * $nilai_besaran_tpp / 100;
 
-		$persentase_pemotongan = $response_data_absen->getData()->data->persentase_pemotongan;
+		$persentase_pemotongan = $response_data_absen->getData()->data->jml_potongan_kehadiran_kerja;
+		// return $persentase_pemotongan;
 
 		$nilaiKehadiran = $persentaseKehadiran * $persentase_pemotongan / 100;
 		$kehadiran_kerja_tpp = $persentaseKehadiran - $nilaiKehadiran;
