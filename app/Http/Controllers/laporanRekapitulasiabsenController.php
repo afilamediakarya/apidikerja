@@ -743,7 +743,7 @@ class laporanRekapitulasiabsenController extends Controller
 
         foreach ($pegawaiBySatuanKerja as $key => $value) {
             $getAbsenPegawai = absen::where('id_pegawai', $value->id)
-                ->select('id', 'id_pegawai', 'waktu_absen', 'status', 'jenis','tanggal_absen',DB::raw('COUNT(IF(status = "apel", 1, NULL)) "jumlah_apel"'))
+                ->select('id', 'id_pegawai', 'waktu_absen', 'status', 'jenis','tanggal_absen',DB::raw('COUNT(IF(status = "apel", 1, NULL)) "jumlah_apel"'),DB::raw('COUNT(IF(status = "hadir", 1, NULL)) "jumlah_hadir"'),DB::raw('COUNT(IF(status = "sakit", 1, NULL)) "jumlah_sakit"'),DB::raw('COUNT(IF(status = "cuti", 1, NULL)) "jumlah_cuti"'),DB::raw('COUNT(IF(status = "dinas luar", 1, NULL)) "jumlah_dinas_luar"'))
                 ->whereIn('tanggal_absen',$getDatatanggal)
                 ->where('validation', 1)
                 // ->groupBy('tb_absen.id')

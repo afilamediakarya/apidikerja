@@ -14,6 +14,7 @@ use App\Models\satuan;
 use App\Models\jabatan;
 use App\Models\kegiatan;
 use App\Models\pegawai;
+use App\Models\aktivitas;
 use DB;
 use Validator;
 use Auth;
@@ -626,12 +627,14 @@ class laporanController extends Controller
         $data = skp::query()
                 ->select('id','id_satuan_kerja','rencana_kerja','tahun')
                 ->with(['aktivitas'=> function($query) use ($bulan) {
-                    $query->select('id','nama_aktivitas','id_skp','waktu','satuan','hasil','tanggal');
+                    $query->select('id','nama_aktivitas','id_skp','satuan','tanggal','keterangan',DB::raw('sum(hasil) as hasil'),DB::raw('sum(waktu) as waktu'));
                     $query->whereMonth('tanggal',$bulan);
+                    $query->groupBy('id_skp', 'nama_aktivitas');
                 }])
                 ->where('tahun',date('Y'))
                 ->where('id_jabatan',$current_pegawai->id)
-                ->get();
+                ->orderBy('created_at','DESC')
+                ->get();      
 
 
         $result = [
