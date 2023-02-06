@@ -341,4 +341,61 @@ class aktivitasController extends Controller
     public function checkMenitKinerja($params){
         return aktivitas::select(DB::raw("SUM(waktu) as count"))->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal',$params)->first();
     }
+
+    public function review_aktivitas_list(){
+        $bulan = request('bulan');
+        $data = array();
+        $nilai_kinerja = 0;
+        $capaian_menit = 0;
+        $target_nilai = 0;
+        $jabatanPegawai = DB::table('tb_jabatan')->select('id')->where('id_pegawai', Auth::user()->id_pegawai)->first();
+        if (isset($jabatanPegawai)) {
+            $myArray = DB::table('tb_jabatan')->select('tb_jabatan.id', 'tb_jabatan.id_pegawai', 'tb_jabatan.nama_jabatan', 'tb_pegawai.nama', 'tb_pegawai.nip','tb_jabatan.target_waktu','tb_jabatan.kelas_jabatan')->join('tb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')->where('parent_id', $jabatanPegawai->id)->get();
+
+            foreach ($myArray as $key => $value) {
+            $aktivitas = DB::table('tb_aktivitas')->select('id','id_pegawai','hasil',DB::raw("SUM(waktu) as count"))->whereMonth('tanggal',$bulan)->where('id_pegawai',$value->id_pegawai)->whereNotNull('id_pegawai')->get();  
+
+            count($aktivitas) > 0 ? $capaian_menit = $aktivitas[0]->count : $capaian_menit = 0;
+            $value->target_waktu !== null ? $target_nilai = $value->target_waktu : $target_nilai = 0;
+            
+            if ($value->kelas_jabatan == 1 || $value->kelas_jabatan == 3 || $value->kelas_jabatan == 15) {
+                $nilai_kinerja = 100;
+            }else{
+                if ($target_nilai > 0) {
+                    $nilai_kinerja = ( $capaian_menit / $target_nilai ) * 100;
+                }else {
+                    $nilai_kinerja = 0;
+                }
+            }
+
+            if ($nilai_kinerja > 100) {
+                $nilai_kinerja = 100;
+            }
+
+            $value->nilai_kinerja = round($nilai_kinerja,2);
+
+            // if ($aktivitas[0]->count !== null) {
+            //     $value->aktivitas = $aktivitas;            
+            // }else{
+            //     $value->aktivitas = [];            
+            // }
+            
+        }        
+
+        if ($myArray) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $myArray
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Data belum ada',
+                'status' => false,
+                'data' => $myArray
+            ]);
+        }
+        }
+    }
+
 }

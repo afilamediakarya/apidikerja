@@ -206,6 +206,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('/delete/{params}', [App\Http\Controllers\aktivitasController::class, 'delete']);
         Route::get('/get-option-sasaran-kinerja', [App\Http\Controllers\aktivitasController::class, 'optionSkp']);
         Route::get('/checkMenitKinerja/{params}', [App\Http\Controllers\aktivitasController::class, 'checkMenitKinerja']);
+        Route::get('/review_aktivitas_list', [App\Http\Controllers\aktivitasController::class, 'review_aktivitas_list']);
 
     });
 

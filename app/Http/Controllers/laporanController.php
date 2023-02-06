@@ -717,6 +717,9 @@ class laporanController extends Controller
         foreach ($pegawai as $key => $value) {
             $aktivitas = DB::table('tb_aktivitas')->select('id','id_pegawai','hasil',DB::raw("SUM(waktu) as count"))->whereMonth('tanggal',$bulan)->where('id_pegawai',$value->id)->whereNotNull('id_pegawai')->get();           
 
+            count($value['aktivitas']) > 0 ? $capaian_menit = $value['aktivitas'][0]['count'] : $capaian_menit = 0;
+            $value['target_waktu'] !== null ? $target_nilai = $value['target_waktu'] : $target_nilai = 0;
+
             if ($aktivitas[0]->count !== null) {
                 $value->aktivitas = $aktivitas;            
             }else{
