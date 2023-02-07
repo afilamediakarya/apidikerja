@@ -219,6 +219,8 @@ class absenController extends Controller
         $queries = DB::getQueryLog();
         $executionTime = $queries[count($queries) - 1]['time'];
 
+        \Log::info("Query execution time: $executionTime");
+
         if ($request->status == 'izin' || $request->status == 'sakit' || $request->status == 'cuti') {
             $this->generateCheckout($request);
         }
