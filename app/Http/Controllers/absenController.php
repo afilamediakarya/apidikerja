@@ -160,6 +160,7 @@ class absenController extends Controller
 
     public function store(Request $request){
         // return $request;
+        DB::connection()->enableQueryLog();
         $validator = Validator::make($request->all(),[
             'id_pegawai' => 'required|numeric',
             'tanggal_absen' => 'required|date',
@@ -215,6 +216,9 @@ class absenController extends Controller
         $data->tahun = date('Y');
         $data->save();
 
+        $queries = DB::getQueryLog();
+        $executionTime = $queries[count($queries) - 1]['time'];
+
         if ($request->status == 'izin' || $request->status == 'sakit' || $request->status == 'cuti') {
             $this->generateCheckout($request);
         }
@@ -223,7 +227,8 @@ class absenController extends Controller
             return response()->json([
                 'message'     => 'Success',
                 'status' => true,
-                'data' => $data
+                'data' => $data,
+                'excute_time' => $executionTime
             ]);
         }else{
               throw ValidationException::withMessages([
