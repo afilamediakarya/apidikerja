@@ -79,7 +79,7 @@ class aktivitasController extends Controller
 
     public function listByUser()
     {
-
+        DB::connection()->enableQueryLog();
         $result = [];
 
         $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai', Auth::user()->id_pegawai)->groupBy('bulan')->get();
@@ -93,40 +93,33 @@ class aktivitasController extends Controller
             $bulan = $this->convertNamaBulan($value->bulan);
 
             $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'))->whereMonth('tanggal', $value->bulan)->groupBy('date')->orderBy('date')->get();
-            // foreach ($aktivitasgetDate as $x => $y) {
-            //     $getAktivitas = aktivitas::where('tanggal',$y->date)->get();
-            //     $aktivitas[$x] = $getAktivitas;
-            // }
-
-            // $result[$key] = [
-            //     'tanggal' => $y->date,
-            //     'aktivitas' => $aktivitas
-            // ];
 
             // TESTING
             foreach ($aktivitasgetDate as $x => $y) {
                 $getAktivitas = aktivitas::where('tanggal', $y->date)->get();
-                // $aktivitas[$y->date][$x] = $getAktivitas;
-
-                // array_push($aktivitas_data_date,$getAktivitas);
                 $aktivitas[$x] = [
                     'tanggal' => $y->date,
                     'data_tanggal' => $getAktivitas
                 ];
             }
 
-            // $result[$key][$bulan][] = $aktivitas;
             $result[$key] = [
                 'bulan' => $bulan,
                 'data_bulan' => $aktivitas
             ];
         }
 
+        $queries = DB::getQueryLog();
+        $executionTime = $queries[count($queries) - 1]['time'];
+
+        \Log::info("Query execution time: $executionTime");
+
         if ($result) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $result
+                'data' => $result,
+                'excute' => $executionTime
             ]);
         } else {
             return response()->json([
@@ -396,6 +389,12 @@ class aktivitasController extends Controller
             ]);
         }
         }
+    }
+
+    public function review_aktivitas_byPegawai($params){
+        $bulan = request('bulan');
+        $data = Aktivitas::with('skp')->where('id_pegawai',$params)->whereMonth('tanggal',$bulan)->get();
+        return $data;
     }
 
 }
