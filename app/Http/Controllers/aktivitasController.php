@@ -79,51 +79,38 @@ class aktivitasController extends Controller
 
     public function listByUser()
     {
-        DB::connection()->enableQueryLog();
+        // DB::connection()->enableQueryLog();
         $result = [];
 
-        $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai', Auth::user()->id_pegawai)->groupBy('bulan')->get();
+        // $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai', Auth::user()->id_pegawai)->groupBy('bulan')->get();
 
-        $bulan = '';
-        // $aktivitasgetDate = array();
+        // $bulan = '';
+        // // $aktivitasgetDate = array();
 
-        foreach ($getbulan as $key => $value) {
-            $aktivitas = [];
-            $aktivitas_data_date = [];
-            // return $value;
-            $bulan = $this->convertNamaBulan($value->bulan);
+        // foreach ($getbulan as $key => $value) {
+        //     $aktivitas = [];
+        //     $aktivitas_data_date = [];
+        //     // return $value;
+        //     $bulan = $this->convertNamaBulan($value->bulan);
 
-            $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'),'id','nama_aktivitas','tanggal','hasil','keterangan')->whereMonth('tanggal', $value->bulan)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
+        //     $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'),'id','nama_aktivitas','tanggal','hasil','keterangan')->whereMonth('tanggal', $value->bulan)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
 
+        //     $result[$key] = [
+        //         'bulan' => $bulan,
+        //         'data_bulan' => $aktivitasgetDate
+        //     ];
+        // }
 
-            // return $aktivitasgetDate;
-            // TESTING
-            // foreach ($aktivitasgetDate as $x => $y) {
-                // $y->data_tanggal = ;
-                // $getAktivitas = aktivitas::where('tanggal', $y->date)->where('id_pegawai',Auth::user()->id_pegawai)->get();
-                // $aktivitas[$x] = [
-                //     'tanggal' => $y->date,
-                //     'data_tanggal' => $getAktivitas
-                // ];
-            // }
+        // $queries = DB::getQueryLog();
+        // $executionTime = $queries[count($queries) - 1]['time'];
 
-            $result[$key] = [
-                'bulan' => $bulan,
-                'data_bulan' => $aktivitasgetDate
-            ];
-        }
-
-        $queries = DB::getQueryLog();
-        $executionTime = $queries[count($queries) - 1]['time'];
-
-        \Log::info("Query execution time: $executionTime");
+        // \Log::info("Query execution time: $executionTime");
 
         if ($result) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
                 'data' => $result,
-                'excute' => $executionTime
             ]);
         } else {
             return response()->json([
