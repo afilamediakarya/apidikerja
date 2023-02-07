@@ -92,7 +92,7 @@ class aktivitasController extends Controller
             // return $value;
             $bulan = $this->convertNamaBulan($value->bulan);
 
-            $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'))->whereMonth('tanggal', $value->bulan)->groupBy('date')->orderBy('date')->get();
+            $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'))->whereMonth('tanggal', $value->bulan)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
 
             // TESTING
             foreach ($aktivitasgetDate as $x => $y) {
