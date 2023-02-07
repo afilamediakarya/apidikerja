@@ -85,6 +85,7 @@ class aktivitasController extends Controller
         $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai', Auth::user()->id_pegawai)->groupBy('bulan')->get();
 
         $bulan = '';
+        // $aktivitasgetDate = array();
 
         foreach ($getbulan as $key => $value) {
             $aktivitas = [];
@@ -92,20 +93,23 @@ class aktivitasController extends Controller
             // return $value;
             $bulan = $this->convertNamaBulan($value->bulan);
 
-            $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'))->whereMonth('tanggal', $value->bulan)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
+            $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'),'id','nama_aktivitas','tanggal','hasil','keterangan')->whereMonth('tanggal', $value->bulan)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
 
+
+            // return $aktivitasgetDate;
             // TESTING
-            foreach ($aktivitasgetDate as $x => $y) {
-                $getAktivitas = aktivitas::where('tanggal', $y->date)->get();
-                $aktivitas[$x] = [
-                    'tanggal' => $y->date,
-                    'data_tanggal' => $getAktivitas
-                ];
-            }
+            // foreach ($aktivitasgetDate as $x => $y) {
+                // $y->data_tanggal = ;
+                // $getAktivitas = aktivitas::where('tanggal', $y->date)->where('id_pegawai',Auth::user()->id_pegawai)->get();
+                // $aktivitas[$x] = [
+                //     'tanggal' => $y->date,
+                //     'data_tanggal' => $getAktivitas
+                // ];
+            // }
 
             $result[$key] = [
                 'bulan' => $bulan,
-                'data_bulan' => $aktivitas
+                'data_bulan' => $aktivitasgetDate
             ];
         }
 
