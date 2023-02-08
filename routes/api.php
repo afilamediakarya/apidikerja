@@ -207,7 +207,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/get-option-sasaran-kinerja', [App\Http\Controllers\aktivitasController::class, 'optionSkp']);
         Route::get('/checkMenitKinerja/{params}', [App\Http\Controllers\aktivitasController::class, 'checkMenitKinerja']);
         Route::get('/review_aktivitas_list', [App\Http\Controllers\aktivitasController::class, 'review_aktivitas_list']);
-
+        // Route::get('/review-aktivitas/{params}', [App\Http\Controllers\aktivitasController::class, 'review_aktivitas_byPegawai']);
     });
 
     Route::prefix('realisasi_skp')->group(function () {
