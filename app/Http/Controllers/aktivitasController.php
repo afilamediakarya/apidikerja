@@ -324,6 +324,10 @@ class aktivitasController extends Controller
 
     public function checkMenitKinerja($params){
         $data = aktivitas::select(DB::raw("SUM(waktu) as count"))->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal',$params)->first();
+        if($data->count == null){
+            $data->count = 0;
+        }
+
         if ($data) {
             return response()->json([
                 'message' => 'Success',
