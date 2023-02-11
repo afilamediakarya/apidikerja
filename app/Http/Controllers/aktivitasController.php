@@ -82,24 +82,24 @@ class aktivitasController extends Controller
         // DB::connection()->enableQueryLog();
         $result = [];
 
-        // $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai', Auth::user()->id_pegawai)->groupBy('bulan')->get();
+        $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai', Auth::user()->id_pegawai)->groupBy('bulan')->get();
 
-        // $bulan = '';
-        // // $aktivitasgetDate = array();
+        $bulan = '';
+        // $aktivitasgetDate = array();
 
-        // foreach ($getbulan as $key => $value) {
-        //     $aktivitas = [];
-        //     $aktivitas_data_date = [];
-        //     // return $value;
-        //     $bulan = $this->convertNamaBulan($value->bulan);
+        foreach ($getbulan as $key => $value) {
+            $aktivitas = [];
+            $aktivitas_data_date = [];
+            // return $value;
+            $bulan = $this->convertNamaBulan($value->bulan);
 
-        //     $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'),'id','nama_aktivitas','tanggal','hasil','keterangan')->whereMonth('tanggal', $value->bulan)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
+            $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'),'id','nama_aktivitas','tanggal','hasil','keterangan')->whereMonth('tanggal', $value->bulan)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
 
-        //     $result[$key] = [
-        //         'bulan' => $bulan,
-        //         'data_bulan' => $aktivitasgetDate
-        //     ];
-        // }
+            $result[$key] = [
+                'bulan' => $bulan,
+                'data_bulan' => $aktivitasgetDate
+            ];
+        }
 
         // $queries = DB::getQueryLog();
         // $executionTime = $queries[count($queries) - 1]['time'];
