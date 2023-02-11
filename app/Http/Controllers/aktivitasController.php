@@ -323,7 +323,20 @@ class aktivitasController extends Controller
     }
 
     public function checkMenitKinerja($params){
-        return aktivitas::select(DB::raw("SUM(waktu) as count"))->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal',$params)->first();
+        $data = aktivitas::select(DB::raw("SUM(waktu) as count"))->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal',$params)->first();
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Data belum ada',
+                'status' => false,
+                'data' => $data
+            ]);
+        }
     }
 
     public function review_aktivitas_list(){
