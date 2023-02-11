@@ -137,15 +137,15 @@ class aktivitasController extends Controller
         }
 
         $waktu = 0;
-        $jumlah_kinerja = $this->checkMenitKinerja($request->tanggal);
-        $ax = $request->waktu + $jumlah_kinerja['count'];
+        $jumlah_kinerja = $this->checkMenitKinerja($request->tanggal)->getData();
+        $ax = $request->waktu + $jumlah_kinerja->data->count;
 
         // return $ax;
 
         if ($ax > 420) {
-            $n_ = (420 - $jumlah_kinerja['count']) - $request->waktu;
+            $n_ = (420 - $jumlah_kinerja->data->count) - $request->waktu;
             $waktu = $ax + $n_;
-            $waktu = $waktu - $jumlah_kinerja['count'];  
+            $waktu = $waktu - $jumlah_kinerja->data->count;  
 
             if ($waktu == 0) {
                 return response()->json([

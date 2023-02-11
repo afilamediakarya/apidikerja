@@ -269,7 +269,7 @@ class dashboardController extends Controller
 		    $total_tpp = $tpp_bruto - $pphPsl;
 
 		// // AKTIVITAS
-		$countAktivitas = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->count();
+		$countAktivitas = aktivitas::join('tb_skp','tb_aktivitas.id_skp','tb_skp.id')->where('id_pegawai', Auth::user()->id_pegawai)->whereMonth('tanggal',$bulan)->count();
 
 		if (count($getJabatanByCurrentParent) > 0) {
 			foreach ($getJabatanByCurrentParent as $key => $value) {
