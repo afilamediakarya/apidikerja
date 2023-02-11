@@ -630,7 +630,7 @@ class laporanController extends Controller
                     $query->select('id','nama_aktivitas','id_skp','satuan','tanggal','keterangan',DB::raw('sum(hasil) as hasil'),DB::raw('sum(waktu) as waktu'));
                     $query->whereMonth('tanggal',$bulan);
                     $query->groupBy('id_skp','tanggal','nama_aktivitas');
-                    $query->orderBy('tanggal','DESC');
+                    $query->orderBy('tanggal','ASC');
                 }])
                 ->where('tahun',date('Y'))
                 ->where('id_jabatan',$current_pegawai->id)
