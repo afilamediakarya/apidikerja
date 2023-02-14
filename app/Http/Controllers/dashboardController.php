@@ -348,27 +348,24 @@ class dashboardController extends Controller
 		$count_realisasi = 0;
 		$count_aktifitas = 0;
 		$bulan = trim(date('m'), "0") + 1;
-		$data = DB::select("SELECT tb_pegawai.id, tb_pegawai.nama, tb_jabatan.nama_jabatan,tb_jabatan.id AS id_jabatan, (SELECT COUNT(*) FROM tb_skp where id_jabatan=tb_jabatan.id and month(tb_skp.created_at)=" . date('m') . ") AS jumlah_skp, (SELECT COUNT(*) FROM tb_review_realisasi_skp where id_pegawai=tb_pegawai.id and bulan=" . $bulan . ") AS jumlah_skp_terealisasi, (SELECT COUNT(*) FROM tb_aktivitas where tb_aktivitas.id_pegawai=tb_pegawai.id and month(tb_aktivitas.tanggal) = " . date('m') . ") AS jumlah_aktivitas FROM tb_pegawai INNER JOIN tb_jabatan ON tb_jabatan.id_pegawai = tb_pegawai.id where tb_pegawai.id_satuan_kerja=" . Auth::user()->pegawai['id_satuan_kerja']);
+		$pegawai_arr = array();
 
+		// $data = DB::select("SELECT tb_pegawai.id, tb_pegawai.nama, tb_jabatan.nama_jabatan,tb_jabatan.id AS id_jabatan, (SELECT COUNT(*) FROM tb_skp where id_jabatan=tb_jabatan.id and month(tb_skp.created_at)=" . date('m') . ") AS jumlah_skp, (SELECT COUNT(*) FROM tb_review_realisasi_skp where id_pegawai=tb_pegawai.id and bulan=" . $bulan . ") AS jumlah_skp_terealisasi, (SELECT COUNT(*) FROM tb_aktivitas where tb_aktivitas.id_pegawai=tb_pegawai.id and month(tb_aktivitas.tanggal) = " . date('m') . ") AS jumlah_aktivitas FROM tb_pegawai INNER JOIN tb_jabatan ON tb_jabatan.id_pegawai = tb_pegawai.id where tb_pegawai.id_satuan_kerja=" . Auth::user()->pegawai['id_satuan_kerja']);
 
+		$data = pegawai::select('tb_pegawai.id', 'tb_pegawai.nama','tb_jabatan.nama_jabatan','tb_jabatan.id AS id_jabatan')->join('tb_jabatan','tb_jabatan.id_pegawai','=','tb_pegawai.id')->join('tb_skp','tb_skp.id_jabatan','=','tb_jabatan.id')->where('tb_jabatan.id_satuan_kerja',Auth::user()->pegawai['id_satuan_kerja'])->groupBy('tb_pegawai.id')->get();
 		foreach ($data as $key => $value) {
-			$count_skp += $value->jumlah_skp;
-			$count_realisasi += $value->jumlah_skp_terealisasi;
-			$count_aktifitas += $value->jumlah_aktivitas;
+			array_push($pegawai_arr, $value->id);
 		}
+		$skp = skp::where('id_satuan_kerja',Auth::user()->pegawai['id_satuan_kerja'])->whereMonth('created_at',date('m'))->whereYear('created_at',date('Y'))->count();
+		$skp_realisasi = DB::table('tb_review_realisasi_skp')->whereIn('id_pegawai',$pegawai_arr)->where('bulan',$bulan)->count();
+		$aktivitas = DB::table("tb_aktivitas")->whereIn('id_pegawai',$pegawai_arr)->whereMonth('tanggal',date('m'))->count();
 
-
-		$pegawaiBySatuankerja = DB::table('tb_pegawai')->select('tb_pegawai.id')->where('id_satuan_kerja', Auth::user()->pegawai['id_satuan_kerja'])->get()->count();
-
-		// foreach ($variable as $key => $value) {
-		// 	# code...
-		// }
 
 		return $result = [
-			'jumlah_pegawai' => $pegawaiBySatuankerja,
-			'jumlah_aktivitas' => $count_aktifitas,
-			'jumlah_skp' => $count_skp,
-			'jumlah_skp_terealisasi' => $count_realisasi,
+			'jumlah_pegawai' => count($data),
+			'jumlah_aktivitas' => $aktivitas,
+			'jumlah_skp' => $skp,
+			'jumlah_skp_terealisasi' => $skp_realisasi,
 		];
 	}
 
