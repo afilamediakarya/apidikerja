@@ -12,6 +12,7 @@ use App\Models\pegawai;
 use App\Models\jabatan;
 use Illuminate\Validation\ValidationException;
 use DB;
+use Illuminate\Support\Facades\Redis;
 class AuthController extends Controller
 {
     public function login(Request $request){
@@ -193,43 +194,59 @@ class AuthController extends Controller
 
     public function current_user(){
           // $data = User::findOrFail(Auth::user()->id);
-        // $current = [];
+        $current = array();
 
-        $user = DB::table('users')->select('users.id','users.id_pegawai','users.role','tb_pegawai.id_satuan_kerja','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.id','tb_pegawai.face_character','tb_pegawai.golongan','tb_satuan_kerja.nama_satuan_kerja','tb_satuan_kerja.inisial_satuan_kerja','tb_satuan_kerja.kode_satuan_kerja','tb_satuan_kerja.status_kepala','tb_lokasi.nama_lokasi','tb_lokasi.lat','tb_lokasi.long')->join('tb_pegawai','users.id_pegawai','=','tb_pegawai.id')->where('users.id',Auth::user()->id)->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_lokasi','tb_jabatan.id_lokasi','=','tb_lokasi.id')->first();
+        $getDataCache= Redis::get('current_user');
+		$current = json_decode($getDataCache);
 
-        if (isset($user)) {
-           $current = [
-                'id' => $user->id,
-                'id_pegawai' => $user->id_pegawai,
-                'role' => $user->role,
-                'pegawai' => [
-                    'id' => $user->id_pegawai,
-                    'id_satuan_kerja' => $user->id_satuan_kerja,
-                    'nama' => $user->nama,
-                    'nip' => $user->nip,
-                    'golongan' => $user->golongan,
-                    'face_character' => $user->face_character,
-                    'satuan_kerja' => [
-                        'id' => $user->id_satuan_kerja,
-                        'nama_satuan_kerja' => $user->nama_satuan_kerja,
-                        'inisial_satuan_kerja' => $user->inisial_satuan_kerja,
-                        'kode_satuan_kerja' => $user->kode_satuan_kerja,
-                        'nama_lokasi' => $user->nama_lokasi,
-                        'lat_location' => $user->lat,
-                        'long_location' => $user->long,
-                        'lokasi_apel_lat' => '-5.5585896680010904',
-                        'lokasi_apel_long' => '120.19320969890903',
-                        'status_kepala' => $user->status_kepala
+		if (!$getDataCache) {
+
+            $user = DB::table('users')->select('users.id','users.id_pegawai','users.role','tb_pegawai.id_satuan_kerja','tb_pegawai.nama','tb_pegawai.nip','tb_pegawai.id','tb_pegawai.face_character','tb_pegawai.golongan','tb_pegawai.lulus_pendidikan','tb_pegawai.jurusan','tb_pegawai.agama','tb_pegawai.status_perkawinan','tb_pegawai.jenis_kelamin','tb_pegawai.tmt_golongan','tb_satuan_kerja.nama_satuan_kerja','tb_satuan_kerja.inisial_satuan_kerja','tb_satuan_kerja.kode_satuan_kerja','tb_satuan_kerja.status_kepala','tb_lokasi.nama_lokasi','tb_lokasi.lat','tb_lokasi.long')->join('tb_pegawai','users.id_pegawai','=','tb_pegawai.id')->where('users.id',Auth::user()->id)->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')->join('tb_jabatan','tb_pegawai.id','=','tb_jabatan.id_pegawai')->join('tb_lokasi','tb_jabatan.id_lokasi','=','tb_lokasi.id')->first();
+
+            if (isset($user)) {
+            $current = [
+                    'id' => $user->id,
+                    'id_pegawai' => $user->id_pegawai,
+                    'role' => $user->role,
+                    'pegawai' => [
+                        'id' => $user->id_pegawai,
+                        'id_satuan_kerja' => $user->id_satuan_kerja,
+                        'nama' => $user->nama,
+                        'nip' => $user->nip,
+                        'golongan' => $user->golongan,
+                        'face_character' => $user->face_character,
+                        'lulus_pendidikan' => $user->lulus_pendidikan,
+                        'jurusan' => $user->jurusan,
+                        'agama' => $user->agama,
+                        'status_perkawinan' => $user->status_perkawinan,
+                        'jenis_kelamin' => $user->jenis_kelamin,
+                        'tmt_golongan' => $user->tmt_golongan,
+                        'satuan_kerja' => [
+                            'id' => $user->id_satuan_kerja,
+                            'nama_satuan_kerja' => $user->nama_satuan_kerja,
+                            'inisial_satuan_kerja' => $user->inisial_satuan_kerja,
+                            'kode_satuan_kerja' => $user->kode_satuan_kerja,
+                            'nama_lokasi' => $user->nama_lokasi,
+                            'lat_location' => $user->lat,
+                            'long_location' => $user->long,
+                            'lokasi_apel_lat' => '-5.5585896680010904',
+                            'lokasi_apel_long' => '120.19320969890903',
+                            'status_kepala' => $user->status_kepala
+                        ],
+                        
                     ],
-                    
-                ],
-            ];
-        }else{
-             return response()->json([
-                'message' => 'Gagal Login',
-                 'messages_' => 'Jabatan tidak di temukan, Mohon hubungi admin opd'
-            ],422);
-        }  
+                ];
+            }else{
+                return response()->json([
+                    'message' => 'Gagal Login',
+                    'messages_' => 'Jabatan tidak di temukan, Mohon hubungi admin opd'
+                ],422);
+            }
+
+            Redis::set('current_user', json_encode($current));
+            Redis::expire('current_user', 1800);
+            
+        }
 
         if ($current) {
             return response()->json([

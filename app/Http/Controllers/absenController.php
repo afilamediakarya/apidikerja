@@ -10,6 +10,7 @@ use Auth;
 use DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Redis;
 class absenController extends Controller
 {
     public function list(){
@@ -50,12 +51,19 @@ class absenController extends Controller
       public function checkAbsenbyDate(){
         // return date('Y-m')
         $data = '';
-        $date = request('tanggal');
-        
-        if (date('D', strtotime($date)) == 'Sun') {
-            $data = null;
-        }else{
-            $data = DB::table('tb_absen')->select('status')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$date)->first();
+
+        $getDataCache= Redis::get('checkAbsenbyDate');
+		$data = json_decode($getDataCache);
+
+        if (!$getDataCache) {
+            $date = request('tanggal');
+            if (date('D', strtotime($date)) == 'Sun') {
+                $data = null;
+            }else{
+                $data = DB::table('tb_absen')->select('status')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$date)->first();
+            }
+            Redis::set('checkAbsenbyDate', json_encode($data));
+            Redis::expire('checkAbsenbyDate', 1800);
         }
 
          if ($data) {
@@ -74,73 +82,74 @@ class absenController extends Controller
     }
 
     public function list_filter_absen(){
-        
-        $satuan_kerja = request('satuan_kerja');
-        $tanggal = request('tanggal');
-        $valid = request('valid');
-        $status = request('status');
-
-        $pegawaiBySatuanKerja = array();
         $result = array();
-        $absen = array();
+        $getDataCache= Redis::get('list_filter_absen');
+		$result = json_decode($getDataCache);
 
-        $where = '';
-        if ($valid !== 'semua') {
-            $where .= "AND validation='$valid'";
-        }
+        if (!$getDataCache) {
+            $satuan_kerja = request('satuan_kerja');
+            $tanggal = request('tanggal');
+            $valid = request('valid');
+            $status = request('status');
 
-        if ($status !== 'semua') {
-            $where .= "AND status='$status'";
-        }
+            $pegawaiBySatuanKerja = array();
+        
+            $absen = array();
+
+            $where = '';
+            if ($valid !== 'semua') {
+                $where .= "AND validation='$valid'";
+            }
+
+            if ($status !== 'semua') {
+                $where .= "AND status='$status'";
+            }
         
 
-        if ($satuan_kerja !== 'semua') {
-            $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$satuan_kerja)->get();
+            if ($satuan_kerja !== 'semua') {
+                $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('id','nama')->where('id_satuan_kerja',$satuan_kerja)->get();
 
-            foreach ($pegawaiBySatuanKerja as $key => $value) {
-                $data = array();
-                
-
-                $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->whereRaw("tanggal_absen = '$tanggal' $where")->get();      
-    //   if ($valid == 'semua') {
-    //                 $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->get();
-    //              }else{
-    //                  $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->where('tanggal_absen',$tanggal)->where('validation',$valid)->get();
-    //              }
-           
-     
-                 
-                 
-     
-                if (count($absen) > 0) {
-                 $data['id'] = $value->id;
-                 $data['nama_pegawai'] = $value->nama;
-                 $data['waktu_pulang'] = '-';
-                 foreach ($absen as $k => $val) {
+                foreach ($pegawaiBySatuanKerja as $key => $value) {
+                    $data = array();
                     
-                     if ($val->jenis == 'checkin') {
-                        $data['waktu_masuk'] = $val->waktu_absen; 
-                        $data['validation'] = $val->validation;
-                        $data['status'] = $val->status; 
-                        $data['tanggal_absen'] = $val->tanggal_absen; 
-                     }else{
-                         $data['waktu_pulang'] = $val->waktu_absen;
-                     }
-                 }
-     
-                 
-                 if (array_key_exists('waktu_masuk', $data) == true) {
-                     $result[] = $data;
-                 }
-              
-     
-                }
-               
-     
-             }
 
+                    $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->whereRaw("tanggal_absen = '$tanggal' $where")->get();                       
+        
+                    if (count($absen) > 0) {
+                    $data['id'] = $value->id;
+                    $data['nama_pegawai'] = $value->nama;
+                    $data['waktu_pulang'] = '-';
+                    foreach ($absen as $k => $val) {
+                        
+                        if ($val->jenis == 'checkin') {
+                            $data['waktu_masuk'] = $val->waktu_absen; 
+                            $data['validation'] = $val->validation;
+                            $data['status'] = $val->status; 
+                            $data['tanggal_absen'] = $val->tanggal_absen; 
+                        }else{
+                            $data['waktu_pulang'] = $val->waktu_absen;
+                        }
+                    }
+        
+                    
+                    if (array_key_exists('waktu_masuk', $data) == true) {
+                        $result[] = $data;
+                    }
+                
+        
+                    }
+                
+        
+                }
+
+                Redis::set('list_filter_absen', json_encode($data));
+                Redis::expire('list_filter_absen', 1800);
+
+            }
         }
-      
+        
+       
+        
 
 
          if ($result) {
@@ -346,39 +355,42 @@ class absenController extends Controller
     }
 
     public function checkAbsen(){
-        $status_ = '';
-        $dt = date('Y-m-d');
-        $time_now = date('H:i:s');
-        $status_checkin = false;
-        $status_checkout = false;
-        $data = absen::where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->get();
-        if (count($data) > 0) {
-            $status_ = $data[0]['status'];
-        }
+        $result = array();
 
-        if (isset($data)) {
-          
-            foreach ($data as $key => $value) {
-                if ($value['jenis'] == 'checkin') {
-                    $status_checkin = true;
-                }else{
-                    $status_checkout = true;
-                }
+        $getDataCache= Redis::get('checkAbsen');
+        $result = json_decode($getDataCache);
 
+        if (!$getDataCache) {
+            $status_ = '';
+            $dt = date('Y-m-d');
+            $time_now = date('H:i:s');
+            $status_checkin = false;
+            $status_checkout = false;
+            $data = absen::select('jenis','status')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$dt)->get();
+            if (count($data) > 0) {
+                $status_ = $data[0]['status'];
             }
-                        
-            return response()->json([
-                'checkin' => $status_checkin,
-                'checkout' => $status_checkout,
-                'status' => $status_
-            ]);
-        }else{
-            return response()->json([
-                  'checkin' => $status_checkin,
-                  'checkout' => $status_checkout,
-                  'status' => $status_
-            ]);
+
+            if (isset($data)) {
+            
+                foreach ($data as $key => $value) {
+                    if ($value['jenis'] == 'checkin') {
+                        $status_checkin = true;
+                    }else{
+                        $status_checkout = true;
+                    }
+
+                }
+            }
+
+            $result = ['checkin' => $status_checkin,'checkout' => $status_checkout,'status' => $status_];
+            Redis::set('checkAbsen', json_encode($result));
+            Redis::expire('checkAbsen', 1800);
         }
+
+       
+
+        return response()->json($result);
     }
 
     public function absenCheckAdmin($id_pegawai,$tanggal_absen){

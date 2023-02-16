@@ -8,12 +8,23 @@ use App\Models\skp;
 use Validator;
 use Auth;
 use DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class aktivitasController extends Controller
 {
     public function list()
     {
-        $data = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->latest()->get();
+        $getDataCache= Redis::get('list-aktivitas');
+        $data = json_decode($getDataCache);
+
+        if (!$getDataCache) {
+            $data = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->latest()->get();
+            Redis::set('list-aktivitas', json_encode($data));
+            Redis::expire('list-aktivitas', 1800);
+        }
+
+        
 
         if ($data) {
             return response()->json([
@@ -79,32 +90,34 @@ class aktivitasController extends Controller
 
     public function listByUser()
     {
-        // DB::connection()->enableQueryLog();
         $result = [];
 
-        $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai', Auth::user()->id_pegawai)->groupBy('bulan')->get();
+        $getDataCache= Redis::get('list-by-user-aktivitas');
+        $result = json_decode($getDataCache);
 
-        $bulan = '';
-        // $aktivitasgetDate = array();
+        if (!$getDataCache) {
+            $getbulan = DB::table("tb_aktivitas")->select(DB::raw('EXTRACT(MONTH FROM tanggal) AS bulan'))->where('id_pegawai', Auth::user()->id_pegawai)->groupBy('bulan')->get();
 
-        foreach ($getbulan as $key => $value) {
-            $aktivitas = [];
-            $aktivitas_data_date = [];
-            // return $value;
-            $bulan = $this->convertNamaBulan($value->bulan);
+            $bulan = '';
 
-            $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'),'id','nama_aktivitas','tanggal','hasil','keterangan')->whereMonth('tanggal', $value->bulan)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
+            foreach ($getbulan as $key => $value) {
+                $aktivitas = [];
+                $aktivitas_data_date = [];
+                // return $value;
+                $bulan = $this->convertNamaBulan($value->bulan);
 
-            $result[$key] = [
-                'bulan' => $bulan,
-                'data_bulan' => $aktivitasgetDate
-            ];
+                $aktivitasgetDate = aktivitas::select(DB::raw('tanggal as date'),'id','nama_aktivitas','tanggal','hasil','keterangan')->whereMonth('tanggal', $value->bulan)->where('id_pegawai',Auth::user()->id_pegawai)->groupBy('date')->orderBy('date')->get();
+
+                $result[$key] = [
+                    'bulan' => $bulan,
+                    'data_bulan' => $aktivitasgetDate
+                ];
+            }
+
+            Redis::set('list-by-user-aktivitas', json_encode($result));
+            Redis::expire('list-by-user-aktivitas', 1800);
         }
 
-        // $queries = DB::getQueryLog();
-        // $executionTime = $queries[count($queries) - 1]['time'];
-
-        // \Log::info("Query execution time: $executionTime");
 
         if ($result) {
             return response()->json([
