@@ -48,7 +48,7 @@ class dashboardController extends Controller
 			$label_review_skp = '';
 
 
-			$res = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai', 'tb_review.kesesuaian AS kesesuaian')->join('tb_skp', 'tb_pegawai.id', '=', 'tb_skp.id_pegawai')->join('tb_review', 'tb_skp.id', '=', 'tb_review.id_skp')->get();
+			$res = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.jenis_jabatan', 'tb_skp.id AS id_skp', 'tb_pegawai.id AS id_pegawai', 'tb_review.kesesuaian AS kesesuaian')->join('tb_jabatan','tb_jabatan.id_pegawai','=','tb_pegawai.id')->join('tb_skp', 'tb_jabatan.id', '=', 'tb_skp.id_jabatan')->join('tb_review', 'tb_skp.id', '=', 'tb_review.id_skp')->get();
 
 			foreach ($res as $key => $value) {
 				$review_realisasi = review_realisasi_skp::where('id_skp', $value->id_skp)->get()->pluck('kesesuaian')->toArray();
