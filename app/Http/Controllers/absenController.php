@@ -52,7 +52,7 @@ class absenController extends Controller
         // return date('Y-m')
         $data = '';
 
-        $getDataCache= Redis::get('checkAbsenbyDate');
+        $getDataCache= Redis::get('checkAbsenbyDate_'.Auth::user()->id_pegawai);
 		$data = json_decode($getDataCache);
 
         if (!$getDataCache) {
@@ -62,8 +62,8 @@ class absenController extends Controller
             }else{
                 $data = DB::table('tb_absen')->select('status')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$date)->first();
             }
-            Redis::set('checkAbsenbyDate', json_encode($data));
-            Redis::expire('checkAbsenbyDate', 1800);
+            Redis::set('checkAbsenbyDate_'.Auth::user()->id_pegawai, json_encode($data));
+            Redis::expire('checkAbsenbyDate_'.Auth::user()->id_pegawai, 1800);
         }
 
          if ($data) {
@@ -83,11 +83,12 @@ class absenController extends Controller
 
     public function list_filter_absen(){
         $result = array();
-        $getDataCache= Redis::get('list_filter_absen');
+        $satuan_kerja = request('satuan_kerja');
+        $getDataCache= Redis::get('list_filter_absen_'.$satuan_kerja);
 		$result = json_decode($getDataCache);
 
         if (!$getDataCache) {
-            $satuan_kerja = request('satuan_kerja');
+            
             $tanggal = request('tanggal');
             $valid = request('valid');
             $status = request('status');
@@ -142,8 +143,8 @@ class absenController extends Controller
         
                 }
 
-                Redis::set('list_filter_absen', json_encode($data));
-                Redis::expire('list_filter_absen', 1800);
+                Redis::set('list_filter_absen_'.$satuan_kerja, json_encode($data));
+                Redis::expire('list_filter_absen_'.$satuan_kerja, 1800);
 
             }
         }
@@ -357,7 +358,7 @@ class absenController extends Controller
     public function checkAbsen(){
         $result = array();
 
-        $getDataCache= Redis::get('checkAbsen');
+        $getDataCache= Redis::get('checkAbsen_'.Auth::user()->id_pegawai);
         $result = json_decode($getDataCache);
 
         if (!$getDataCache) {
@@ -384,8 +385,8 @@ class absenController extends Controller
             }
 
             $result = ['checkin' => $status_checkin,'checkout' => $status_checkout,'status' => $status_];
-            Redis::set('checkAbsen', json_encode($result));
-            Redis::expire('checkAbsen', 1800);
+            Redis::set('checkAbsen_'.Auth::user()->id_pegawai, json_encode($result));
+            Redis::expire('checkAbsen_'.Auth::user()->id_pegawai, 1800);
         }
 
        

@@ -15,13 +15,13 @@ class aktivitasController extends Controller
 {
     public function list()
     {
-        $getDataCache= Redis::get('list-aktivitas');
+        $getDataCache= Redis::get('list-aktivitas_'.Auth::user()->id_pegawai);
         $data = json_decode($getDataCache);
 
         if (!$getDataCache) {
             $data = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->latest()->get();
-            Redis::set('list-aktivitas', json_encode($data));
-            Redis::expire('list-aktivitas', 1800);
+            Redis::set('list-aktivitas_'.Auth::user()->id_pegawai, json_encode($data));
+            Redis::expire('list-aktivitas_'.Auth::user()->id_pegawai, 1800);
         }
 
         
@@ -92,7 +92,7 @@ class aktivitasController extends Controller
     {
         $result = [];
 
-        $getDataCache= Redis::get('list-by-user-aktivitas');
+        $getDataCache= Redis::get('list-by-user-aktivitas_'.Auth::user()->id_pegawai);
         $result = json_decode($getDataCache);
 
         if (!$getDataCache) {
@@ -114,8 +114,8 @@ class aktivitasController extends Controller
                 ];
             }
 
-            Redis::set('list-by-user-aktivitas', json_encode($result));
-            Redis::expire('list-by-user-aktivitas', 1800);
+            Redis::set('list-by-user-aktivitas_'.Auth::user()->id_pegawai, json_encode($result));
+            Redis::expire('list-by-user-aktivitas_'.Auth::user()->id_pegawai, 1800);
         }
 
 

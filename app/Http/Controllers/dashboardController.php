@@ -39,10 +39,10 @@ class dashboardController extends Controller
 		$result = json_decode($getDataCache);
 
 		if (!$getDataCache) {
-			$skp = skp::all()->count();
-			$realisasi = realisasi_skp::all()->count();
-			$aktivitas = aktivitas::all()->count();
-			$pegawai = pegawai::all()->count();
+			$skp = skp::count();
+			$realisasi = realisasi_skp::count();
+			$aktivitas = aktivitas::count();
+			$pegawai = pegawai::count();
 			$list_pegawai = [];
 			$label_review = '';
 			$label_review_skp = '';
@@ -97,7 +97,7 @@ class dashboardController extends Controller
 	public function pegawai_dashboard()
 	{
 
-		$getDataCache= Redis::get('pegawai_dashboard');
+		$getDataCache= Redis::get('pegawai_dashboard_'.Auth::user()->id_pegawai);
 		$result = json_decode($getDataCache);
 		if (!$getDataCache) {
 			$list_pegawai = [];
@@ -312,8 +312,8 @@ class dashboardController extends Controller
 				'bulan' => request('bulan')
 			];
 
-			Redis::set('pegawai_dashboard', json_encode($result));
-            Redis::expire('pegawai_dashboard', 1800);
+			Redis::set('pegawai_dashboard_'.Auth::user()->id_pegawai, json_encode($result));
+            Redis::expire('pegawai_dashboard_'.Auth::user()->id_pegawai, 1800);
 		}
 
 		return $result;
@@ -322,7 +322,7 @@ class dashboardController extends Controller
 	public function opd_dashboard()
 	{
 		$result = array();
-		$getDataCache= Redis::get('opd_dashboard');
+		$getDataCache= Redis::get('opd_dashboard_'.Auth::user()->pegawai['id_satuan_kerja']);
 		$result = json_decode($getDataCache);
 
 		if (!$getDataCache) {
@@ -349,8 +349,8 @@ class dashboardController extends Controller
 				'jumlah_skp_terealisasi' => $skp_realisasi,
 			];
 			
-			Redis::set('opd_dashboard', json_encode($result));
-            Redis::expire('opd_dashboard', 1800);
+			Redis::set('opd_dashboard_'.Auth::user()->pegawai['id_satuan_kerja'], json_encode($result));
+            Redis::expire('opd_dashboard_'.Auth::user()->pegawai['id_satuan_kerja'], 1800);
 		}
 
 		return $result;

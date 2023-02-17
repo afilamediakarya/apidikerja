@@ -196,7 +196,7 @@ class AuthController extends Controller
           // $data = User::findOrFail(Auth::user()->id);
         $current = array();
 
-        $getDataCache= Redis::get('current_user');
+        $getDataCache= Redis::get('current_user'.Auth::user()->id_pegawai);
 		$current = json_decode($getDataCache);
 
 		if (!$getDataCache) {
@@ -243,8 +243,8 @@ class AuthController extends Controller
                 ],422);
             }
 
-            Redis::set('current_user', json_encode($current));
-            Redis::expire('current_user', 1800);
+            Redis::set('current_user_'.Auth::user()->id_pegawai, json_encode($current));
+            Redis::expire('current_user_'.Auth::user()->id_pegawai, 1800);
             
         }
 
