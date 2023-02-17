@@ -22,6 +22,8 @@ Route::get('/tes/list', [App\Http\Controllers\pegawaiController::class, 'list_te
 Route::get('/view-rekapByUser/{start_date}/{end_date}/{id_pegawai}', [App\Http\Controllers\laporanRekapitulasiabsenController::class, 'viewrekapByUser']);
 Route::get('laporan-kinerja', [App\Http\Controllers\laporanController::class, 'kinerjaView']);
 Route::get('/manual', [App\Http\Controllers\skpController::class, 'manual']);
+Route::get('/remove-cache', [App\Http\Controllers\AuthController::class, 'removeCache']);
+
 // Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/register-user', [App\Http\Controllers\AuthController::class, 'register_user']);

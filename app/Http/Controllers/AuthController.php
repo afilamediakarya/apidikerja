@@ -340,4 +340,9 @@ class AuthController extends Controller
             'message' => 'You have successfully logged out and the token was successfully deleted'
         ];
     }
+
+    public function removeCache(){
+        $cache_Remove = Redis::flushAll();
+        return $cache_Remove;
+    }
 }
