@@ -21,10 +21,8 @@ class aktivitasController extends Controller
         if (!$getDataCache) {
             $data = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->latest()->get();
             Redis::set('list-aktivitas_'.Auth::user()->id_pegawai, json_encode($data));
-            Redis::expire('list-aktivitas_'.Auth::user()->id_pegawai, 1800);
+            Redis::expire('list-aktivitas_'.Auth::user()->id_pegawai, 60);
         }
-
-        
 
         if ($data) {
             return response()->json([

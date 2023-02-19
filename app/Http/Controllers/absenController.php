@@ -144,11 +144,14 @@ class absenController extends Controller
                 }
 
                 Redis::set('list_filter_absen_'.$satuan_kerja, json_encode($data));
-                Redis::expire('list_filter_absen_'.$satuan_kerja, 1800);
+                Redis::expire('list_filter_absen_'.$satuan_kerja, 60);
 
             }
         }
         
+        if ($result == null) {
+            $result = array();
+        }
        
         
 
@@ -358,10 +361,10 @@ class absenController extends Controller
     public function checkAbsen(){
         $result = array();
 
-        $getDataCache= Redis::get('checkAbsen_'.Auth::user()->id_pegawai);
-        $result = json_decode($getDataCache);
+        // $getDataCache= Redis::get('checkAbsen_'.Auth::user()->id_pegawai);
+        // $result = json_decode($getDataCache);
 
-        if (!$getDataCache) {
+        // if (!$getDataCache) {
             $status_ = '';
             $dt = date('Y-m-d');
             $time_now = date('H:i:s');
@@ -385,9 +388,9 @@ class absenController extends Controller
             }
 
             $result = ['checkin' => $status_checkin,'checkout' => $status_checkout,'status' => $status_];
-            Redis::set('checkAbsen_'.Auth::user()->id_pegawai, json_encode($result));
-            Redis::expire('checkAbsen_'.Auth::user()->id_pegawai, 1800);
-        }
+            // Redis::set('checkAbsen_'.Auth::user()->id_pegawai, json_encode($result));
+            // Redis::expire('checkAbsen_'.Auth::user()->id_pegawai, 5);
+        // }
 
        
 
