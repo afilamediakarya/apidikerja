@@ -63,7 +63,7 @@ class absenController extends Controller
                 $data = DB::table('tb_absen')->select('status')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$date)->first();
             }
             Redis::set('checkAbsenbyDate_'.Auth::user()->id_pegawai, json_encode($data));
-            Redis::expire('checkAbsenbyDate_'.Auth::user()->id_pegawai, 1800);
+            Redis::expire('checkAbsenbyDate_'.Auth::user()->id_pegawai, 5);
         }
 
          if ($data) {
