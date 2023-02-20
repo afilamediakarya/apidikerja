@@ -84,7 +84,8 @@ class absenController extends Controller
     public function list_filter_absen(){
         $result = array();
         $satuan_kerja = request('satuan_kerja');
-        $getDataCache= Redis::get('list_filter_absen_'.$satuan_kerja);
+        $getDataCache= Redis::get('list_filter_absen_'.Auth::user()->id_pegawai);
+        // return $getDataCache;
 		$result = json_decode($getDataCache);
 
         if (!$getDataCache) {
@@ -143,8 +144,8 @@ class absenController extends Controller
         
                 }
 
-                Redis::set('list_filter_absen_'.$satuan_kerja, json_encode($data));
-                Redis::expire('list_filter_absen_'.$satuan_kerja, 60);
+                Redis::set('list_filter_absen_'.Auth::user()->id_pegawai, json_encode($result));
+                Redis::expire('list_filter_absen_'.Auth::user()->id_pegawai, 5);
 
             }
         }
