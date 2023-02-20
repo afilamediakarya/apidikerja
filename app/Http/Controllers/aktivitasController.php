@@ -15,14 +15,14 @@ class aktivitasController extends Controller
 {
     public function list()
     {
-        $getDataCache= Redis::get('list-aktivitas_'.Auth::user()->id_pegawai);
-        $data = json_decode($getDataCache);
+        // $getDataCache= Redis::get('list-aktivitas_'.Auth::user()->id_pegawai);
+        // $data = json_decode($getDataCache);
 
-        if (!$getDataCache) {
+        // if (!$getDataCache) {
             $data = aktivitas::where('id_pegawai', Auth::user()->id_pegawai)->latest()->get();
-            Redis::set('list-aktivitas_'.Auth::user()->id_pegawai, json_encode($data));
-            Redis::expire('list-aktivitas_'.Auth::user()->id_pegawai, 60);
-        }
+            // Redis::set('list-aktivitas_'.Auth::user()->id_pegawai, json_encode($data));
+            // Redis::expire('list-aktivitas_'.Auth::user()->id_pegawai, 60);
+        // }
 
         if ($data) {
             return response()->json([
