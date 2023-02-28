@@ -679,12 +679,15 @@ class laporanController extends Controller
         $data = skp::query()
                 ->select('id','id_satuan_kerja','rencana_kerja','tahun')
                 ->with(['aktivitas'=> function($query) use ($bulan) {
-                    $query->select('id','nama_aktivitas','id_skp','waktu','satuan','hasil','tanggal');
+                    $query->select('id','nama_aktivitas','id_skp','satuan','tanggal','keterangan',DB::raw('sum(hasil) as hasil'),DB::raw('sum(waktu) as waktu'));
                     $query->whereMonth('tanggal',$bulan);
+                    $query->groupBy('id_skp','tanggal','nama_aktivitas');
+                    $query->orderBy('tanggal','ASC');
                 }])
                 ->where('tahun',date('Y'))
                 ->where('id_jabatan',$current_pegawai->id)
-                ->get();
+                ->orderBy('created_at','DESC')
+                ->get();      
 
 
         $result = [
