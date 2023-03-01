@@ -56,6 +56,23 @@ class aktivitasController extends Controller
         }
     }
 
+    public function listByReview(){
+        $data = aktivitas::select('id','id_skp','tanggal','nama_aktivitas','hasil','kesesuaian')->with('skp')->where('id_pegawai', request('pegawai'))->whereMonth('tanggal',request('bulan'))->whereYear('tanggal',request('tahun'))->latest()->get();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Failed',
+                'status' => false
+            ]);
+        }
+    }
+
     public function convertNamaBulan($params)
     {
         switch ($params) {
@@ -175,8 +192,14 @@ class aktivitasController extends Controller
             $waktu = $request->waktu;
         }
 
+        if (isset($request->id_pegawai)) {
+            $pegawai_val = $request->id_pegawai;
+        }else{
+            $pegawai_val = Auth::user()->id_pegawai;
+        }
+
         $data = new aktivitas();
-        $data->id_pegawai = Auth::user()->id_pegawai;
+        $data->id_pegawai = $pegawai_val;
         $data->id_skp = $request->id_skp;
         $data->nama_aktivitas = $request->nama_aktivitas;
         $data->keterangan = $request->keterangan;
@@ -299,6 +322,15 @@ class aktivitasController extends Controller
 
     public function optionSkp()
     {
+
+        $pegawai = '';
+        $req_pegawai = request('pegawai');
+        if(isset($req_pegawai)){
+            $pegawai = $req_pegawai;
+        }else{
+            $pegawai = Auth::user()->id_pegawai;
+        }
+
         $result = [];
         $data = array();
         $tahun = request('tahun');
@@ -306,7 +338,6 @@ class aktivitasController extends Controller
         $jabatanByPegawai =  DB::table('tb_jabatan')->select('tb_jabatan.id', 'tb_jabatan.id_pegawai')->join('tb_pegawai', 'tb_jabatan.id_pegawai', '=', 'tb_pegawai.id')->where('tb_jabatan.id_pegawai', Auth::user()->id_pegawai)->first();
 
         if (isset($tahun)) {
-            // $data = skp::where('id_jabatan',$jabatanByPegawai->id)->latest()->where('tahun',$tahun)->get();
             $data = skp::where('id_jabatan', $jabatanByPegawai->id)
                 ->where('tahun', $tahun)
                 ->orderBy('jenis', 'ASC')
@@ -314,7 +345,6 @@ class aktivitasController extends Controller
                 ->orderBy('id', 'ASC')
                 ->get();
         } else {
-            // $data = skp::where('id_jabatan', $jabatanByPegawai->id)->latest()->where('tahun', date('Y'))->get();
             $data = skp::where('id_jabatan', $jabatanByPegawai->id)
                 ->where('tahun', date('Y'))
                 ->orderBy('jenis', 'ASC')
@@ -414,6 +444,27 @@ class aktivitasController extends Controller
         $bulan = request('bulan');
         $data = Aktivitas::with('skp')->where('id_pegawai',$params)->whereMonth('tanggal',$bulan)->get();
         return $data;
+    }
+
+    public function review_aktivitas_post(Request $request){
+        $data = Aktivitas::where('id',$request->id_aktivitas)->first();
+        $data->kesesuaian = $request->kesesuaian;
+        $data->save();
+
+        if ($data) {
+            return response()->json([
+                'message' => 'Success',
+                'status' => true,
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Data belum ada',
+                'status' => false,
+                'data' => $data
+            ]);
+        }
+
     }
 
 }

@@ -51,6 +51,14 @@ class absenController extends Controller
       public function checkAbsenbyDate(){
         // return date('Y-m')
         $data = '';
+        $pegawai_val = '';
+        $req_pegawai = request('pegawai');
+
+        if (isset($req_pegawai)) {
+            $pegawai_val = $req_pegawai;
+        }else{
+            $pegawai_val = Auth::user()->id_pegawai;
+        }
 
         // $getDataCache= Redis::get('checkAbsenbyDate_'.Auth::user()->id_pegawai);
 		// $data = json_decode($getDataCache);
@@ -60,7 +68,7 @@ class absenController extends Controller
             if (date('D', strtotime($date)) == 'Sun') {
                 $data = null;
             }else{
-                $data = DB::table('tb_absen')->select('status')->where('id_pegawai',Auth::user()->id_pegawai)->where('tanggal_absen',$date)->first();
+                $data = DB::table('tb_absen')->select('status')->where('id_pegawai',$pegawai_val)->where('tanggal_absen',$date)->first();
             }
             // Redis::set('checkAbsenbyDate_'.Auth::user()->id_pegawai, json_encode($data));
             // Redis::expire('checkAbsenbyDate_'.Auth::user()->id_pegawai, 5);

@@ -202,6 +202,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/list', [App\Http\Controllers\aktivitasController::class, 'list']);
         Route::get('/listByDate', [App\Http\Controllers\aktivitasController::class, 'listByDate']);
         Route::get('/list-by-user', [App\Http\Controllers\aktivitasController::class, 'listByUser']);
+        Route::get('/list-by-review', [App\Http\Controllers\aktivitasController::class, 'listByReview']);
         Route::post('/store', [App\Http\Controllers\aktivitasController::class, 'store']);
         Route::get('/show/{params}', [App\Http\Controllers\aktivitasController::class, 'show']);
         Route::post('/update/{params}', [App\Http\Controllers\aktivitasController::class, 'update']);
@@ -209,6 +210,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/get-option-sasaran-kinerja', [App\Http\Controllers\aktivitasController::class, 'optionSkp']);
         Route::get('/checkMenitKinerja/{params}', [App\Http\Controllers\aktivitasController::class, 'checkMenitKinerja']);
         Route::get('/review_aktivitas_list', [App\Http\Controllers\aktivitasController::class, 'review_aktivitas_list']);
+        Route::post('/review_aktivitas', [App\Http\Controllers\aktivitasController::class, 'review_aktivitas_post']);
         // Route::get('/review-aktivitas/{params}', [App\Http\Controllers\aktivitasController::class, 'review_aktivitas_byPegawai']);
     });
 
