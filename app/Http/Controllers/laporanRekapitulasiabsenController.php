@@ -7,6 +7,7 @@ use App\Models\absen;
 use App\Models\pegawai;
 use DB;
 use Auth;
+use Carbon\Carbon;
 
 class laporanRekapitulasiabsenController extends Controller
 {
@@ -33,7 +34,6 @@ class laporanRekapitulasiabsenController extends Controller
 
     public function rekapByUser($startDate, $endDate, $pegawai = null)
     {
-        
         $startTime = strtotime($startDate);
         $endTime = strtotime($endDate);
         $getDatatanggal = [];
@@ -94,6 +94,8 @@ class laporanRekapitulasiabsenController extends Controller
         $tes = [];
         // return $pegawai;
         $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', $pegawai_)->first();
+    
+        // return  $getAbsen = DB::table('tb_absen')->where('id_pegawai', $pegawai_)->where('validation', 1)->where('tanggal_absen','2023-03-06')->groupBy('tanggal_absen','jenis')->get();
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
             $getAbsen = DB::table('tb_absen')->where('id_pegawai', $pegawai_)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
@@ -102,10 +104,10 @@ class laporanRekapitulasiabsenController extends Controller
                 if ($v->jenis == 'checkin') {
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
                     if (in_array($v->tanggal_absen, $monday)){
-                       if ($v->status !== 'apel') {
-                         $jumlah_apel += 1;
+                        if ($v->status !== 'apel' && $v->status !== 'dinas_luar') {
+                            $jumlah_apel += 1;
                         }             
-                }
+                    }
 
                  $selisih_waktu = $this->konvertWaktu('checkin', $v->waktu_absen);
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
@@ -125,6 +127,7 @@ class laporanRekapitulasiabsenController extends Controller
                 } else {
 
                     $selisih_waktu = $this->konvertWaktu('checkout', $v->waktu_absen);
+                    
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
                         $temps_absensi['cpk']['cpk_30'][] = $selisih_waktu;
                     } elseif ($selisih_waktu >= 31 && $selisih_waktu <= 60) {
@@ -151,6 +154,7 @@ class laporanRekapitulasiabsenController extends Controller
                 ];
             }
 
+            // return $dataAbsen;
             if (count($dataAbsen) == 1) {
                 if ($value['date'] < date('Y-m-d')) {
 
@@ -165,25 +169,16 @@ class laporanRekapitulasiabsenController extends Controller
 
                 $temps_absensi['cpk']['cpk_90_keatas'][] = 90; 
             }
-            // else{
-            //        // return $dataAbsen;
-            //     if ($dataAbsen[0]['status_absen'] == 'cuti' || $dataAbsen[0]['status_absen'] == 'dinas luar' || $dataAbsen[0]['status_absen'] == 'sakit' || $dataAbsen[0]['status_absen'] == 'izin') {
-            //          $dataAbsen[1] = [
-            //             'jenis' => 'checkout',
-            //             'status_absen' => 'hadir',
-            //             'waktu_absen' => '16:30:00',
-            //             'keterangan' => '-'
-            //         ];
-            //     }
-
-            // }
           
+            
             if ($value['date'] > date('Y-m-d')) {
+                // return 'a';
                 $rekapAbsen[$key] = [
                     'tanggal' => $value['date'],
                     'data_tanggal' => []
                 ];
             } else {
+            
                 if ($dataAbsen !== []) {
                     $rekapAbsen[$key] = [
                         'tanggal' => $value['date'],
@@ -616,8 +611,22 @@ class laporanRekapitulasiabsenController extends Controller
         }
     }
 
+    function getDateRange()
+    {
+        $start_date = '2023-03-24';
+        $end_date = '2023-04-23';
+
+        $dates = [];
+        for ($date = Carbon::parse($start_date); $date->lte(Carbon::parse($end_date)); $date->addDay()) {
+            $dates[] = $date->format('Y-m-d');
+        }
+
+        return $dates;
+    }
+
     public function konvertWaktu($params, $waktu)
     {
+   
         $diff = '';
         $selisih_waktu = '';
         $menit = 0;
@@ -626,7 +635,16 @@ class laporanRekapitulasiabsenController extends Controller
             $waktu_absen = strtotime($waktu);
             $diff = $waktu_absen - $waktu_tetap_absen;
         } else {
-            $waktu_tetap_absen = strtotime('16:00:00');
+            $waktu_checkout = '16:00:00';
+            $arr = $this->getDateRange();
+            $key = array_search($waktu, $arr);
+            return $key;
+
+            if ($key !== false) {
+                $waktu_checkout = '15:00:00';
+            }
+
+            $waktu_tetap_absen = strtotime($waktu_checkout);
             $waktu_absen = strtotime($waktu);
             $diff = $waktu_tetap_absen - $waktu_absen;
             // return $diff;

@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Redis;
 
 class aktivitasController extends Controller
 {
+
+
     public function list()
     {
         // $getDataCache= Redis::get('list-aktivitas_'.Auth::user()->id_pegawai);

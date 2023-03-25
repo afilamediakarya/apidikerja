@@ -627,7 +627,7 @@ class laporanController extends Controller
         $data = skp::query()
                 ->select('id','id_satuan_kerja','rencana_kerja','tahun')
                 ->with(['aktivitas'=> function($query) use ($bulan) {
-                    $query->select('id','nama_aktivitas','id_skp','satuan','tanggal','keterangan',DB::raw('sum(hasil) as hasil'),DB::raw('sum(waktu) as waktu'));
+                    $query->select('id','nama_aktivitas','id_skp','satuan','tanggal','created_at','keterangan',DB::raw('sum(hasil) as hasil'),DB::raw('sum(waktu) as waktu'));
                     $query->whereMonth('tanggal',$bulan);
                     $query->groupBy('id_skp','tanggal','nama_aktivitas');
                     $query->orderBy('tanggal','ASC');
@@ -679,7 +679,7 @@ class laporanController extends Controller
         $data = skp::query()
                 ->select('id','id_satuan_kerja','rencana_kerja','tahun')
                 ->with(['aktivitas'=> function($query) use ($bulan) {
-                    $query->select('id','nama_aktivitas','id_skp','satuan','tanggal','keterangan',DB::raw('sum(hasil) as hasil'),DB::raw('sum(waktu) as waktu'));
+                    $query->select('id','nama_aktivitas','id_skp','satuan','tanggal','created_at','keterangan',DB::raw('sum(hasil) as hasil'),DB::raw('sum(waktu) as waktu'));
                     $query->whereMonth('tanggal',$bulan);
                     $query->groupBy('id_skp','tanggal','nama_aktivitas');
                     $query->orderBy('tanggal','ASC');

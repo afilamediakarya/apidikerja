@@ -123,19 +123,28 @@ class absenController extends Controller
                     $data = array();
                     
 
-                    $absen = DB::table('tb_absen')->select('waktu_absen','id','jenis','validation','status','tanggal_absen')->where('id_pegawai',$value->id)->whereRaw("tanggal_absen = '$tanggal' $where")->get();                       
-        
+                    $absen = DB::table('tb_absen')->select('tb_absen.waktu_absen','tb_absen.id','tb_absen.jenis','tb_absen.validation','tb_absen.status','tb_absen.tanggal_absen','tb_absen.updated_at','tb_absen.user_update')->where('id_pegawai',$value->id)->whereRaw("tanggal_absen = '$tanggal' $where")->get();                       
+
+                    //->join('tb_pegawai','tb_absen.user_update','=','tb_pegawai.id')
+                        // ,'tb_pegawai.nama as nama_user_update'
                     if (count($absen) > 0) {
+                    $user_update = '';
                     $data['id'] = $value->id;
                     $data['nama_pegawai'] = $value->nama;
                     $data['waktu_pulang'] = '-';
                     foreach ($absen as $k => $val) {
-                        
                         if ($val->jenis == 'checkin') {
+                           $checkUserUpdate = DB::table('tb_pegawai')->select('nama')->where('id',$val->user_update)->first();
+
+                           isset($checkUserUpdate) ? $user_update = $checkUserUpdate['nama'] : $user_update = 'super_admin';
+
                             $data['waktu_masuk'] = $val->waktu_absen; 
                             $data['validation'] = $val->validation;
                             $data['status'] = $val->status; 
-                            $data['tanggal_absen'] = $val->tanggal_absen; 
+                            $data['tanggal_absen'] = $val->tanggal_absen;
+                            $data['updated_at'] = $val->updated_at;
+                            $data['user_update'] = $user_update;
+                            // $data['nama_user_update'] = ;
                         }else{
                             $data['waktu_pulang'] = $val->waktu_absen;
                         }
@@ -181,7 +190,6 @@ class absenController extends Controller
     }
 
     public function store(Request $request){
-        // return $request;
         DB::connection()->enableQueryLog();
         $validator = Validator::make($request->all(),[
             'id_pegawai' => 'required|numeric',
@@ -215,7 +223,6 @@ class absenController extends Controller
                 }elseif ($status == 'dinas luar' || $status == 'izin' || $status == 'sakit') {
                     $validation_ = 0;
                 }
-            
             }
 
         }else{
@@ -243,7 +250,7 @@ class absenController extends Controller
 
         \Log::info("Query execution time: $executionTime");
 
-        if ($request->status == 'izin' || $request->status == 'sakit' || $request->status == 'cuti') {
+        if ($request->status == 'izin' || $request->status == 'sakit' || $request->status == 'cuti' || $request->status == 'dinas luar') {
             $this->generateCheckout($request);
         }
 
