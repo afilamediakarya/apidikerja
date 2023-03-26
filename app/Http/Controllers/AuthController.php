@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Redis;
 class AuthController extends Controller
 {
     public function login(Request $request){
-
+        
         if (!Auth::attempt($request->only('username', 'password')))
         {
             return response()
@@ -30,13 +30,13 @@ class AuthController extends Controller
         $user = array();
 
 
-        if ($request->username !== 'super_admin') {
+        if ($request->username !== 'super_admin' && $request->username !== 'adminkeuangan') {
             $user = User::select('users.id','id_pegawai','role','tb_pegawai.id_satuan_kerja','nama','nip','golongan','tb_satuan_kerja.nama_satuan_kerja')->join('tb_pegawai','tb_pegawai.id','users.id_pegawai')->join('tb_satuan_kerja','tb_satuan_kerja.id','tb_pegawai.id_satuan_kerja')->where('username', $request['username'])->firstOrFail();
         }else{
             $user = User::where('username', $request['username'])->firstOrFail();
         }
 
-         if ($user['role'] == 'admin_opd' || $user['role'] == 'super_admin') {
+         if ($user['role'] == 'admin_opd' || $user['role'] == 'super_admin' || $user['role'] == 'keuangan') {
                $token = $user->createToken('auth_token')->plainTextToken; 
                  return response()->json([
                 'message' => 'Hi '.$user->username.', Berhasil Login',
