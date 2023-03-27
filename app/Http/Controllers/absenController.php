@@ -135,9 +135,9 @@ class absenController extends Controller
                     foreach ($absen as $k => $val) {
                         if ($val->jenis == 'checkin') {
                            $checkUserUpdate = DB::table('tb_pegawai')->select('nama')->where('id',$val->user_update)->first();
-
-                           isset($checkUserUpdate) ? $user_update = $checkUserUpdate['nama'] : $user_update = 'super_admin';
-
+                      
+                           isset($checkUserUpdate) ? $user_update = $checkUserUpdate->nama : $user_update = 'super_admin';
+                            
                             $data['waktu_masuk'] = $val->waktu_absen; 
                             $data['validation'] = $val->validation;
                             $data['status'] = $val->status; 
