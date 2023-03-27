@@ -90,6 +90,7 @@ class laporanRekapitulasiTppController extends Controller
             $get_kinerja = aktivitas::query()
                            ->select(DB::raw("SUM(waktu) as count"))
                            ->where('id_pegawai',$value->id)
+                           ->where('kesesuaian',1)
                            ->whereMonth('tanggal',$bulan)
                            ->first();
             $value->get_kinerja = $get_kinerja;

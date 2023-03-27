@@ -182,6 +182,7 @@ class dashboardController extends Controller
 						->select(DB::raw("SUM(waktu) as count"))
 						->where('id_pegawai',Auth::user()->id_pegawai)
 						->whereMonth('tanggal',$bulan)
+						 ->where('kesesuaian',1)
 						->where('tahun',request('tahun'))
 						->first();
 			
