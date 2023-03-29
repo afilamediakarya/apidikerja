@@ -113,7 +113,7 @@ class laporanRekapitulasiabsenController extends Controller
                     
                     if (in_array($v->tanggal_absen, $monday)){
                         
-                        if ($v->status !== 'apel' && $v->status !== 'dinas luar') {
+                        if ($v->status !== 'apel' && $v->status !== 'dinas luar' && $v->status !== 'cuti' && $v->status !== 'izin') {
                             $jumlah_tidak_apel += 1;
                         }
                     }
@@ -331,7 +331,7 @@ class laporanRekapitulasiabsenController extends Controller
                 if ($v->jenis == 'checkin') {
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
                      if (in_array($v->tanggal_absen, $monday)){
-                        if ($v->status !== 'apel' && $v->status !== 'dinas luar') {
+                        if ($v->status !== 'apel' && $v->status !== 'dinas luar' && $v->status !== 'cuti' && $v->status !== 'izin') {
                             $jumlah_tidak_apel += 1;
                         }
                     }
