@@ -63,14 +63,14 @@ class laporanRekapitulasiabsenController extends Controller
         $jumlah_alpa = 0;
         $potongan_masuk_kerja = 0;
         $potongan_pulang_kerja = 0;
-        $jumlah_apel = 0;
+        $jumlah_tidak_apel = 0;
 
         $res_jml_alpa = 0;
         $res_jml_tidak_apel = 0;
 
         $endDate > date('Y-m-d') ? $endDate_if = strtotime(date('Y-m-d')) : $endDate_if = $endTime;
 
-
+        $jumlah_ikut_apel = 0;
         // return $hariLibur;
         for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
             if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
@@ -99,14 +99,23 @@ class laporanRekapitulasiabsenController extends Controller
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
             $getAbsen = DB::table('tb_absen')->where('id_pegawai', $pegawai_)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
+
+            
+            // if ($value['date'] === '2023-01-09') {
+            //     return $getAbsen;
+            // }
+
             foreach ($getAbsen as $i => $v) {
                 $keterangan = '';
+                
                 if ($v->jenis == 'checkin') {
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
+                    
                     if (in_array($v->tanggal_absen, $monday)){
-                        if ($v->status !== 'apel' && $v->status !== 'dinas_luar') {
-                            $jumlah_apel += 1;
-                        }             
+                        
+                        if ($v->status !== 'apel' && $v->status !== 'dinas luar') {
+                            $jumlah_tidak_apel += 1;
+                        }
                     }
 
                  $selisih_waktu = $this->konvertWaktu('checkin', $v->waktu_absen);
@@ -145,6 +154,7 @@ class laporanRekapitulasiabsenController extends Controller
                     }
                 }
 
+                
                 $dataAbsen[$i] = [
                     'jenis' => $v->jenis,
                     'status_absen' => $v->status,
@@ -153,6 +163,8 @@ class laporanRekapitulasiabsenController extends Controller
                     'keterangan' => $keterangan
                 ];
             }
+
+            
 
             // return $dataAbsen;
             if (count($dataAbsen) == 1) {
@@ -186,7 +198,6 @@ class laporanRekapitulasiabsenController extends Controller
                     ];
                 } else {
                     $jumlah_alpa += 1;
-                    // $tes[] = $value['date'];
                     $rekapAbsen[$key] = [
                         'tanggal' => $value['date'],
                         'data_tanggal' => [
@@ -196,14 +207,22 @@ class laporanRekapitulasiabsenController extends Controller
                             'keterangan' => 'tanpa keterangan'
                         ]
                     ];
+
+                    if (in_array($value['date'], $monday)){
+                        $jumlah_tidak_apel += 1;
+                    }
+
                 }
             }
         }
 
+        // return $tes;
+        // return $rekapAbsen;
+
          $jml_potongan_kehadiran = ($jumlah_alpa * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
 
          $res_jml_alpa = $jumlah_alpa * 3;
-         $res_jml_tidak_apel = $jumlah_apel * 2;
+         $res_jml_tidak_apel = $jumlah_tidak_apel * 2;
 
         $potongan_masuk_kerja = (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60']) * 1) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5); 
         $potongan_pulang_kerja = (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60']) * 1) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5); 
@@ -225,7 +244,7 @@ class laporanRekapitulasiabsenController extends Controller
         $result['potongan_masuk_kerja'] = $potongan_masuk_kerja;
         $result['potongan_pulang_kerja'] = $potongan_pulang_kerja;
         $result['potongan_apel'] = $res_jml_tidak_apel;
-        $result['jumlah_tidak_apel'] = $jumlah_apel;
+        $result['jumlah_tidak_apel'] = $jumlah_tidak_apel;
         $result['jml_potongan_kehadiran_kerja'] = $jml_potongan_kehadiran_kerja;
 
         if ($result) {
@@ -244,172 +263,6 @@ class laporanRekapitulasiabsenController extends Controller
 
     public function viewrekapByUser($startDate, $endDate, $id_pegawai)
     {
-        // $startTime = strtotime($startDate);
-        // $endTime = strtotime($endDate);
-        // $getDatatanggal = [];
-
-        // $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
-        // $hariLibur = $this->cekHariLibur($jmlHariKerja);
-        // $jml_kehadiran = [];
-        // $temps_absensi = [
-        //     'kmk' => [
-        //         'kmk_30' => [],
-        //         'kmk_60' => [],
-        //         'kmk_90' => [],
-        //         'kmk_90_keatas' => [],
-        //     ],
-        //     'cpk' => [
-        //         'cpk_30' => [],
-        //         'cpk_60' => [],
-        //         'cpk_90' => [],
-        //         'cpk_90_keatas' => [],
-        //     ],
-        //     'alpa' => []
-        // ];
-        // for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
-        //     if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
-        //         $getDatatanggal[]['date'] = date('Y-m-d', $i);
-        //     }
-        // }
-
-        // $result = [];
-        // $rekapAbsen = [];
-        // $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', $id_pegawai)->first();
-
-        // foreach ($getDatatanggal as $key => $value) {
-        //     $dataAbsen = [];
-        //     $getAbsen = DB::table('tb_absen')->where('id_pegawai', $id_pegawai)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
-
-        //     foreach ($getAbsen as $i => $v) {
-
-        //         $keterangan = '';
-        //         if ($v->jenis == 'checkin') {
-        //             $selisih_waktu = $this->konvertWaktu('checkin', $v->waktu_absen);
-        //             $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
-        //             if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
-        //                 $temps_absensi['kmk']['kmk_30'][] = $selisih_waktu;
-        //             } elseif ($selisih_waktu >= 31 && $selisih_waktu <= 60) {
-        //                 $temps_absensi['kmk']['kmk_60'][] = $selisih_waktu;
-        //             } elseif ($selisih_waktu >= 61 && $selisih_waktu <= 90) {
-        //                 $temps_absensi['kmk']['kmk_90'][] = $selisih_waktu;;
-        //             } elseif ($selisih_waktu >= 91) {
-        //                 $temps_absensi['kmk']['kmk_90_keatas'][] = $selisih_waktu;
-        //             }
-        //             if ($selisih_waktu > 0) {
-        //                 $keterangan = 'Telat ' . $selisih_waktu . ' menit';
-        //             } else {
-        //                 $keterangan = 'Tepat waktu';
-        //             }
-        //         } else {
-              
-        //             $selisih_waktu = $this->konvertWaktu('checkout', $v->waktu_absen);
-
-        //             if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
-        //                 $temps_absensi['cpk']['cpk_30'][] = $selisih_waktu;
-        //             } elseif ($selisih_waktu >= 31 && $selisih_waktu <= 60) {
-        //                 $temps_absensi['cpk']['cpk_60'][] = $selisih_waktu;
-        //             } elseif ($selisih_waktu >= 61 && $selisih_waktu <= 90) {
-        //                 $temps_absensi['cpk']['cpk_90'][] = $selisih_waktu;;
-        //             } elseif ($selisih_waktu >= 91) {
-        //                 $temps_absensi['cpk']['cpk_90_keatas'][] = $selisih_waktu;
-        //             }
-
-
-        //             if ($selisih_waktu > 0) {
-        //                 $keterangan = 'Cepat ' . $selisih_waktu . ' menit';
-        //             } else {
-        //                 $keterangan = 'Tepat waktu';
-        //             }
-        //         }
-
-
-        //         $dataAbsen[$i] = [
-        //             'jenis' => $v->jenis,
-        //             'status_absen' => $v->status,
-        //             'tanggal_absen' => $v->tanggal_absen,
-        //             'waktu_absen' => $v->waktu_absen,
-        //             'keterangan' => $keterangan
-        //         ];
-        //     }
-
-        //     if (count($dataAbsen) == 1) {
-        //         if ($value['date'] < date('Y-m-d')) {
-
-        //             $dataAbsen[1] = [
-        //                 'jenis' => 'checkout',
-        //                 'status_absen' => 'hadir',
-        //                 'waktu_absen' => '14:00:00',
-        //                 'keterangan' => 'cepat 90 menit'
-        //             ];
-        //             $jml_kehadiran[$dataAbsen[0]['tanggal_absen']] = 'checkout';
-        //         }
-        //         $temps_absensi['cpk']['cpk_90_keatas'][] = 90;
-        //     }else{
-        //         // return $dataAbsen;
-        //         if (isset($dataAbsen[0])) {
-        //             if ($dataAbsen[0]['status_absen'] == 'cuti' || $dataAbsen[0]['status_absen'] == 'dinas luar' || $dataAbsen[0]['status_absen'] == 'sakit') {
-        //              $dataAbsen[1] = [
-        //                 'jenis' => 'checkout',
-        //                 'status_absen' => 'hadir',
-        //                 'waktu_absen' => '16:30:00',
-        //                 'keterangan' => '-'
-        //             ];
-        //         }
-
-        //         }
-        //     }
-
-        //     if ($value['date'] > date('Y-m-d')) {
-        //         $rekapAbsen[$key] = [
-        //             'tanggal' => $value['date'],
-        //             'data_tanggal' => []
-        //         ];
-        //     } else {
-        //         if ($dataAbsen !== []) {
-        //             $rekapAbsen[$key] = [
-        //                 'tanggal' => $value['date'],
-        //                 'data_tanggal' => $dataAbsen
-        //             ];
-        //         } else {
-        //             $temps_absensi['alpa'][] = $key;
-        //             $rekapAbsen[$key] = [
-        //                 'tanggal' => $value['date'],
-        //                 'data_tanggal' => [
-        //                     'jenis' => '',
-        //                     'status_absen' => 'tanpa keterangan',
-        //                     'waktu_absen' => '00:00:00',
-        //                     'keterangan' => 'tanpa keterangan'
-        //                 ]
-        //             ];
-        //         }
-        //     }
-        // }
-        // // return $jml_kehadiran;
-
-        // $jml_potongan_kehadiran = (count($temps_absensi['alpa']) * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
-
-        // $persentase_pemotongan_tunjangan = $jml_potongan_kehadiran * 0.4;
-
-        // $result['jml_hari_kerja'] = count($rekapAbsen);
-        // $result['kehadiran'] = count($jml_kehadiran);
-        // $result['tanpa_keterangan'] = count($temps_absensi['alpa']);
-        // $result['potongan_kehadiran'] = $jml_potongan_kehadiran;
-        // $result['persentase_pemotongan'] = round($persentase_pemotongan_tunjangan, 2);
-        // $result['pegawai'] = $pegawai;
-        // $result['data_absen'] = $rekapAbsen;
-
-        // if ($result) {
-        //     return response()->json([
-        //         'message' => 'Success',
-        //         'status' => true,
-        //         'data' => $result
-        //     ]);
-        // } else {
-        //     return response()->json([
-        //         'message' => 'Failed',
-        //         'status' => false
-        //     ]);
-        // }
 
         $startTime = strtotime($startDate);
         $endTime = strtotime($endDate);
@@ -439,7 +292,7 @@ class laporanRekapitulasiabsenController extends Controller
         $jumlah_alpa = 0;
         $potongan_masuk_kerja = 0;
         $potongan_pulang_kerja = 0;
-        $jumlah_apel = 0;
+        $jumlah_tidak_apel = 0;
 
         $res_jml_alpa = 0;
         $res_jml_tidak_apel = 0;
@@ -477,11 +330,11 @@ class laporanRekapitulasiabsenController extends Controller
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
-                    if (in_array($v->tanggal_absen, $monday)){
-                       if ($v->status !== 'apel') {
-                         $jumlah_apel += 1;
-                        }             
-                }
+                     if (in_array($v->tanggal_absen, $monday)){
+                        if ($v->status !== 'apel' && $v->status !== 'dinas luar') {
+                            $jumlah_tidak_apel += 1;
+                        }
+                    }
 
                  $selisih_waktu = $this->konvertWaktu('checkin', $v->waktu_absen);
                     if ($selisih_waktu >= 1 && $selisih_waktu <= 30) {
@@ -565,6 +418,9 @@ class laporanRekapitulasiabsenController extends Controller
                             'keterangan' => 'tanpa keterangan'
                         ]
                     ];
+                    if (in_array($value['date'], $monday)){
+                        $jumlah_tidak_apel += 1;
+                    }
                 }
             }
         }
@@ -572,7 +428,7 @@ class laporanRekapitulasiabsenController extends Controller
          $jml_potongan_kehadiran = ($jumlah_alpa * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
 
          $res_jml_alpa = $jumlah_alpa * 3;
-         $res_jml_tidak_apel = $jumlah_apel * 2;
+         $res_jml_tidak_apel = $jumlah_tidak_apel * 2;
 
         $potongan_masuk_kerja = (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60']) * 1) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5); 
         $potongan_pulang_kerja = (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60']) * 1) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5); 
@@ -594,7 +450,7 @@ class laporanRekapitulasiabsenController extends Controller
         $result['potongan_masuk_kerja'] = $potongan_masuk_kerja;
         $result['potongan_pulang_kerja'] = $potongan_pulang_kerja;
         $result['potongan_apel'] = $res_jml_tidak_apel;
-        $result['jumlah_tidak_apel'] = $jumlah_apel;
+        $result['jumlah_tidak_apel'] = $jumlah_tidak_apel;
         $result['jml_potongan_kehadiran_kerja'] = $jml_potongan_kehadiran_kerja;
 
         if ($result) {
@@ -697,6 +553,7 @@ class laporanRekapitulasiabsenController extends Controller
         $getDatatanggal = [];
         $startTime = strtotime($startDate);
         $endTime = strtotime($endDate);
+        $monday = array();
         $count_monday = 0;
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
 
@@ -732,7 +589,8 @@ class laporanRekapitulasiabsenController extends Controller
                 $date_ = date('Y-m-d', $i);
                 $day_ = date('l', strtotime($date_));
                 if ($day_ == 'Monday') {
-                    $count_monday += 1;          
+                    // $count_monday += 1;  
+                    $monday[] = $date_;        
                 }      
             }
 
@@ -764,7 +622,6 @@ class laporanRekapitulasiabsenController extends Controller
                 ->select('id', 'id_pegawai', 'waktu_absen', 'status', 'jenis','tanggal_absen',DB::raw('COUNT(IF(status = "apel", 1, NULL)) "jumlah_apel"'),DB::raw('COUNT(IF(status = "hadir", 1, NULL)) "jumlah_hadir"'),DB::raw('COUNT(IF(status = "sakit", 1, NULL)) "jumlah_sakit"'),DB::raw('COUNT(IF(status = "cuti", 1, NULL)) "jumlah_cuti"'),DB::raw('COUNT(IF(status = "dinas luar", 1, NULL)) "jumlah_dinas_luar"'))
                 ->whereIn('tanggal_absen',$getDatatanggal)
                 ->where('validation', 1)
-                // ->groupBy('tb_absen.id')
                 ->groupBy('tb_absen.tanggal_absen','tb_absen.jenis')
                 ->get();
 
@@ -784,7 +641,7 @@ class laporanRekapitulasiabsenController extends Controller
             'hari_kerja' => count($getDatatanggal),
             'pegawai' => $pegawai_data,
             'range' => $range['hari_kerja'],
-            'count_monday' => $count_monday
+            'monday' => $monday
         ];
     }
 }
