@@ -66,7 +66,6 @@ class laporanRekapitulasiTppController extends Controller
                 ->where('tb_pegawai.id_satuan_kerja', $satuanKerja)
                 // ->where('tb_pegawai.id', 256)
                 ->orderBy('tb_jabatan.kelas_jabatan', 'desc')
-                ->orderBy('tb_pegawai.nama','asc')
                 ->get();
         } else {
             $pegawai = pegawai::where('id', Auth::user()->id_pegawai)->first();

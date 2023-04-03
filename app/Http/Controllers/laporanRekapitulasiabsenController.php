@@ -71,15 +71,15 @@ class laporanRekapitulasiabsenController extends Controller
         $endDate > date('Y-m-d') ? $endDate_if = strtotime(date('Y-m-d')) : $endDate_if = $endTime;
 
         $jumlah_ikut_apel = 0;
-        // return $hariLibur;
+       
         for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
-            if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
+            if (in_array(date('Y-m-d', $i), $hariLibur) !== 1) {
                 $getDatatanggal[]['date'] = date('Y-m-d', $i);
             }
         }
 
          for ($i = $startTime; $i <= $endDate_if; $i = $i + 86400) {
-            if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
+            if (in_array(date('Y-m-d', $i), $hariLibur) !== 1) {
                 $date_ = date('Y-m-d', $i);
                 $day_ = date('l', strtotime($date_));
                 if ($day_ == 'Monday') {
@@ -101,7 +101,7 @@ class laporanRekapitulasiabsenController extends Controller
             $getAbsen = DB::table('tb_absen')->where('id_pegawai', $pegawai_)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
 
             
-            // if ($value['date'] === '2023-01-09') {
+            // if ($value['date'] === '2023-04-02') {
             //     return $getAbsen;
             // }
 
@@ -555,6 +555,7 @@ class laporanRekapitulasiabsenController extends Controller
         $endTime = strtotime($endDate);
         $monday = array();
         $count_monday = 0;
+        $tempsRange = [];
         $jmlHariKerja = $this->jmlHariKerja($startDate, $endDate);
 
         $endDate > date('Y-m-d') ? $endDate_if = strtotime(date('Y-m-d')) : $endDate_if = $endTime;
@@ -567,20 +568,23 @@ class laporanRekapitulasiabsenController extends Controller
         } else {
             $range = $this->jmlHariKerja($startDate, date('Y-m-d'));
         }
+
+        // return $range;
     
         $hariLibur = $this->cekHariLibur($jmlHariKerja);
     
         foreach ($hariLibur as $k => $liburDay) {
-            if (in_array($liburDay, $range['hari_kerja'])) {
-                $index = array_search($liburDay, $range['hari_kerja']);
-                \array_splice($range['hari_kerja'], $index, 1);
+            if (isset($range['hari_kerja'])) {
+                if (in_array($liburDay, $range['hari_kerja'])) {
+                    $index = array_search($liburDay, $range['hari_kerja']);
+                    \array_splice($range['hari_kerja'], $index, 1);
+                }
+                $tempsRange = $range['hari_kerja'];
             }
         }
-
-        for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
-            if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
-                $date_ = date('Y-m-d', $i);
-                $getDatatanggal[] = ['date' => $date_];            
+         for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
+            if (in_array(date('Y-m-d', $i), $hariLibur) !== 1) {
+                $getDatatanggal[]['date'] = date('Y-m-d', $i);
             }
         }
 
@@ -593,7 +597,6 @@ class laporanRekapitulasiabsenController extends Controller
                     $monday[] = $date_;        
                 }      
             }
-
         }
 
 
@@ -614,10 +617,8 @@ class laporanRekapitulasiabsenController extends Controller
                 ->get();
         }
 
-        // return $getDatatanggal;
-
-
         foreach ($pegawaiBySatuanKerja as $key => $value) {
+            // return $value;
             $getAbsenPegawai = absen::where('id_pegawai', $value->id)
                 ->select('id', 'id_pegawai', 'waktu_absen', 'status', 'jenis','tanggal_absen',DB::raw('COUNT(IF(status = "apel", 1, NULL)) "jumlah_apel"'),DB::raw('COUNT(IF(status = "hadir", 1, NULL)) "jumlah_hadir"'),DB::raw('COUNT(IF(status = "sakit", 1, NULL)) "jumlah_sakit"'),DB::raw('COUNT(IF(status = "cuti", 1, NULL)) "jumlah_cuti"'),DB::raw('COUNT(IF(status = "dinas luar", 1, NULL)) "jumlah_dinas_luar"'))
                 ->whereIn('tanggal_absen',$getDatatanggal)
@@ -635,12 +636,13 @@ class laporanRekapitulasiabsenController extends Controller
             }
         }
    
+        
 
         return $result = [
             'satuan_kerja' => $satuan_kerja_,
             'hari_kerja' => count($getDatatanggal),
             'pegawai' => $pegawai_data,
-            'range' => $range['hari_kerja'],
+            'range' => $tempsRange,
             'monday' => $monday
         ];
     }
