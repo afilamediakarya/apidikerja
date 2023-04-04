@@ -169,15 +169,13 @@ class aktivitasController extends Controller
         $waktu = 0;
         $jumlah_kinerja = $this->checkMenitKinerja($request->tanggal)->getData();
         $ax = $request->waktu + $jumlah_kinerja->data->count;
-
-        // return $ax;
-
+        
         if ($ax > 420) {
             $n_ = (420 - $jumlah_kinerja->data->count) - $request->waktu;
             $waktu = $ax + $n_;
             $waktu = $waktu - $jumlah_kinerja->data->count;  
 
-            if ($waktu == 0) {
+            if ($waktu <= 0 ) {
                 return response()->json([
                     'error' => [
                         'title' =>'Jumlah waktu sudah cukup',
@@ -185,11 +183,6 @@ class aktivitasController extends Controller
                     ]
                 ], 422);
             }
-
-            //   return response()->json(['error'=> [
-            //     'text' => 'Anda belum bisa menambah aktivitas',
-            //     'title' => 'Maaf Anda belum Absen'
-            // ] ],422);
         }else{
             $waktu = $request->waktu;
         }

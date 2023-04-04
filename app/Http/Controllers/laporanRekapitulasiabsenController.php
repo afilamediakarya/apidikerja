@@ -73,13 +73,13 @@ class laporanRekapitulasiabsenController extends Controller
         $jumlah_ikut_apel = 0;
        
         for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
-            if (in_array(date('Y-m-d', $i), $hariLibur) !== 1) {
+            if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
                 $getDatatanggal[]['date'] = date('Y-m-d', $i);
             }
         }
 
          for ($i = $startTime; $i <= $endDate_if; $i = $i + 86400) {
-            if (in_array(date('Y-m-d', $i), $hariLibur) !== 1) {
+            if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
                 $date_ = date('Y-m-d', $i);
                 $day_ = date('l', strtotime($date_));
                 if ($day_ == 'Monday') {
@@ -91,19 +91,12 @@ class laporanRekapitulasiabsenController extends Controller
 
         $result = [];
         $rekapAbsen = [];
-        $tes = [];
-        // return $pegawai;
+
         $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', $pegawai_)->first();
     
-        // return  $getAbsen = DB::table('tb_absen')->where('id_pegawai', $pegawai_)->where('validation', 1)->where('tanggal_absen','2023-03-06')->groupBy('tanggal_absen','jenis')->get();
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
             $getAbsen = DB::table('tb_absen')->where('id_pegawai', $pegawai_)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
-
-            
-            // if ($value['date'] === '2023-04-02') {
-            //     return $getAbsen;
-            // }
 
             foreach ($getAbsen as $i => $v) {
                 $keterangan = '';
@@ -112,10 +105,11 @@ class laporanRekapitulasiabsenController extends Controller
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
                     
                     if (in_array($v->tanggal_absen, $monday)){
-                        
-                        if ($v->status !== 'apel' && $v->status !== 'dinas luar' && $v->status !== 'cuti' && $v->status !== 'izin') {
-                            $jumlah_tidak_apel += 1;
-                        }
+                        if (!in_array($v->tanggal_absen, $this->getDateRange())) {
+                            if ($v->status !== 'apel' && $v->status !== 'dinas luar' && $v->status !== 'cuti' && $v->status !== 'izin') {
+                                $jumlah_tidak_apel += 1;
+                            }
+                        }                        
                     }
 
                  $selisih_waktu = $this->konvertWaktu('checkin', $v->waktu_absen);
@@ -216,9 +210,6 @@ class laporanRekapitulasiabsenController extends Controller
             }
         }
 
-        // return $tes;
-        // return $rekapAbsen;
-
          $jml_potongan_kehadiran = ($jumlah_alpa * 3) + (count($temps_absensi['kmk']['kmk_30']) * 0.5) + (count($temps_absensi['kmk']['kmk_60'])) + (count($temps_absensi['kmk']['kmk_90']) * 1.25) + (count($temps_absensi['kmk']['kmk_90_keatas']) * 1.5) + (count($temps_absensi['cpk']['cpk_30']) * 0.5) + (count($temps_absensi['cpk']['cpk_60'])) + (count($temps_absensi['cpk']['cpk_90']) * 1.25) + (count($temps_absensi['cpk']['cpk_90_keatas']) * 1.5);
 
          $res_jml_alpa = $jumlah_alpa * 3;
@@ -235,7 +226,6 @@ class laporanRekapitulasiabsenController extends Controller
 
         $result['jml_hari_kerja'] = count($rekapAbsen);
         $result['kehadiran'] = count($jml_kehadiran);
-        // $result['persentase_pemotongan'] = round($persentase_pemotongan_tunjangan, 2);
         $result['tanpa_keterangan'] = $jumlah_alpa;
         $result['pegawai'] = $pegawai;
         $result['data_absen'] = $rekapAbsen;
@@ -299,7 +289,6 @@ class laporanRekapitulasiabsenController extends Controller
 
         $endDate > date('Y-m-d') ? $endDate_if = strtotime(date('Y-m-d')) : $endDate_if = $endTime;
 
-
         // return $hariLibur;
         for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
             if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
@@ -330,10 +319,13 @@ class laporanRekapitulasiabsenController extends Controller
                 $keterangan = '';
                 if ($v->jenis == 'checkin') {
                     $jml_kehadiran[$v->tanggal_absen] = $v->jenis;
-                     if (in_array($v->tanggal_absen, $monday)){
-                        if ($v->status !== 'apel' && $v->status !== 'dinas luar' && $v->status !== 'cuti' && $v->status !== 'izin') {
-                            $jumlah_tidak_apel += 1;
-                        }
+
+                    if (in_array($v->tanggal_absen, $monday)){
+                        if (!in_array($v->tanggal_absen, $this->getDateRange())) {
+                            if ($v->status !== 'apel' && $v->status !== 'dinas luar' && $v->status !== 'cuti' && $v->status !== 'izin') {
+                                $jumlah_tidak_apel += 1;
+                            }
+                        }                        
                     }
 
                  $selisih_waktu = $this->konvertWaktu('checkin', $v->waktu_absen);
@@ -507,8 +499,6 @@ class laporanRekapitulasiabsenController extends Controller
         }
 
         if ($diff > 0) {
-            // $jam = floor($diff/3600);
-            // $selisih_waktu = $diff%3600;
             $menit = floor($diff / 60);
         } else {
             $diff = 0;
@@ -533,8 +523,6 @@ class laporanRekapitulasiabsenController extends Controller
                 $harikerja['weekend'][] = date('Y-m-d', $i);
             }
         }
-
-        // $jumlah_hari = count($harikerja);
 
         return $harikerja;
     }
@@ -583,7 +571,7 @@ class laporanRekapitulasiabsenController extends Controller
             }
         }
          for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
-            if (in_array(date('Y-m-d', $i), $hariLibur) !== 1) {
+            if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
                 $getDatatanggal[]['date'] = date('Y-m-d', $i);
             }
         }
