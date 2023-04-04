@@ -314,7 +314,7 @@ class dashboardController extends Controller
 			];
 
 			Redis::set('pegawai_dashboard_'.Auth::user()->id_pegawai, json_encode($result));
-            Redis::expire('pegawai_dashboard_'.Auth::user()->id_pegawai, 1800);
+            Redis::expire('pegawai_dashboard_'.Auth::user()->id_pegawai, 30);
 		}
 
 		return $result;
