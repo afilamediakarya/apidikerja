@@ -59,13 +59,22 @@ class aktivitasController extends Controller
     }
 
     public function listByReview(){
-        $data = aktivitas::select('id','id_skp','tanggal','nama_aktivitas','hasil','kesesuaian')->with('skp')->where('id_pegawai', request('pegawai'))->whereMonth('tanggal',request('bulan'))->whereYear('tanggal',request('tahun'))->latest()->get();
+
+        $jabatan =  DB::table('tb_jabatan')
+        ->select('target_waktu')
+        ->where('id_pegawai',Auth::user()->id_pegawai)
+        ->first();
+
+        $data = aktivitas::select('id','id_skp','tanggal','nama_aktivitas','hasil','kesesuaian','created_at','waktu')->where('id_pegawai', request('pegawai'))->whereMonth('tanggal',request('bulan'))->whereYear('tanggal',request('tahun'))->orderBy('tanggal')->get();
 
         if ($data) {
             return response()->json([
                 'message' => 'Success',
                 'status' => true,
-                'data' => $data
+                'data' => [
+                    'waktu' => $jabatan->target_waktu,
+                    'kinerja' => $data
+                ]
             ]);
         } else {
             return response()->json([
@@ -447,11 +456,15 @@ class aktivitasController extends Controller
 
     public function review_aktivitas_post(Request $request){
         
-        foreach ($request->id_aktivitas as $key => $value) {
-            $data = Aktivitas::where('id',$value)->first();
-            $data->kesesuaian = $request->kesesuaian[$key];
-            $data->save();
-        }
+        // foreach ($request->id_aktivitas as $key => $value) {
+        //     $data = Aktivitas::where('id',$value)->first();
+        //     $data->kesesuaian = $request->kesesuaian[$key];
+        //     $data->save();
+        // }
+
+        $data = Aktivitas::where('id', $request->id_aktivitas)->first();
+        $data->kesesuaian = $request->kesesuaian;
+        $data->save();
 
         if ($data) {
             return response()->json([
