@@ -110,7 +110,6 @@ class dashboardController extends Controller
 				$getJabatanAtasan = DB::table('tb_jabatan')->where('id', $getJabatanPegawai->parent_id)->first();
 				$getJabatanByCurrentParent = jabatan::where('parent_id', $getJabatanPegawai->id)->get();
 			}
-
 			// INFO PEGAWAI
 			$info_pegawai = [];
 			$get_pegawai = pegawai::join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
@@ -131,15 +130,15 @@ class dashboardController extends Controller
 			// INFO PENILAI
 			$info_penilai = [];
 			if (isset($getJabatanAtasan)) {
-
+				// return $getJabatanAtasan->id_pegawai;
 				$get_penilai = pegawai::where('id', $getJabatanAtasan->id_pegawai)->first();
 
 				$info_penilai = [
-					'nama' => $get_penilai['nama'],
-					'nip' => $get_penilai['nip'],
-					'pangkat' => $get_penilai['golongan'],
+					'nama' => isset($get_penilai) ? $get_penilai['nama'] : '-',
+					'nip' => isset($get_penilai) ? $get_penilai['nip'] : '-',
+					'pangkat' => isset($get_penilai) ? $get_penilai['golongan'] : '-',
 					'jabatan' => $getJabatanAtasan->nama_jabatan,
-					'Instansi' => $get_penilai['satuan_kerja']['nama_satuan_kerja']
+					'Instansi' => isset($get_penilai) ? $get_penilai['satuan_kerja']['nama_satuan_kerja'] : '-'
 				];
 			}
 

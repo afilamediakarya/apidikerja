@@ -602,6 +602,8 @@ class laporanController extends Controller
         $bulan = request('bulan');
 
         $current_pegawai =  $this->jabatanByPegawai(Auth::user()->id_pegawai,'pegawai');
+        
+        // return $current_pegawai;
         $atasan = $this->jabatanByPegawai($current_pegawai->parent_id,'atasan');
 
         $pegawai_dinilai = [
@@ -625,10 +627,11 @@ class laporanController extends Controller
         // $data = skp::where('id_jabatan',$current_pegawai->id)->get();
 
         $data = skp::query()
-                ->select('id','id_satuan_kerja','rencana_kerja','tahun')
-                ->with(['aktivitas'=> function($query) use ($bulan) {
-                    $query->select('id','nama_aktivitas','id_skp','satuan','tanggal','created_at','keterangan',DB::raw('sum(hasil) as hasil'),DB::raw('sum(waktu) as waktu'));
+                ->select('id','id_satuan_kerja','rencana_kerja','id_jabatan','tahun')
+                ->with(['aktivitas'=> function($query) use ($bulan,$current_pegawai) {
+                    $query->select('id','nama_aktivitas','id_skp','satuan','tanggal','id_pegawai','created_at','keterangan',DB::raw('sum(hasil) as hasil'),DB::raw('sum(waktu) as waktu'));
                     $query->whereMonth('tanggal',$bulan);
+                    // $query->where('id_pegawai',$current_pegawai->id_pegawai);
                     $query->groupBy('id_skp','tanggal','nama_aktivitas');
                     $query->orderBy('tanggal','ASC');
                 }])
