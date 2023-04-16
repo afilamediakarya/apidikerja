@@ -722,7 +722,7 @@ class laporanController extends Controller
                 ->get();
 
         foreach ($pegawai as $key => $value) {
-            $aktivitas = DB::table('tb_aktivitas')->select('id','id_pegawai','hasil',DB::raw("SUM(waktu) as count"))->whereMonth('tanggal',$bulan)->where('id_pegawai',$value->id)->whereNotNull('id_pegawai')->get();           
+            $aktivitas = DB::table('tb_aktivitas')->select('id','id_pegawai','hasil',DB::raw("SUM(waktu) as count"))->whereMonth('tanggal',$bulan)->where('id_pegawai',$value->id)->where('kesesuain','1')->whereNotNull('id_pegawai')->get();           
 
             
             if ($aktivitas[0]->count !== null) {
