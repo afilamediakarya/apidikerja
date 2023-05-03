@@ -92,7 +92,7 @@ class laporanRekapitulasiabsenController extends Controller
         $result = [];
         $rekapAbsen = [];
 
-        $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', $pegawai_)->first();
+        $pegawai = DB::table('tb_pegawai')->select('nama', 'nip', 'id_satuan_kerja')->where('id', $pegawai_)->first();
     
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];

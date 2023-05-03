@@ -23,27 +23,8 @@ class laporanRekapitulasiTppController extends Controller
         $endDate =  date('Y-m-t', strtotime($currentDate));
 
         $getDatatanggal = [];
-        // tes
-
         $startTime = strtotime($startDate);
         $endTime = strtotime($endDate);
-
-        // $jmlHariKerja = (new laporanRekapitulasiabsenController)->jmlHariKerja($startDate, $endDate);
-
-        // $range = [];
-        // if ($endDate <= date('Y-m-d')) {
-        //     $range = (new laporanRekapitulasiabsenController)->jmlHariKerja($startDate, $endDate);
-        // } else {
-        //     $range = (new laporanRekapitulasiabsenController)->jmlHariKerja($startDate, date('Y-m-d'));
-        // }
-        // $hariLibur = (new laporanRekapitulasiabsenController)->cekHariLibur($jmlHariKerja);
-
-        // for ($i = $startTime; $i <= $endTime; $i = $i + 86400) {
-        //     if (in_array(date('Y-m-d', $i), $hariLibur) != 1) {
-        //         $getDatatanggal[]['date'] = date('Y-m-d', $i);
-        //     }
-        // }
-
 
         $result = [];
 
@@ -68,7 +49,7 @@ class laporanRekapitulasiTppController extends Controller
                 ->orderBy('tb_jabatan.kelas_jabatan', 'desc')
                 ->get();
         } else {
-            $pegawai = pegawai::where('id', Auth::user()->id_pegawai)->first();
+            $pegawai = DB::table('tb_pegawai')->select('id_satuan_kerja')->where('id', Auth::user()->id_pegawai)->first();
 
             $pegawaiBySatuanKerja = DB::table('tb_pegawai')->select('tb_pegawai.id', 'tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.golongan', 'tb_pegawai.jenis_jabatan', 'tb_jabatan.nama_jabatan', 'tb_jabatan.nilai_jabatan','tb_jabatan.pembayaran_tpp', 'tb_jabatan.id_jenis_jabatan', 'tb_jenis_jabatan.level','tb_jabatan.target_waktu','tb_jabatan.kelas_jabatan')
                 ->join('tb_jabatan', 'tb_pegawai.id', '=', 'tb_jabatan.id_pegawai')
@@ -86,8 +67,15 @@ class laporanRekapitulasiTppController extends Controller
             $jabatanByPegawai = DB::table('tb_jabatan')->where('id_pegawai', $value->id)->first();
 
 
-            $get_kinerja = aktivitas::query()
-                           ->select(DB::raw("SUM(waktu) as count"))
+            // $get_kinerja = aktivitas::query()
+            //                ->select(DB::raw("SUM(waktu) as count"))
+            //                ->where('id_pegawai',$value->id)
+            //                ->where('kesesuaian','1')
+            //                ->whereMonth('tanggal',$bulan)
+            //                ->first();
+
+            $get_kinerja = DB::table('tb_aktivitas')
+                            ->select(DB::raw("SUM(waktu) as count"))
                            ->where('id_pegawai',$value->id)
                            ->where('kesesuaian','1')
                            ->whereMonth('tanggal',$bulan)
