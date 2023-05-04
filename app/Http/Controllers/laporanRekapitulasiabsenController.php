@@ -92,7 +92,7 @@ class laporanRekapitulasiabsenController extends Controller
         $result = [];
         $rekapAbsen = [];
 
-        $pegawai = DB::table('tb_pegawai')->select('nama', 'nip', 'id_satuan_kerja')->where('id', $pegawai_)->first();
+        $pegawai = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.id_satuan_kerja','tb_satuan_kerja.nama_satuan_kerja')->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')->where('tb_pegawai.id', $pegawai_)->first();
     
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
@@ -311,7 +311,8 @@ class laporanRekapitulasiabsenController extends Controller
         $rekapAbsen = [];
         $tes = [];
         // return $pegawai;
-        $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', $pegawai_)->first();
+        // $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', $pegawai_)->first();
+        $pegawai = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.id_satuan_kerja','tb_satuan_kerja.nama_satuan_kerja')->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')->where('tb_pegawai.id', $pegawai_)->first();
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
             $getAbsen = DB::table('tb_absen')->where('id_pegawai', $pegawai_)->where('validation', 1)->where('tanggal_absen', $value['date'])->groupBy('tanggal_absen','jenis')->get();
