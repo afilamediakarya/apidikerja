@@ -60,9 +60,15 @@ class aktivitasController extends Controller
 
     public function listByReview(){
 
+        $pegawai = request('pegawai');
+
+        if (!$pegawai) {
+            $pegawai = Auth::user()->id_pegawai;    
+        }
+
         $jabatan =  DB::table('tb_jabatan')
-        ->select('target_waktu')
-        ->where('id_pegawai',Auth::user()->id_pegawai)
+        ->select('target_waktu','id_pegawai')
+        ->where('id_pegawai',$pegawai)
         ->first();
 
         $data = aktivitas::select('id','id_skp','tanggal','nama_aktivitas','hasil','kesesuaian','created_at','waktu')->where('id_pegawai', request('pegawai'))->whereMonth('tanggal',request('bulan'))->whereYear('tanggal',request('tahun'))->orderBy('tanggal')->get();
