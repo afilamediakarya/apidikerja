@@ -626,6 +626,8 @@ class laporanController extends Controller
 
         // $data = skp::where('id_jabatan',$current_pegawai->id)->get();
 
+        return $current_pegawai->id;
+
         $data = skp::query()
                 ->select('id','id_satuan_kerja','rencana_kerja','id_jabatan','tahun')
                 ->with(['aktivitas'=> function($query) use ($bulan,$current_pegawai) {
