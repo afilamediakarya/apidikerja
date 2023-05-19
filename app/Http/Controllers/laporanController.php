@@ -603,7 +603,7 @@ class laporanController extends Controller
 
         $current_pegawai =  $this->jabatanByPegawai(Auth::user()->id_pegawai,'pegawai');
         
-        // return $current_pegawai;
+        dd($current_pegawai);
         $atasan = $this->jabatanByPegawai($current_pegawai->parent_id,'atasan');
 
         $pegawai_dinilai = [
