@@ -603,7 +603,7 @@ class laporanController extends Controller
 
         $current_pegawai =  $this->jabatanByPegawai(Auth::user()->id_pegawai,'pegawai');
         
-        dd($current_pegawai);
+        // return $current_pegawai;
         $atasan = $this->jabatanByPegawai($current_pegawai->parent_id,'atasan');
 
         $pegawai_dinilai = [
@@ -625,8 +625,6 @@ class laporanController extends Controller
 
 
         // $data = skp::where('id_jabatan',$current_pegawai->id)->get();
-
-        return $current_pegawai->id;
 
         $data = skp::query()
                 ->select('id','id_satuan_kerja','rencana_kerja','id_jabatan','tahun')
