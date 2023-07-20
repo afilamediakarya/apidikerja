@@ -181,6 +181,17 @@ class aktivitasController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
+         if (DB::table('tb_libur')->where('start_end', '<=', $request->tanggal)
+                ->where('end_date', '>=', $request->tanggal)
+                ->exists()) {
+                return response()->json([
+                    'error' => [
+                        'title' =>'Aktivitas tidak dapat ditambahkan pada hari libur',
+                        'text' => 'anda tidak bisa menambah aktivitas'
+                    ]
+                ], 422);
+        }
+
         $waktu = 0;
         $jumlah_kinerja = $this->checkMenitKinerja($request->tanggal)->getData();
         $ax = $request->waktu + $jumlah_kinerja->data->count;
@@ -201,6 +212,33 @@ class aktivitasController extends Controller
         }else{
             $waktu = $request->waktu;
         }
+
+        // $jumlah_kinerja = $this->checkMenitKinerja($request->tanggal)->getData();
+        // $total_time_recorded = $jumlah_kinerja->data->count;
+
+        // // Get the requested time from the request
+        // $requested_time = $request->waktu;
+
+        // // Calculate the remaining available time in minutes (420 minutes is the maximum)
+        // $remaining_time = 420 - $total_time_recorded;
+
+        // // Calculate the total time considering the requested time and remaining available time
+        // $total_time = $total_time_recorded + $requested_time;
+
+        // if ($total_time > 420) {
+        //     // If the total time exceeds the available time, calculate the exceeded time
+        //     $exceeded_time = $total_time - 420;
+
+        //     return response()->json([
+        //         'error' => [
+        //             'title' => 'Jumlah waktu sudah mencapai batas maksimum',
+        //             'text' => 'Anda tidak bisa menambah aktivitas lebih dari ' . $remaining_time . ' menit'
+        //         ]
+        //     ], 422);
+        // } else {
+        //     // If the total time does not exceed the available time, the requested time is valid
+        //     $waktu = $requested_time;
+        // }
 
         $pegawai_val = Auth::user()->id_pegawai;
         if (isset($request->id_pegawai)) {
@@ -291,7 +329,7 @@ class aktivitasController extends Controller
         $data->nama_aktivitas = $request->nama_aktivitas;
         $data->keterangan = $request->keterangan;
         $data->satuan = $request->satuan;
-            $data->waktu_awal = '12:02:00';
+        $data->waktu_awal = '12:02:00';
         $data->waktu_akhir = '12:02:00';                
         $data->tanggal = $request->tanggal;
         $data->tahun = date('Y');

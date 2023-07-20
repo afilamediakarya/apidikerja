@@ -631,7 +631,6 @@ class laporanController extends Controller
                 ->with(['aktivitas'=> function($query) use ($bulan,$current_pegawai) {
                     $query->select('id','nama_aktivitas','id_skp','satuan','tanggal','id_pegawai','created_at','keterangan',DB::raw('sum(hasil) as hasil'),DB::raw('sum(waktu) as waktu'));
                     $query->whereMonth('tanggal',$bulan);
-                    // $query->where('id_pegawai',$current_pegawai->id_pegawai);
                     $query->groupBy('id_skp','tanggal','nama_aktivitas');
                     $query->orderBy('tanggal','ASC');
                 }])

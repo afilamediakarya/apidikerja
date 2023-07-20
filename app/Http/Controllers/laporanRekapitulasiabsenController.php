@@ -14,7 +14,6 @@ class laporanRekapitulasiabsenController extends Controller
 
     public function cekHariLibur($params)
     {
-        // return $params;
         $temps = [];
         $libur = DB::table('tb_libur')->latest()->get();
         foreach ($libur as $key => $value) {
@@ -22,13 +21,11 @@ class laporanRekapitulasiabsenController extends Controller
                 $temps[] = date('Y-m-d', $i);
             }
         }
-
         if (isset($params['weekend'])) {
             for ($i = 0; $i < count($params['weekend']); $i++) {
                 $temps[] = $params['weekend'][$i];
             }
         }
-
         return $temps;
     }
 
@@ -310,8 +307,6 @@ class laporanRekapitulasiabsenController extends Controller
         $result = [];
         $rekapAbsen = [];
         $tes = [];
-        // return $pegawai;
-        // $pegawai = pegawai::select('nama', 'nip', 'id_satuan_kerja')->where('id', $pegawai_)->first();
         $pegawai = DB::table('tb_pegawai')->select('tb_pegawai.nama', 'tb_pegawai.nip', 'tb_pegawai.id_satuan_kerja','tb_satuan_kerja.nama_satuan_kerja')->join('tb_satuan_kerja','tb_pegawai.id_satuan_kerja','=','tb_satuan_kerja.id')->where('tb_pegawai.id', $pegawai_)->first();
         foreach ($getDatatanggal as $key => $value) {
             $dataAbsen = [];
@@ -624,9 +619,6 @@ class laporanRekapitulasiabsenController extends Controller
                 ];
             }
         }
-   
-        
-
         return $result = [
             'satuan_kerja' => $satuan_kerja_,
             'hari_kerja' => count($getDatatanggal),
